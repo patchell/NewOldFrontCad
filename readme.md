@@ -1,5 +1,10 @@
 Move along folks, nothing to see here, move along.
 
+August 24, 2025
+
+Made a few changes.  I wanted to be able to disable object fills.
+That really turned out to be one deep rabit hole. 
+
 July 28, 2025
 Fixed a few more bugs.  Plenty more from where those came from.
 
