@@ -1,0 +1,162 @@
+CParser::Point(1000,1000)
+CParser::Point(5000,5000)
+CParser::Point(1125,2125)
+CParser::Point(4875,3000)
+CParser::Point(125,125)
+CParser::Point(4000,4844)
+CParser::Point(2000,4844)
+CParser::Point(2000,1156)
+CParser::Point(4000,1156)
+CParser::Point(1000,5000)
+CParser::Point(1000,5125)
+CParser::Point(1000,5875)
+CParser::Point(1099,5935)
+Text Rect:p1=1099,5935 p2=1554,6133
+CParser::Point(2000,5125)
+CParser::Point(2000,5875)
+CParser::Point(2099,5935)
+Text Rect:p1=2099,5935 p2=2554,6133
+CParser::Point(4000,5125)
+CParser::Point(4000,6000)
+CParser::Point(4099,6060)
+Text Rect:p1=4099,6060 p2=4554,6258
+CParser::Point(5000,5125)
+CParser::Point(5000,6000)
+CParser::Point(5099,6060)
+Text Rect:p1=5099,6060 p2=5554,6258
+CParser::Point(5125,5000)
+CParser::Point(5875,5000)
+CParser::Point(5935,4901)
+Text Rect:p1=5935,4901 p2=6390,5099
+CParser::Point(5125,1000)
+CParser::Point(5875,1000)
+CParser::Point(5935,901)
+Text Rect:p1=5935,901 p2=6390,1099
+CParser::Point(5125,4844)
+CParser::Point(6750,4844)
+CParser::Point(6810,4745)
+Text Rect:p1=6810,4745 p2=7265,4943
+CParser::Point(5125,1156)
+CParser::Point(6375,1156)
+CParser::Point(6435,1057)
+Text Rect:p1=6435,1057 p2=6890,1255
+CParser::Point(2250,750)
+Text Rect:p1=2250,750 p2=3272,925
+CParser::Point(4500,5125)
+CParser::Point(4500,5875)
+CParser::Point(4599,5935)
+Text Rect:p1=4599,5935 p2=5054,6133
+CParser::Point(5250,4000)
+CParser::Point(6500,4000)
+CParser::Point(6560,3901)
+Text Rect:p1=6560,3901 p2=7015,4099
+CParser::Point(5250,3615)
+CParser::Point(6250,3615)
+CParser::Point(6310,3516)
+Text Rect:p1=6310,3516 p2=6765,3714
+CParser::Point(1750,5250)
+CParser::Point(1750,6000)
+CParser::Point(1849,6060)
+Text Rect:p1=1849,6060 p2=2304,6258
+CParser::Point(2600,5000)
+CParser::Point(2600,6250)
+CParser::Point(2699,6310)
+Text Rect:p1=2699,6310 p2=3154,6508
+CParser::Point(3750,5125)
+CParser::Point(3750,5875)
+CParser::Point(3849,5935)
+Text Rect:p1=3849,5935 p2=4304,6133
+CParser::Point(4500,2750)
+CParser::Point(3500,2750)
+CParser::Point(2500,2750)
+CParser::Point(1500,2750)
+CParser::Point(1500,2375)
+CParser::Point(2500,2375)
+CParser::Point(3500,2375)
+CParser::Point(4500,2375)
+CParser::Point(1125,3125)
+CParser::Point(4875,4375)
+CParser::Point(125,125)
+CParser::Point(1750,3615)
+CParser::Point(2600,3615)
+CParser::Point(3500,4000)
+CParser::Point(4000,4000)
+CParser::Point(4500,4000)
+CParser::Point(2500,4125)
+CParser::Point(2750,4125)
+CParser::Point(3750,3375)
+CParser::Point(4250,3375)
+CParser::Point(3375,4250)
+CParser::Point(3625,4250)
+CParser::Point(3875,4250)
+CParser::Point(4125,4250)
+CParser::Point(4375,4250)
+CParser::Point(4625,4250)
+CParser::Point(3750,3250)
+Text Rect:p1=3750,3250 p2=3781,3272
+CParser::Point(4305,4170)
+Text Rect:p1=4305,4170 p2=4679,4317
+CParser::Point(3815,4165)
+Text Rect:p1=3815,4165 p2=4165,4312
+CParser::Point(3320,4170)
+Text Rect:p1=3320,4170 p2=3670,4317
+CParser::Point(3820,3260)
+Text Rect:p1=3820,3260 p2=4164,3485
+CParser::Point(2460,4020)
+Text Rect:p1=2460,4020 p2=2805,4245
+CParser::Point(4500,1750)
+CParser::Point(3500,1750)
+CParser::Point(2500,1750)
+CParser::Point(1500,1750)
+CParser::Point(2875,2500)
+CParser::Point(3125,2500)
+CParser::Point(2390,1490)
+CParser::Point(3640,1490)
+CParser::Point(2420,1400)
+Text Rect:p1=2420,1400 p2=3687,1575
+CParser::Point(2785,2420)
+Text Rect:p1=2785,2420 p2=3219,2595
+CParser::Point(3975,4440)
+Text Rect:p1=3975,4440 p2=4924,4740
+CParser::Point(1100,1035)
+Text Rect:p1=1100,1035 p2=1576,1335
+CParser::Point(4825,3875)
+CParser::Point(1175,3875)
+CParser::Point(1200,2375)
+CParser::Point(4800,2375)
+CParser::Point(1625,4125)
+CParser::Point(1875,4125)
+CParser::Point(1680,4015)
+Text Rect:p1=1680,4015 p2=1843,4240
+CParser::Point(1175,5250)
+CParser::Point(1175,6500)
+CParser::Point(1274,6560)
+Text Rect:p1=1274,6560 p2=1729,6758
+CParser::Point(1200,1000)
+CParser::Point(1200,500)
+CParser::Point(1299,-15)
+Text Rect:p1=1299,-15 p2=1754,183
+CParser::Point(4800,1000)
+CParser::Point(4800,750)
+CParser::Point(4899,235)
+Text Rect:p1=4899,235 p2=5354,433
+CParser::Point(4825,5250)
+CParser::Point(4825,7000)
+CParser::Point(4924,7060)
+Text Rect:p1=4924,7060 p2=5379,7258
+CParser::Point(5000,3875)
+CParser::Point(6750,3875)
+CParser::Point(6810,3776)
+Text Rect:p1=6810,3776 p2=7265,3974
+CParser::Point(5250,2375)
+CParser::Point(6250,2375)
+CParser::Point(6310,2276)
+Text Rect:p1=6310,2276 p2=6765,2474
+CParser::Point(5250,2750)
+CParser::Point(6250,2750)
+CParser::Point(6310,2651)
+Text Rect:p1=6310,2651 p2=6765,2849
+CParser::Point(5250,1750)
+CParser::Point(6250,1750)
+CParser::Point(6310,1651)
+Text Rect:p1=6310,1651 p2=6765,1849
