@@ -22,9 +22,8 @@ class CCadLine : public CCadObject
 	inline static int m_RenderEnable = 1;
 	int m_OutLineWidth;
 	COLORREF m_LineColor;
-	CPen *m_pPenLine;
+	CCadPolygon* m_Poly;
 public:
-	CCadPolygon * m_Poly;
 	CCadLine();
 	CCadLine(CCadLine &line);
 	virtual ~CCadLine();

@@ -19,7 +19,6 @@ CCadLine::CCadLine():CCadObject(OBJECT_TYPE_LINE)
 {
 	m_OutLineWidth = 1;
 	m_LineColor = RGB(0,0,0);	//black line
-	m_pPenLine = 0;
 	m_Poly = 0;
 }
 
@@ -27,7 +26,6 @@ CCadLine::CCadLine(CCadLine &line):CCadObject(OBJECT_TYPE_LINE)
 {
 	m_OutLineWidth = 1;
 	m_LineColor = line.m_LineColor;	//black line
-	m_pPenLine = 0;
 	m_Poly = 0;
 	SetP1(line.GetP1());
 	SetP2(line.GetP2());
@@ -35,24 +33,24 @@ CCadLine::CCadLine(CCadLine &line):CCadObject(OBJECT_TYPE_LINE)
 
 CCadLine::~CCadLine()
 {
-	if(m_pPenLine) delete m_pPenLine;
-	if(m_Poly) delete m_Poly;
 }
 
 void CCadLine::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 {
-	///---------------------------------------------
-	///	Draw
-	///		This function draws the object onto the
-	///	specified device context.
-	///
-	/// parameters:
-	///		pDC......pointer to the device context
-	///		mode.....mode to use when drawing
-	///		Offset...Offset to add to points
-	///		Scale....Sets Units to Pixels ratio
-	///---------------------------------------------
-	CPen *pOld;
+	//---------------------------------------------
+	//	Draw
+	//		This function draws the object onto the
+	//	specified device context.
+	//
+	// parameters:
+	//		pDC......pointer to the device context
+	//		mode.....mode to use when drawing
+	//		Offset...Offset to add to points
+	//		Scale....Sets Units to Pixels ratio
+	//---------------------------------------------
+	CPen *pOld, penLine;
+	LOGBRUSH lbMode;
+	CBrush brushFill, * pOldB;
 	CPoint P1,P2,Diff;
 	int Lw;
 	CRect rect;
@@ -63,68 +61,66 @@ void CCadLine::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 		P2 = (Scale * GetP2()) + O;
 		Lw = int(Scale.m_ScaleX * m_OutLineWidth);
 		if (Lw < 1) Lw = 1;
+		brushFill.CreateSolidBrush(RGB(0,0,255));
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
-			if (GetLastMode() != OBJECT_MODE_FINAL || GetDirty())
+			if(CCadObject::AreShapeFillsDisabled())
+				lbMode.lbStyle = BS_HOLLOW;
+			else
 			{
-				if (m_pPenLine) delete m_pPenLine;
-				m_pPenLine = new CPen(PS_SOLID, Lw, m_LineColor);
-				SetLastMode(mode);
-				SetDirty(0);
+				lbMode.lbStyle = BS_SOLID;
+				lbMode.lbColor = m_LineColor;
+				lbMode.lbHatch = 0;
 			}
+			penLine.CreatePen(PS_GEOMETRIC | PS_ENDCAP_ROUND | PS_JOIN_ROUND, Lw, &lbMode);
 			break;
 		case OBJECT_MODE_SELECTED:
-			if (GetLastMode() != OBJECT_MODE_SELECTED || GetDirty())
+			if (CCadObject::AreShapeFillsDisabled())
+				lbMode.lbStyle = BS_HOLLOW;
+			else
 			{
-				if (m_pPenLine) delete m_pPenLine;
-				m_pPenLine = new CPen(PS_SOLID, 1, m_LineColor);
-				SetLastMode(mode);
-				SetDirty(0);
+				lbMode.lbStyle = BS_SOLID;
+				lbMode.lbColor = RGB(255,0,0);
+				lbMode.lbHatch = 0;
 			}
+			penLine.CreatePen(PS_GEOMETRIC | PS_ENDCAP_ROUND | PS_JOIN_ROUND, Lw, &lbMode);
 			break;
 		case OBJECT_MODE_SKETCH:
-			if (GetLastMode() != OBJECT_MODE_SELECTED)
-			{
-				if (m_pPenLine) delete m_pPenLine;
-				m_pPenLine = new CPen(PS_DOT, 1, m_LineColor);
-				SetLastMode(mode);
-			}
-			break;
-		case OBJECT_MODE_ERASE:
+			penLine.CreatePen(PS_DOT , 1, RGB(0, 0, 255));
 			break;
 		}
+		pOld = pDC->SelectObject(&penLine);
+		pOldB = pDC->SelectObject(&brushFill);
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
-			pOld = pDC->SelectObject(m_pPenLine);
 			pDC->MoveTo(P1);
 			pDC->LineTo(P2);
-			pDC->SelectObject(pOld);
 			break;
 		case OBJECT_MODE_SELECTED:
-			pOld = pDC->SelectObject(m_pPenLine);
 			Diff = CPoint(4, 4);
-
 			rect.SetRect(P1 + (-Diff), P1 + Diff);
 			pDC->Rectangle(&rect);
 			rect.SetRect(P2 + (-Diff), P2 + Diff);
 			pDC->Rectangle(&rect);
-			pDC->SelectObject(m_pPenLine);
 			pDC->MoveTo(P1);
 			pDC->LineTo(P2);
-			pDC->SelectObject(pOld);
 			break;
 		case OBJECT_MODE_SKETCH:
 			Diff = CPoint(4, 4);
-			pOld = pDC->SelectObject(m_pPenLine);
+			rect.SetRect(P1 + (-Diff), P1 + Diff);
+			pDC->Rectangle(&rect);
+			rect.SetRect(P2 + (-Diff), P2 + Diff);
+			pDC->Rectangle(&rect);
 			pDC->MoveTo(P1);
 			pDC->LineTo(P2);
-			pDC->SelectObject(pOld);
 			break;
 		case OBJECT_MODE_ERASE:
 			break;
 		}
+		pDC->SelectObject(pOld);
+		pDC->SelectObject(pOldB);
 	}
 }
 
