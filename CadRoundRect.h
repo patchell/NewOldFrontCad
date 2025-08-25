@@ -27,9 +27,8 @@ class CCadRoundRect : public CCadObject
 	inline static int m_RenderEnable = 1;
 	COLORREF m_FillColor;
 	COLORREF m_LineColor;
-	int m_OutLineWidth;
+	int m_LineWidth;
 	CPoint m_P3;
-	CPen *m_pPenLine;
 public:
 	CCadRoundRect(CCadRoundRect &r);
 	CCadRoundRect();
@@ -43,16 +42,15 @@ public:
 	virtual void SetVertex(int Vi,CPoint p);
 	virtual int GrabVertex(CPoint p);
 	virtual void AdjustRefernce(CPoint Ref);
-	CBrush * m_pBrush;
 	virtual void Draw(CDC *pDC,int mode=0,CPoint Offset=CPoint(0,0),CScale Scale=CScale(0.1,0.1));
 	virtual int CheckSelected(CPoint p, CSize Offset = CSize(0, 0));
 	//------------------------------
-	COLORREF GetFillColor(void){return m_FillColor;}
-	COLORREF GetLineColor(void){return m_LineColor;}
-	int GetOutLineWidth(void){return m_OutLineWidth;}
+	COLORREF GetFillColor(void)const {return m_FillColor;}
+	COLORREF GetLineColor(void)const {return m_LineColor;}
+	int GetOutLineWidth(void) const {return m_LineWidth;}
 	void SetFillColor(COLORREF nC){m_FillColor = nC;}
 	void SetLineColor(COLORREF nC){m_LineColor = nC;}
-	void SetLineWidth(int nW){m_OutLineWidth = nW;}
+	void SetLineWidth(int nW){m_LineWidth = nW;}
 	void SetArc(CPoint p){m_P3 = p;}
 	CPoint GetArc(void){return m_P3;}
 	CCadRoundRect operator=(CCadRoundRect &v);

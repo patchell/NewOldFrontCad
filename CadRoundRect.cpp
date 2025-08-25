@@ -17,20 +17,16 @@ static char THIS_FILE[]=__FILE__;
 
 CCadRoundRect::CCadRoundRect():CCadObject(OBJECT_TYPE_RNDRECT)
 {
-	m_pPenLine = 0;
-	m_pBrush = 0;
 	m_FillColor = RGB(0,0,0);
 	m_LineColor = RGB(0, 0, 0);
-	m_OutLineWidth = 1;
+	m_LineWidth = 1;
 }
 
 CCadRoundRect::CCadRoundRect(CCadRoundRect &r):CCadObject(OBJECT_TYPE_RNDRECT)
 {
-	m_pPenLine=0;
-	m_pBrush = 0;
 	m_FillColor = r.m_FillColor;
 	m_LineColor = r.m_LineColor;
-	m_OutLineWidth = r.m_OutLineWidth;
+	m_LineWidth = r.m_LineWidth;
 	SetP1(r.GetP1());
 	SetP2(r.GetP2());
 	m_P3 = r.m_P3;
@@ -39,25 +35,23 @@ CCadRoundRect::CCadRoundRect(CCadRoundRect &r):CCadObject(OBJECT_TYPE_RNDRECT)
 
 CCadRoundRect::~CCadRoundRect()
 {
-	if(m_pPenLine) delete m_pPenLine;
-	if(m_pBrush) delete m_pBrush;
 }
 
 void CCadRoundRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 {
-	///---------------------------------------------
-	///	Draw
-	///		This function draws the object onto the
-	///	specified device context.
-	///
-	/// parameters:
-	///		pDC......pointer to the device context
-	///		mode.....mode to use when drawing
-	///		Offset...Offset to add to points
-	///		Scale....Sets Units to Pixels ratio
-	///---------------------------------------------
-	CPen *pOld;
-	CBrush *pOldBr;
+	//---------------------------------------------
+	//	Draw
+	//		This function draws the object onto the
+	//	specified device context.
+	//
+	// parameters:
+	//		pDC......pointer to the device context
+	//		mode.....mode to use when drawing
+	//		Offset...Offset to add to points
+	//		Scale....Sets Units to Pixels ratio
+	//---------------------------------------------
+	CPen *pOld = 0, penLine;
+	CBrush *pOldBr = 0, brushFill;
 	CPoint P1,P2,P3;
 	CRect rect;
 	CSize rectLWcomp;
@@ -68,7 +62,7 @@ void CCadRoundRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 		P1 = Scale * GetP1() + Offset;
 		P2 = Scale * GetP2() + Offset;
 		P3 = Scale * m_P3;
-		Lw = int(m_OutLineWidth * Scale.m_ScaleX);
+		Lw = int(m_LineWidth * Scale.m_ScaleX);
 		if (Lw <= 1 || OBJECT_MODE_SKETCH == mode)
 		{
 			Lw = 1;
@@ -78,52 +72,38 @@ void CCadRoundRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 			rectLWcomp = CSize(Lw / 2, Lw / 2);
 		//	rect.SetRect(P1,P2);
 
-		if ((GetLastMode() != mode) || GetDirty())
-		{
-			if (m_pPenLine) delete m_pPenLine;
-			switch (mode)
-			{
-			case OBJECT_MODE_FINAL:
-				m_pPenLine = new CPen(PS_SOLID, Lw, m_LineColor);
-				break;
-			case OBJECT_MODE_SELECTED:
-				m_pPenLine = new CPen(PS_SOLID, Lw, RGB(200, 50, 50));
-				break;
-			case OBJECT_MODE_SKETCH:
-				m_pPenLine = new CPen(PS_DOT, 1, m_LineColor);
-				break;
-			}
-		}
-		if (m_pBrush == 0)
-			m_pBrush = new CBrush(m_FillColor);
-		else if (GetDirty())
-		{
-			if (m_pBrush) delete m_pBrush;
-			m_pBrush = new CBrush(m_FillColor);
-			SetDirty(0);
-		}
-		SetRect(rect, P1, P2, rectLWcomp);
-
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
-			pOld = pDC->SelectObject(m_pPenLine);
-			pOldBr = pDC->SelectObject(m_pBrush);
+			penLine.CreatePen(PS_SOLID, Lw, m_LineColor);
+			if (CCadObject::AreShapeFillsDisabled())
+				brushFill.CreateStockObject(NULL_BRUSH);
+			else
+				brushFill.CreateSolidBrush(m_FillColor);
+			break;
+		case OBJECT_MODE_SELECTED:
+			penLine.CreatePen(PS_SOLID, Lw, RGB(200, 50, 50));
+			if (CCadObject::AreShapeFillsDisabled())
+				brushFill.CreateStockObject(NULL_BRUSH);
+			else
+				brushFill.CreateSolidBrush(RGB(100, 50, 50));
+			break;
+		case OBJECT_MODE_SKETCH:
+			penLine.CreatePen(PS_DOT, 1, m_LineColor);
+			brushFill.CreateStockObject(NULL_BRUSH);
+			break;
+		}
+		SetRect(rect, P1, P2, rectLWcomp);
+		pOld = pDC->SelectObject(&penLine);	
+		pOldBr = pDC->SelectObject(&brushFill);
+		switch (mode)
+		{
+		case OBJECT_MODE_FINAL:
 			pDC->RoundRect(rect, P3);
-			pDC->SelectObject(pOldBr);
-			pDC->SelectObject(pOld);
 			break;
 		case OBJECT_MODE_SELECTED:
 		{
-			CPen SelPen;
-			CBrush SelBrush;
-			SelPen.CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-			SelBrush.CreateSolidBrush(RGB(255, 0, 0));
-			pOld = pDC->SelectObject(m_pPenLine);
-			pOldBr = pDC->SelectObject(m_pBrush);
 			pDC->RoundRect(rect, P3);
-			pDC->SelectObject(&SelPen);
-			pDC->SelectObject(&SelBrush);
 			CRect rect;
 			CSize p = CSize(4, 4);
 			rect.SetRect(P1 - p, P1 + p);
@@ -136,18 +116,16 @@ void CCadRoundRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 			p3 = P2 - P3;
 			rect.SetRect(p3 - p, p3 + p);
 			pDC->Rectangle(&rect);
-			pDC->SelectObject(pOldBr);
-			pDC->SelectObject(pOld);
 		}
 		break;
 		case OBJECT_MODE_SKETCH:
-			pOld = pDC->SelectObject(m_pPenLine);
 			pDC->RoundRect(rect, P3);
-			pDC->SelectObject(pOld);
 			break;
 		case OBJECT_MODE_ERASE:
 			break;
 		}
+		pDC->SelectObject(pOldBr);
+		pDC->SelectObject(pOld);
 	}
 }
 
@@ -173,20 +151,20 @@ int CCadRoundRect::CheckSelected(CPoint p,CSize O)
 
 CCadRoundRect CCadRoundRect::operator=(CCadRoundRect &v)
 {
-	///----------------------------------------
-	/// operator=
-	///		this function is used when the assing
-	///operator is used to copy this object.
-	///
-	/// parameters:
-	///		v.....reference to object to copy
-	///----------------------------------------
+	//----------------------------------------
+	// operator=
+	//		this function is used when the assing
+	//operator is used to copy this object.
+	//
+	// parameters:
+	//		v.....reference to object to copy
+	//----------------------------------------
 	SetP1(v.GetP1());
 	SetP2(v.GetP2());
 	m_P3 = v.m_P3;
 	m_FillColor = v.m_FillColor;
 	m_LineColor = v.m_LineColor;
-	m_OutLineWidth = v.m_OutLineWidth;
+	m_LineWidth = v.m_LineWidth;
 	return *this;
 }
 
@@ -220,7 +198,7 @@ int CCadRoundRect::Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing,
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
 	LookAHeadToken = pParser->Color(TOKEN_FILL_COLOR, pIN, m_FillColor, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_OutLineWidth, LookAHeadToken);
+	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_LineWidth, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
 	(*ppDrawing)->AddObject(this);
 	return LookAHeadToken;
@@ -252,7 +230,7 @@ void CCadRoundRect::Save(FILE* pO, int Indent)
 		CFileParser::SavePoint(s3, 64, TOKEN_POINT_3, m_P3),
 		CFileParser::SaveColor(s4, 64, m_LineColor, TOKEN_LINE_COLOR),
 		CFileParser::SaveColor(s5, 64, m_FillColor, TOKEN_FILL_COLOR),
-		CFileParser::SaveDecimalValue(s6,64, TOKEN_LINE_WIDTH,m_OutLineWidth)
+		CFileParser::SaveDecimalValue(s6,64, TOKEN_LINE_WIDTH,m_LineWidth)
 	);
 	delete[]s6;
 	delete[]s5;
