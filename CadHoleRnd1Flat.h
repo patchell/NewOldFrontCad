@@ -11,12 +11,18 @@
 
 class CFileParser;
 
-typedef struct{
+struct HoleRnd1FlatAttributes {
 	int m_Width;
 	int m_FlatDist;	///distance from flat to center point
 	COLORREF m_LineColor;
 	int m_Radius;
-} HoleRnd1FlatAttributes;
+	HoleRnd1FlatAttributes() {
+		m_Width = 1;
+		m_LineColor = RGB(0, 0, 0);
+		m_FlatDist = 50;
+		m_Radius = 50;
+	}
+} ;
 
 class CCadHoleRnd1Flat : public CCadObject
 {

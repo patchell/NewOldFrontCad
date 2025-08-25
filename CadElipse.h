@@ -9,11 +9,16 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-typedef struct {
+struct ElipseAttributes {
 	int m_LineWidth;
 	COLORREF m_LineColor;
 	COLORREF m_FillColor;
-}ElipseAttributes;
+	ElipseAttributes() {
+		m_LineWidth = 1;
+		m_LineColor = RGB(0, 0, 0);
+		m_FillColor = RGB(192, 192, 192);
+	}
+};
 
 class CFileParser;
 

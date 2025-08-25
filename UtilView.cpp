@@ -805,10 +805,10 @@ void CUtilView::ShowHideForSelected(int objecttype)
 			this->m_Static_LineColor.ShowWindow(SW_SHOW);
 			this->m_Static_X1.ShowWindow(SW_SHOW);
 			this->m_Static_X2.ShowWindow(SW_SHOW);
-			this->m_Static_X3.ShowWindow(SW_HIDE);
+			this->m_Static_X3.ShowWindow(SW_SHOW);
 			this->m_Static_Y1.ShowWindow(SW_SHOW);
 			this->m_Static_Y2.ShowWindow(SW_SHOW);
-			this->m_Static_Y3.ShowWindow(SW_HIDE);
+			this->m_Static_Y3.ShowWindow(SW_SHOW);
 			this->m_Static_LineWidth.ShowWindow(SW_SHOW);
 			this->m_Static_FillColorText.ShowWindow(SW_SHOW);
 			this->m_Static_LineColorText.ShowWindow(SW_SHOW);
@@ -1178,9 +1178,16 @@ void CUtilView::SetupTextSelected(int objecttype)
 			this->m_Static_X2.SetWindowText("X2");
 			this->m_Static_Y2.SetWindowText("Y2");
 			break;
+		case OBJECT_TYPE_RNDRECT:
+			m_Static_X3.SetWindowTextA("X Radius");
+			m_Static_Y3.SetWindowTextA("Y Radius");	
+			this->m_Static_X1.SetWindowText("X1");
+			this->m_Static_Y1.SetWindowText("Y1");
+			this->m_Static_X2.SetWindowText("X2");
+			this->m_Static_Y2.SetWindowText("Y2");
+			break;
 		case OBJECT_TYPE_RECT:		// SetupTextSelected
 		case OBJECT_TYPE_ELLIPSE:		
-		case OBJECT_TYPE_RNDRECT:	
 			this->m_Static_X1.SetWindowText("X1");
 			this->m_Static_Y1.SetWindowText("Y1");
 			this->m_Static_X2.SetWindowText("X2");

@@ -4,10 +4,14 @@
 #ifndef ORIGINATRIB
 #define ORIGINATRIB
 
-typedef struct {
+struct OriginAttrib {
 	int m_Width;
 	COLORREF m_Color;
-} OriginAttrib;
+	OriginAttrib() {
+		m_Width = 1;
+		m_Color = RGB(0, 0, 0);
+	}
+} ;
 
 #endif
 

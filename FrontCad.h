@@ -26,6 +26,7 @@ class CFrontCadApp : public CWinApp
 	CLibFormView* m_pLibView;
 	CUtilView* m_UtilView;
 	CFrontCadDoc* m_pDoc;
+	FILE* pConsol;
 public:
 	///------------------------------
 	/// Program settings
@@ -72,6 +73,12 @@ public:
 	FILE *m_pLogFile;
 public:
 	FILE* GetLog() { return m_pLogFile; }
+	bool HasConsol() {
+		bool rV = false;
+		if (pConsol)
+			rV = true;
+		return rV;
+	}
 };
 
 extern CFrontCadApp theApp;

@@ -11,13 +11,20 @@
 
 
 
-typedef struct {
+struct RndRectAttb {
 	COLORREF m_FillColor;
 	COLORREF m_LineColor;
 	int m_OutLineWidth;
 	int m_Y3;
 	int m_X3;
-} RndRectAttb;
+	RndRectAttb() {
+		m_FillColor = RGB(0, 0, 0);
+		m_LineColor = RGB(0, 0, 0);
+		m_OutLineWidth = 1;
+		m_Y3 = 10;
+		m_X3 = 10;
+	}
+} ;
 
 class CFileParser;
 

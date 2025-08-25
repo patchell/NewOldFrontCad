@@ -9,12 +9,18 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-typedef struct{
+struct HoleRnd2FlatAttributes {
 	int m_Width;
 	int m_FlatDist;	///distance from flat to center point
 	COLORREF m_LineColor;
 	int m_Radius;
-} HoleRnd2FlatAttributes;
+	HoleRnd2FlatAttributes() {
+		m_Width = 1;
+		m_LineColor = RGB(0, 0, 0);
+		m_FlatDist = 50;
+		m_Radius = 50;
+	}
+} ;
 
 class CFileParser;
 

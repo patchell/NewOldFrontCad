@@ -45,7 +45,7 @@ int ZoomScaleDiv[MAX_ZOOM] = {
 
 
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadView
 
 IMPLEMENT_DYNCREATE(CFrontCadView, CView)
@@ -130,9 +130,12 @@ BEGIN_MESSAGE_MAP(CFrontCadView, CView)
 	ON_COMMAND(ID_BUTTON_PRINT_RECTANGLE, &CFrontCadView::OnButtonPrintRectangle)
 	ON_COMMAND(ID_TOOLBAR_CIRCLE, &CFrontCadView::OnToolbarCircle)
 //	ON_UPDATE_COMMAND_UI(ID_TOOLBAR_CIRCLE, &CFrontCadView::OnUpdateToolbarCircle)
+ON_WM_SYSCHAR()
+ON_WM_SYSKEYDOWN()
+ON_WM_SYSKEYUP()
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadView construction/destruction
 
 CFrontCadView::CFrontCadView()
@@ -166,7 +169,7 @@ CFrontCadView::CFrontCadView()
 	m_DocSize = CSize(24000, 24000);
 	m_pTempCadBitmap = 0;
 	m_MouseState = 0;
-	///Selected Object List
+	//Selected Object List
 	m_pSelObjList = 0;
 	m_pSelObjEnd = 0;
 	m_nSelRegionLock = 0;
@@ -182,21 +185,21 @@ BOOL CFrontCadView::PreCreateWindow(CREATESTRUCT& cs)
 	return CView::PreCreateWindow(cs);
 }
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadView drawing
 
 void CFrontCadView::OnPrint(CDC* pDC, CPrintInfo* pInfo)
 {
-///------------------------------------------
-///	OnPrint
-///		This is the draw function that is
-/// called when the device context is
-/// the printer.
-///
-///	parameters:
-///		pDC....pointer to the device context
-///		pInfo..poointer to printer information
-///------------------------------------------
+//------------------------------------------
+//	OnPrint
+//		This is the draw function that is
+// called when the device context is
+// the printer.
+//
+//	parameters:
+//		pDC....pointer to the device context
+//		pInfo..poointer to printer information
+//------------------------------------------
 	int HPix = pDC->GetDeviceCaps(HORZRES);
 	int VPix = pDC->GetDeviceCaps(VERTRES);
 	int DpiX = pDC->GetDeviceCaps(LOGPIXELSX);
@@ -223,7 +226,7 @@ void CFrontCadView::OnPrint(CDC* pDC, CPrintInfo* pInfo)
 	pDC->FillRect(&rect,&br);
 	//----------------------------------
 	// Make all of the objects dirty
-	///---------------------------------
+	//---------------------------------
 	pDoc->MakeDirty();
 	//----------------------------------
 	// Print the document
@@ -241,17 +244,17 @@ void CFrontCadView::OnPrint(CDC* pDC, CPrintInfo* pInfo)
 
 void CFrontCadView::OnDraw(CDC* pDC)
 {
-	///----------------------------------------
-	/// OnDraw
-	///		This is the function that is called
-	/// when the screen needs to be redrawn.
-	/// To minimize screen flicker, all drawing
-	/// is done to a Memory DC, and then it is
-	/// blt to the screen.
-	///
-	///	parameters:
-	///		pDC....pointer to the device context
-	///----------------------------------------
+	//----------------------------------------
+	// OnDraw
+	//		This is the function that is called
+	// when the screen needs to be redrawn.
+	// To minimize screen flicker, all drawing
+	// is done to a Memory DC, and then it is
+	// blt to the screen.
+	//
+	//	parameters:
+	//		pDC....pointer to the device context
+	//----------------------------------------
 	CDC *pDCm = new CDC;
 	CBitmap bm;
 	CFrontCadDoc* pDoc = GetDocument();
@@ -260,7 +263,7 @@ void CFrontCadView::OnDraw(CDC* pDC)
 	CRect rect;
 	//Set Background Color
 	GetClientRect(&rect);
-	///create a compatable memory device context
+	//create a compatable memory device context
 	bm.CreateBitmap(rect.Width(), rect.Height(), 1, 32, NULL);
 	pDCm->CreateCompatibleDC(pDC);
 	pDCm->SelectObject(&bm);
@@ -398,7 +401,7 @@ void CFrontCadView::OnInitialUpdate()
     OnUpdate(NULL, 0, NULL);
 }
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadView printing
 
 BOOL CFrontCadView::OnPreparePrinting(CPrintInfo* pInfo)
@@ -415,7 +418,7 @@ void CFrontCadView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 {
 }
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadView diagnostics
 
 #ifdef _DEBUG
@@ -436,31 +439,33 @@ CFrontCadDoc* CFrontCadView::GetDocument() // non-debug version is inline
 }
 #endif //_DEBUG
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadView message handlers
 
 BOOL CFrontCadView::OnEraseBkgnd(CDC* pDC)
 {
-	///--------------------------------------
-	///	OnEraseBkgnd
-	///		We override this function so that
-	///	the window is not erased.
-	///--------------------------------------
+	//--------------------------------------
+	//	OnEraseBkgnd
+	//		We override this function so that
+	//	the window is not erased.
+	//--------------------------------------
 	return TRUE;
 }
 
 void CFrontCadView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	///----------------------------------------
-	/// OnKeyDown
-	///		This function is used to intercept
-	/// key presses, looking for  HHotkeys
-	/// that do certain funcrtions
-	///----------------------------------------
-	switch(nChar)	///check the key press
+	//----------------------------------------
+	// OnKeyDown
+	//		This function is used to intercept
+	// key presses, looking for  HHotkeys
+	// that do certain funcrtions
+	//----------------------------------------
+	printf("OnKEYDOWN KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+
+	switch(nChar)	//check the key press
 	{
-		case VK_SHIFT:	///shift key
-			m_SnapOff = 1;	///turn of snapo grid
+	case VK_CONTROL:	//control key
+		m_SnapOff = 1;	//turn of snapo grid
 			break;
 		case VK_DELETE:
 			break;
@@ -472,36 +477,25 @@ void CFrontCadView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			break;
 		case VK_DOWN:
 			break;
-		case VK_CONTROL:	///control key
-			if(GetTopSelection())
-			{
-				CCadObject *pO = GetTopSelection();
-				if(pO->GetType() == OBJECT_TYPE_BITMAP)
-				{
-					///turn off maintain aspect ratio
-					/// when resizing bitmaps
-					((CCadBitmap*)pO)->SetMaintainAspectRatio(0);
-				}
-			}
-			break;
 	}
 	CView::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
 void CFrontCadView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	///--------------------------------------------
-	/// OnKeyUp
-	///		This function intercepts key releases.
-	///--------------------------------------------
+	//--------------------------------------------
+	// OnKeyUp
+	//		This function intercepts key releases.
+	//--------------------------------------------
 	int id;
 
-	switch(nChar)	///check released character
+	printf("OnKEYUP KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+	switch(nChar)	//check released character
 	{
-		case VK_SHIFT:	///shift key
-			m_SnapOff = 0;	///turn snap back on
+		case VK_CONTROL:	//control key
+			m_SnapOff = 0;	//turn snap back on
 			break;
-		case VK_DELETE:	///delete selected objects
+		case VK_DELETE:	//delete selected objects
 			{
 				id = MessageBox("Delete Selected Objects?","DELETE OBJECTS",MB_YESNO);
 				if(id == IDYES)
@@ -518,46 +512,53 @@ void CFrontCadView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 				}
 			}
 			break;
-		case VK_LEFT:	///left arrow, move cursor
+		case VK_LEFT:	//left arrow, move cursor
 			NextSnap(VK_LEFT,m_SnapGrid);
 			SetCursorPos(m_MousePos);
 			Invalidate();
 			break;
-		case VK_RIGHT:	///right arrow, move cursor
+		case VK_RIGHT:	//right arrow, move cursor
 			NextSnap(VK_RIGHT,m_SnapGrid);
 			SetCursorPos(m_MousePos);
 			Invalidate();
 			break;
-		case VK_UP:	///up arrow, move cursor
+		case VK_UP:	//up arrow, move cursor
 			NextSnap(VK_UP,m_SnapGrid);
 			SetCursorPos(m_MousePos);
 			Invalidate();
 			break;
-		case VK_DOWN:	///down arrow,movecursor
+		case VK_DOWN:	//down arrow,movecursor
 			NextSnap(VK_DOWN,m_SnapGrid);
 			SetCursorPos(m_MousePos);
 			Invalidate();
 			break;
-		case 'A':	///A key, draw arc
+		case 'A':	//A key, draw arc
 			OnToolbarArc();
 			break;
-		case 'E':	/// E key, draw Ellipse
+		case 'E':	// E key, draw Ellipse
 			OnToolbarEllipse();
 			break;
-		case 'G':	///G key, toggle grid
+		case 'G':	//G key, toggle grid
 			this->m_GridOn ^= 1;
 			break;
-		case 'L':	///L key, draw line
+		case 'L':	//L key, draw line
 			OnToolbarLine();
 			break;
-		case 'P':	///P key, draw polygon
+		case 'P':	//P key, draw polygon
 			OnToolbarPolywithfill();
 			break;
-		case 'R':	///R key, draw rectangle
+		case 'R':	//R key, draw rectangle
 			OnToolbarRect();
 			break;
-		case 'S':	///S key, toggle Snap Grid
+		case 'S':	//S key, toggle Snap Grid
 			this->m_SnapOff ^= 1;
+			break;
+		case VK_ESCAPE:	//escape key
+			m_Drawmode = DrawMode::SELECT;
+			break;
+		case VK_MENU: //alt key
+			printf("\nOnKEYUP ALT-KEY:%04x Repeat:%d FLAGS:%04x\n\n", nChar, nRepCnt, nFlags);
+			m_SnapOff = 0; //turn off snap grid
 			break;
 	}
 	CView::OnKeyUp(nChar, nRepCnt, nFlags);
@@ -565,25 +566,25 @@ void CFrontCadView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	///-------------------------------------------
-	/// OnLButtonDown
-	///		This function perfroms the functions
-	/// when the mouse button is presses.
-	///
-	///	parameters:
-	///		nFlags.....status flaGs of mouse press
-	///		point......point where mouse was pressed
-	///-------------------------------------------
+	//-------------------------------------------
+	// OnLButtonDown
+	//		This function perfroms the functions
+	// when the mouse button is presses.
+	//
+	//	parameters:
+	//		nFlags.....status flaGs of mouse press
+	//		point......point where mouse was pressed
+	//-------------------------------------------
 	CFrontCadApp *pA = (CFrontCadApp *)AfxGetApp();
 	CFrontCadDoc *pDoc = GetDocument();
 	CUtilView *pUV = this->GetUtilityView();
 
-	/// correct mouse position for scrolling, etc
+	// correct mouse position for scrolling, etc
 	m_MousePos = CorrectMousePosition(point);
-	/// Snap the mouse posiition
+	// Snap the mouse posiition
 	m_SnapPos = Snap(m_MousePos,m_SnapGrid);
 	this->m_MouseState = MOUSESTATE_DOWN;
-	///do actions depending of Drawmode state
+	//do actions depending of Drawmode state
 	switch(m_Drawmode)
 	{
 		case DrawMode::NONE:
@@ -676,7 +677,7 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 					break;
 			}
 			break;
-		case DrawMode::SELECT:///MOUSE DOWN
+		case DrawMode::SELECT://MOUSE DOWN
 			//----------------------------------
 			// Now we are getting complicated.
 			// We do not know, at this junksure
@@ -684,7 +685,7 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 			// object, or wants to maybe drag
 			// something.
 			//----------------------------------
-			if(m_pSelObjList)	///object selected?
+			if(m_pSelObjList)	//object selected?
 			{
 				CCadObject *pOb = m_pSelObjList;
 				m_GrabbedVertex = pOb->GrabVertex(m_SnapPos);
@@ -700,7 +701,7 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 			{
 				case DRAWSTATE_WAITMOUSE_DOWN:
 					{
-						///update rounded rect paramters
+						//update rounded rect paramters
 						pA->m_RndRectAttributes.m_OutLineWidth = pUV->m_Edit_LineThickness.GetValue();
 						pA->m_RndRectAttributes.m_X3 = pUV->m_Edit_X3.GetValue();
 						pA->m_RndRectAttributes.m_Y3 = pUV->m_Edit_Y3.GetValue();
@@ -720,11 +721,11 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 					break;
 			}
 			break;
-		case DrawMode::POLYGON:///MOUSE DOWN
+		case DrawMode::POLYGON://MOUSE DOWN
 			{
 				switch(m_DrawState)
 				{
-					case DRAWSTATE_WAITMOUSE_DOWN:	///This is where we start
+					case DRAWSTATE_WAITMOUSE_DOWN:	//This is where we start
 						{
 							CUtilView *pUV = this->GetUtilityView();
 							pA->m_PolyAttributes.m_Width = pUV->m_Edit_LineThickness.GetValue();;
@@ -980,7 +981,7 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		case DrawMode::GETREF:
 			break;
-		case DrawMode::MOVE:		/// mouse down
+		case DrawMode::MOVE:		// mouse down
 			switch(this->m_DrawState)
 			{
 				case DRAWSTATE_GETREFEREMCE:
@@ -1008,16 +1009,16 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 					break;
 			}
 			break;
-		case DrawMode::COPY:	///mouse button down
+		case DrawMode::COPY:	//mouse button down
 			switch(m_DrawState)
 			{
 				case DRAWSTATE_GETREFEREMCE:
 					{
-						///----------------------------------------------
-						///for copy, leave the objects behind in the
-						///drawing, but make a new copy of the objects
-						///to put into the "clipboard"
-						///----------------------------------------------
+						//----------------------------------------------
+						//for copy, leave the objects behind in the
+						//drawing, but make a new copy of the objects
+						//to put into the "clipboard"
+						//----------------------------------------------
 //						m_RefPoint = m_SnapPos;
 						CCadObject *pObj = this->GetTopSelection();
 						CCadObject *newObj;
@@ -1059,11 +1060,11 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 			{
 				case DRAWSTATE_GETREFEREMCE:
 					{
-						///----------------------------------------------
-						///for copy, leave the objects behind in the
-						///drawing, but make a new copy of the objects
-						///to put into the "clipboard"
-						///----------------------------------------------
+						//----------------------------------------------
+						//for copy, leave the objects behind in the
+						//drawing, but make a new copy of the objects
+						//to put into the "clipboard"
+						//----------------------------------------------
 						CCadObject *pObj = this->GetTopSelection();
 						if (m_pClipBoard == 0) m_pClipBoard = new CMoveObjects;
 						m_pClipBoard->Clear(1);	//delete objects in clipboard
@@ -1072,9 +1073,9 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 							RemoveObject(pObj);	//remove from sel list
 							//remove from drawing
 							pDoc->RemoveObject(pObj);
-							///add to clipboard
+							//add to clipboard
 							m_pClipBoard->AddObject(pObj);
-							///get next obje3ct
+							//get next obje3ct
 							pObj = GetTopSelection();
 						}
 						m_pClipBoard->SetRef(m_SnapPos);
@@ -1103,7 +1104,7 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 			m_pDrawObject = m_pTempCadBitmap;
 			m_pDrawObject->SetP1(m_SnapPos);
 			break;
-		case DrawMode::ARROW:	///Button Down
+		case DrawMode::ARROW:	//Button Down
 			switch (m_DrawState)
 			{
 				case DRAWSTATE_WAITMOUSE_DOWN:
@@ -1237,14 +1238,14 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	///-----------------------------------------------
-	/// OnLButtonUp
-	///		This function is used to perfrom functions
-	/// when the mouse button is released.
-	///	parameters:
-	///		nFlags.....Mouse flags
-	///		point......point where mouse button released
-	///-----------------------------------------------
+	//-----------------------------------------------
+	// OnLButtonUp
+	//		This function is used to perfrom functions
+	// when the mouse button is released.
+	//	parameters:
+	//		nFlags.....Mouse flags
+	//		point......point where mouse button released
+	//-----------------------------------------------
 
 	m_MousePos = CorrectMousePosition(point);
 	m_SnapPos = Snap(m_MousePos,m_SnapGrid);
@@ -1297,7 +1298,7 @@ void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 				break;
 			}
 			break;
-		case DrawMode::RECTANGLE:	///Button Up
+		case DrawMode::RECTANGLE:	//Button Up
 		case DrawMode::ELIPSE:
 		case DrawMode::RNDRECT:
 			switch (m_DrawState)
@@ -1319,7 +1320,7 @@ void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 					break;
 			}
 			break;
-		case DrawMode::POLYGON:	///mouse up.
+		case DrawMode::POLYGON:	//mouse up.
 			{
 				CCadPolygon *pCP = (CCadPolygon *)m_pDrawObject;
 				switch(m_DrawState)
@@ -1333,7 +1334,7 @@ void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 						{
 							pCP->DeleteLastPoint();
 							if ((m_SnapPos.x == m_PolyStart.x) && (m_SnapPos.y == m_PolyStart.y))
-							{	///we are back at the start point, terminate
+							{	//we are back at the start point, terminate
 								pDoc->AddObject(m_pDrawObject);
 								m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
 								theApp.GetMainFrame()->UpdateStatusBar("PolyGon:Place First Point");
@@ -1381,7 +1382,7 @@ void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 			}
 			Invalidate();
 			break;
-		case DrawMode::ARC:	///Mouse Up
+		case DrawMode::ARC:	//Mouse Up
 			{
 				CCadArc *pCA = (CCadArc *)m_pDrawObject;
 				switch(m_DrawState)
@@ -1551,7 +1552,7 @@ void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 		case DrawMode::TEXT:		//mouse up
 			m_pDrawObject = 0;
 			break;
-		case DrawMode::LIBPART:	///mouse up
+		case DrawMode::LIBPART:	//mouse up
 			m_pDrawObject = 0;
 			break;
 		case DrawMode::GETREF:
@@ -1691,7 +1692,7 @@ void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 			}
 			Invalidate();
 			break;
-		case DrawMode::ARROW:	///Button Up
+		case DrawMode::ARROW:	//Button Up
 			switch (m_DrawState)
 			{
 			case DRAWSTATE_WAITMOUSE_DOWN:
@@ -1827,11 +1828,11 @@ void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CFrontCadView::OnMouseMove(UINT nFlags, CPoint point)
 {
-	///-----------------------------------------------
-	/// OnMouseMove
-	///		This function handles the functionality
-	/// when the mouse is moved.
-	///-----------------------------------------------
+	//-----------------------------------------------
+	// OnMouseMove
+	//		This function handles the functionality
+	// when the mouse is moved.
+	//-----------------------------------------------
 	CPoint LastPosition = m_SnapPos;
 	m_MousePos = CorrectMousePosition(point);
 	m_SnapPos = Snap(m_MousePos,m_SnapGrid);
@@ -1883,7 +1884,7 @@ void CFrontCadView::OnMouseMove(UINT nFlags, CPoint point)
 					break;
 			}
 			break;
-		case DrawMode::POLYGON:	///mouse move
+		case DrawMode::POLYGON:	//mouse move
 			{
 				CCadPolygon *pCP = (CCadPolygon *)m_pDrawObject;
 				switch(m_DrawState)
@@ -1972,13 +1973,13 @@ void CFrontCadView::OnMouseMove(UINT nFlags, CPoint point)
 				CPoint Diff = m_SnapPos - LastPosition;
 				m_pSelObjList->Move(m_pSelObjList->GetReference()+Diff);
 			}
-			else if(m_pSelObjList && (0 <= m_GrabbedVertex))	///object selected?
+			else if(m_pSelObjList && (0 <= m_GrabbedVertex))	//object selected?
 			{
 				m_pSelObjList->SetVertex(m_GrabbedVertex,m_SnapPos);
 			}
 			Invalidate();
 			break;
-		case DrawMode::HOLE_ROUND:	///Mouse Move
+		case DrawMode::HOLE_ROUND:	//Mouse Move
 		case DrawMode::HOLE_RECT:
 		case DrawMode::HOLE_RND1F:
 		case DrawMode::HOLE_RND2F:
@@ -2058,7 +2059,7 @@ void CFrontCadView::OnMouseMove(UINT nFlags, CPoint point)
 			}
 			Invalidate();
 			break;
-		case DrawMode::ORIGIN:	///OnMouseMove
+		case DrawMode::ORIGIN:	//OnMouseMove
 			switch (m_DrawState)
 			{
 				case DRAWSTATE_WAITMOUSE_DOWN:
@@ -2187,17 +2188,17 @@ void CFrontCadView::OnSize(UINT nType, int cx, int cy)
 
 void CFrontCadView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	///------------------------------------------------
-	/// OnHScroll
-	///		This is the function that is called when
-	/// the user presses the horizonalscroll bar in
-	/// the view.
-	///
-	/// parameters:
-	///		nSBCode.....part of the scrollbar clicked
-	///		nPos........Position of the scrollbar
-	///		pScrollBar..pointer to the scrollbar object
-	///------------------------------------------------
+	//------------------------------------------------
+	// OnHScroll
+	//		This is the function that is called when
+	// the user presses the horizonalscroll bar in
+	// the view.
+	//
+	// parameters:
+	//		nSBCode.....part of the scrollbar clicked
+	//		nPos........Position of the scrollbar
+	//		pScrollBar..pointer to the scrollbar object
+	//------------------------------------------------
 	int Delta = 0;
 
 	switch(nSBCode)
@@ -2238,17 +2239,17 @@ void CFrontCadView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 void CFrontCadView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	///------------------------------------------------
-	/// OnVScroll
-	///		This is the function that is called when
-	/// the user presses the VerticalScroll bar in
-	/// the view.
-	///
-	/// parameters:
-	///		nSBCode.....part of the scrollbar clicked
-	///		nPos........Position of the scrollbar
-	///		pScrollBar..pointer to the scrollbar object
-	///------------------------------------------------
+	//------------------------------------------------
+	// OnVScroll
+	//		This is the function that is called when
+	// the user presses the VerticalScroll bar in
+	// the view.
+	//
+	// parameters:
+	//		nSBCode.....part of the scrollbar clicked
+	//		nPos........Position of the scrollbar
+	//		pScrollBar..pointer to the scrollbar object
+	//------------------------------------------------
 	int Delta=0;
 	switch(nSBCode)
 	{
@@ -2290,11 +2291,11 @@ void CFrontCadView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 void CFrontCadView::OnToolbarZoomout()
 {
-	///--------------------------------------------
-	/// OnToolbarZoomout
-	///		This function is called when the user
-	/// clicks the ZoomOut command
-	///--------------------------------------------
+	//--------------------------------------------
+	// OnToolbarZoomout
+	//		This function is called when the user
+	// clicks the ZoomOut command
+	//--------------------------------------------
 	m_ZoomLevel++;
 	if(m_ZoomLevel >= MAX_ZOOM)
 		m_ZoomLevel = MAX_ZOOM-1;
@@ -2308,11 +2309,11 @@ void CFrontCadView::OnToolbarZoomout()
 
 void CFrontCadView::OnUpdateToolbarZoomout(CCmdUI* pCmdUI)
 {
-	///--------------------------------------------
-	/// OnUpdateToolbarZoomout
-	///		This function is called to see if the
-	/// Zoomout command should be enabled or not.
-	///--------------------------------------------
+	//--------------------------------------------
+	// OnUpdateToolbarZoomout
+	//		This function is called to see if the
+	// Zoomout command should be enabled or not.
+	//--------------------------------------------
 	if(m_ZoomLevel >= (MAX_ZOOM-1))
 		pCmdUI->Enable(FALSE);
 	else
@@ -2321,11 +2322,11 @@ void CFrontCadView::OnUpdateToolbarZoomout(CCmdUI* pCmdUI)
 
 void CFrontCadView::OnToolbarZoomin()
 {
-	///--------------------------------------------
-	/// OnToolbarZoomin
-	///		This function is called when the useer
-	/// user presses the ZoomIn button.
-	///--------------------------------------------
+	//--------------------------------------------
+	// OnToolbarZoomin
+	//		This function is called when the useer
+	// user presses the ZoomIn button.
+	//--------------------------------------------
 	m_ZoomLevel--;
 	if(m_ZoomLevel < 0)
 		m_ZoomLevel = 0;
@@ -2339,11 +2340,11 @@ void CFrontCadView::OnToolbarZoomin()
 
 void CFrontCadView::OnUpdateToolbarZoomin(CCmdUI* pCmdUI)
 {
-	///--------------------------------------------
-	/// OnUpdateToolbarZoomIn
-	///		This function is called to see if the
-	/// Zoomin command should be enabled or not.
-	///--------------------------------------------
+	//--------------------------------------------
+	// OnUpdateToolbarZoomIn
+	//		This function is called to see if the
+	// Zoomin command should be enabled or not.
+	//--------------------------------------------
 	if(m_ZoomLevel <= 0)
 		pCmdUI->Enable(FALSE);
 	else
@@ -2357,17 +2358,17 @@ void CFrontCadView::OnToolbarToggleruler()
 	m_pParent->ShowRulers(this->m_bShowRulers);
 }
 
-///----------------------------------------------
-/// Drawing Functions
-///----------------------------------------------
+//----------------------------------------------
+// Drawing Functions
+//----------------------------------------------
 
 void CFrontCadView::OnToolbarSelect()
 {
-	///--------------------------------
-	/// OnToolbarSelect
-	///		This function put us into
-	/// the Select Mode
-	///--------------------------------
+	//--------------------------------
+	// OnToolbarSelect
+	//		This function put us into
+	// the Select Mode
+	//--------------------------------
 	m_Drawmode = DrawMode::SELECT;
 	theApp.GetMainFrame()->UpdateStatusBar("Select Object");
 }
@@ -2416,11 +2417,11 @@ void CFrontCadView::OnButtonOrigin()
 
 void CFrontCadView::OnToolbarRect()
 {
-	///----------------------------------------
-	/// OnToolbarRect
-	///		This function put the program into
-	/// the Draw rectangle mode
-	///----------------------------------------
+	//----------------------------------------
+	// OnToolbarRect
+	//		This function put the program into
+	// the Draw rectangle mode
+	//----------------------------------------
 	CUtilView *pUV = GetUtilityView();
 	CFrontCadApp *pA = (CFrontCadApp *)AfxGetApp();
 	m_Drawmode = DrawMode::RECTANGLE;
@@ -2435,12 +2436,12 @@ void CFrontCadView::OnToolbarRect()
 
 void CFrontCadView::OnToolbarBitmap()
 {
-	///----------------------------------------
-	/// OnToolbarBitmap
-	///		This function is called when the
-	/// Draw Bitmap button is pressed and puts
-	/// the program into the Draw Bitmap mode.
-	///----------------------------------------
+	//----------------------------------------
+	// OnToolbarBitmap
+	//		This function is called when the
+	// Draw Bitmap button is pressed and puts
+	// the program into the Draw Bitmap mode.
+	//----------------------------------------
 	if(this->m_pTempCadBitmap) delete m_pTempCadBitmap;
 	m_Drawmode = DrawMode::BITMAPIMAGE;
 	CFileDialog dlg(TRUE);
@@ -2968,20 +2969,20 @@ void CFrontCadView::OnToolbarDrawtext()
 
 LRESULT CFrontCadView::OnUtilMessage(WPARAM wP, LPARAM lP)
 {
-	///----------------------------------------------
-	/// OnUtilMessage
-	///		This function recieves a message from the
-	///	controls in the Utility pane when the user updates
+	//----------------------------------------------
+	// OnUtilMessage
+	//		This function recieves a message from the
+	//	controls in the Utility pane when the user updates
 	//	one of the controls.  This is used to edit
-	/// an object in the drawing when that object
-	/// is selected
-	///
-	///	parameters:
-	///		wP.....holds the sub message
-	///				this identifies the object
-	///				that the message came from
-	///		lP.....resaerved
-	///----------------------------------------------
+	// an object in the drawing when that object
+	// is selected
+	//
+	//	parameters:
+	//		wP.....holds the sub message
+	//				this identifies the object
+	//				that the message came from
+	//		lP.....resaerved
+	//----------------------------------------------
 	CFrontCadDoc *pDoc;
 
 	switch(wP)
@@ -3233,14 +3234,14 @@ CCadObject *CFrontCadView::PopSelList(void)
 
 void CFrontCadView::AddToSelList(CCadObject *pO)
 {
-	///----------------------------------------
-	///	AddToSelList
-	///		This function adds an object to the
-	/// selection list.
-	///
-	///	parameter:
-	///		pO.....Object to add to list
-	///---------------------------------------
+	//----------------------------------------
+	//	AddToSelList
+	//		This function adds an object to the
+	// selection list.
+	//
+	//	parameter:
+	//		pO.....Object to add to list
+	//---------------------------------------
 	if(this->m_pSelObjList)
 	{
 		pO->SetNextSelection(m_pSelObjList);
@@ -3257,20 +3258,20 @@ void CFrontCadView::AddToSelList(CCadObject *pO)
 
 CCadObject * CFrontCadView::GetTopSelection()
 {
-	///-------------------------------------------
-	///	GetTopSelection
-	///		Returns the object that is at the
-	/// top of the Selected Objects List
-	///-------------------------------------------
+	//-------------------------------------------
+	//	GetTopSelection
+	//		Returns the object that is at the
+	// top of the Selected Objects List
+	//-------------------------------------------
 	return m_pSelObjList;
 }
 
 void CFrontCadView::RemoveUnselected()
 {
-	///-------------------------------------
-	/// RemoveUnselected
-	///remove all unselected objects
-	///--------------------------------------
+	//-------------------------------------
+	// RemoveUnselected
+	//remove all unselected objects
+	//--------------------------------------
 	CCadObject *pO,*pOr,*pPrev=0;
 
 	pO = m_pSelObjList;
@@ -3307,13 +3308,13 @@ void CFrontCadView::RemoveUnselected()
 
 void CFrontCadView::RemoveObject(CCadObject *pO)
 {
-	///----------------------------------------------
-	///	RemoveObject
-	/// This fuction removes the specified object
-	/// from the selected list
-	///		parameters:
-	///			pO.....pointer to object to remove
-	///----------------------------------------------
+	//----------------------------------------------
+	//	RemoveObject
+	// This fuction removes the specified object
+	// from the selected list
+	//		parameters:
+	//			pO.....pointer to object to remove
+	//----------------------------------------------
 	CCadObject *pL,*pPrev=0;
 	int loop=1;
 
@@ -3775,7 +3776,7 @@ void CFrontCadView::OnFilePrinttoclipboard()
 	bitmap.Detach();
 }
 
-// ///helper function for printing to clipboard
+// //helper function for printing to clipboard
 void CFrontCadView::PrintToDC(CDC * pDC)
 {
 	CFrontCadDoc* pDoc = GetDocument();
@@ -3813,7 +3814,7 @@ void CFrontCadView::PrintToDC(CDC * pDC)
 	pDC->FillRect(&rect, &br);
 	//----------------------------------
 	// Make all of the objects dirty
-	///---------------------------------
+	//---------------------------------
 	pDoc->MakeDirty();
 	//----------------------------------
 	// Print to the clipboard
@@ -4250,3 +4251,31 @@ CPoint CFrontCadView::Scale(CPoint nP)
 	return CPoint(x,y);
 }
 
+
+void CFrontCadView::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	CView::OnSysChar(nChar, nRepCnt, nFlags);
+}
+
+void CFrontCadView::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	printf("OnSysKeyDown KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+	switch (nChar)
+	{
+	case VK_MENU:
+		break;
+	}
+
+	CView::OnSysKeyDown(nChar, nRepCnt, nFlags);
+}
+
+void CFrontCadView::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	printf("OnSysKeyUp KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+	switch (nChar)
+	{
+	case VK_MENU:
+		break;
+	}
+	CView::OnSysKeyUp(nChar, nRepCnt, nFlags);
+}

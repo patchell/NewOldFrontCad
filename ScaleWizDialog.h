@@ -14,7 +14,7 @@
 #include "ComboBoxHoleType.h"
 #include "ComboBoxLibrary.h"
 
-typedef struct{
+struct SCALEWIZattributes {
 	int m_ArcStart;
 	int m_ArcEnd;
 	int m_ArcLineWidth;
@@ -40,7 +40,35 @@ typedef struct{
 	COLORREF m_BkColor;
 	char *m_pFont;		//name of font.
 	char *m_pLabels[SCALE_LABELS_SIZE];
-}SCALEWIZattributes;
+	SCALEWIZattributes() {
+		m_ArcStart=135;
+		m_ArcEnd=45;
+		m_ArcLineWidth=2;
+		m_ArcRadius=100;
+		m_ArcColor=RGB(0,0,0);
+		m_Divisions=10;
+		m_DivisionLineWidth=2;
+		m_DivisionLineLegnth=10;
+		m_DivLineColor=RGB(0,0,0);
+		m_SubDivisions=5;
+		m_SubDivisionLineWidth=1;
+		m_SubdivisionLengnth=5;
+		m_SubDivColor=RGB(0,0,0);
+		m_HoleSize=5;
+		m_HoleType=0;
+		m_FlatDist=7;
+		m_Ref=CPoint(0,0);
+		m_FontSize=12;
+		m_FontWeight=400;
+		m_DistToTick=15;
+		m_TextColor=RGB(0,0,0);
+		m_BkColor=RGB(255,255,255);
+		m_pFont=_strdup("Arial");
+		for (int i=0; i<SCALE_LABELS_SIZE; i++) {
+			sprintf(m_pLabels[i],"%.2f",i*1.0);
+		}
+	}
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // CScaleWizDialog dialog

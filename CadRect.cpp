@@ -48,11 +48,11 @@ void CCadRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 	//		Offset...Offset to add to points
 	//		Scale....Sets Units to Pixels ratio
 	//---------------------------------------------
-	CPen *pOld = 0, penDraw, penSelect;
+	CPen *pOld = 0, penDraw, penPoint;
 	CBrush *pOldBr = 0, brushFill, brushSelect;
-	CRect rect;
+	CRect rect, rectVertex;;
 	CSize rectLWcomp;
-	CPoint P1,P2;
+	CPoint P1,P2, Diff;
 	int Lw;
 
 	if (CCadRect::m_RenderEnable)
@@ -78,6 +78,8 @@ void CCadRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 			break;
 		case OBJECT_MODE_SELECTED:
 			penDraw.CreatePen(PS_SOLID, Lw, RGB(200, 50, 50));
+			penPoint.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+			brushSelect.CreateSolidBrush(RGB(0, 0, 255));
 			if (CCadObject::AreShapeFillsDisabled())
 				brushFill.CreateStockObject(NULL_BRUSH);
 			else
@@ -85,6 +87,8 @@ void CCadRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 			break;
 		case OBJECT_MODE_SKETCH:
 			penDraw.CreatePen(PS_DOT, 1, m_LineColor);
+			penPoint.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+			brushSelect.CreateSolidBrush(RGB(0, 0, 255));
 			brushFill.CreateStockObject(NULL_BRUSH);
 			break;
 		}
@@ -97,10 +101,16 @@ void CCadRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 			pDC->Rectangle(&rect);
 			break;
 		case OBJECT_MODE_SELECTED:
-			pDC->Rectangle(&rect);
-		break;
 		case OBJECT_MODE_SKETCH:
 			pDC->Rectangle(&rect);
+			pDC->SelectObject(&penPoint);
+			pDC->SelectObject(&brushSelect);
+			Diff = CPoint(4, 4);
+			rectVertex.SetRect(P1 + (-Diff), P1 + Diff);
+			pDC->SelectObject(&penPoint);
+			pDC->Rectangle(&rectVertex);
+			rectVertex.SetRect(P2 + (-Diff), P2 + Diff);
+			pDC->Rectangle(&rectVertex);
 			break;
 		case OBJECT_MODE_ERASE:
 			break;

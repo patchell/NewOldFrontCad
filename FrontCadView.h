@@ -233,6 +233,9 @@ public:
 	CPoint Scale(CPoint p);
     afx_msg void OnToolbarCircle();
 //    afx_msg void OnUpdateToolbarCircle(CCmdUI* pCmdUI);
+    afx_msg void OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+    afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+    afx_msg void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 #ifndef _DEBUG  // debug version in FrontCadView.cpp

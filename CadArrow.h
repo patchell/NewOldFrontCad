@@ -1,19 +1,24 @@
 #pragma once
 
 
-typedef struct {
+struct ArrowAttributes {
 	COLORREF m_Color;
 	int m_Len;
 	int m_ArrowWidth;
+	ArrowAttributes() {
+		m_Color = RGB(0, 0, 0);
+		m_Len = 20;
+		m_ArrowWidth = 10;
+	}
 
-}ArrowAttributes;
+};
 
 class CFileParser;
 
 class CCadArrow :public CCadObject
 {
 	friend CFileParser;
-	inline static int m_RenderEnable;
+	inline static int m_RenderEnable = 1;
 private:
 	ArrowAttributes m_Attrib;
 	CBrush *m_pBrFill;

@@ -11,11 +11,16 @@
 
 
 
-typedef struct
+struct PolyAttributes
 {
 	int m_Width;
 	COLORREF m_LineColor;
-}PolyAttributes;
+	PolyAttributes()
+	{
+		m_Width = 1;
+		m_LineColor = RGB(0, 0, 0);
+	}
+};
 
 class CCadPolygonFill;
 class CFileParser;

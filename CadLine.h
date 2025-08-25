@@ -11,10 +11,14 @@
 
 class CFileParser;
 
-typedef struct{
+struct LineAttrib {
 	int m_Width;
 	COLORREF m_Color;
-} LineAttrib;
+	LineAttrib() {
+		m_Width = 1;
+		m_Color = RGB(0, 0, 0);
+	}
+} ;
 
 class CCadLine : public CCadObject
 {

@@ -12,11 +12,16 @@
 
 class CFileParser;
 
-typedef struct {
+struct HoleRoundAttributes {
 	int m_Radius;
 	int m_Width;
 	COLORREF m_LineColor;
-}HoleRoundAttributes;
+	HoleRoundAttributes() {
+		m_Width = 1;
+		m_LineColor = RGB(0, 0, 0);
+		m_Radius = 50;
+	}
+};
 
 class CCadHoleRound : public CCadObject
 {

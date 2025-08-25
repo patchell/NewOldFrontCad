@@ -31,6 +31,7 @@ END_MESSAGE_MAP()
 
 CFrontCadApp::CFrontCadApp()
 {
+	pConsol = 0;
 	m_pMainView = 0;
 	m_pLibView = 0;
 	m_UtilView = 0;
@@ -84,6 +85,9 @@ BOOL CFrontCadApp::InitInstance()
 	// Dispatch commands specified on the command line
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
+//	AllocConsole();
+//	freopen_s(&pConsol, "CONOUT$", "w", stdout);
+	if (HasConsol())	printf("Ready\n");
 
 	// The one and only window has been initialized, so show and update it.
 	m_pMainWnd->ShowWindow(SW_SHOW);
@@ -164,6 +168,7 @@ int CFrontCadApp::ExitInstance()
 {
 	SaveSettings();
 	if (m_pLogFile) fclose(m_pLogFile);
+	if(HasConsol()) fclose(pConsol);
 	return CWinApp::ExitInstance();
 }
 
@@ -433,8 +438,8 @@ char* CFrontCadApp::ConvertCStringToChar(char* cpDest, CString& csSource)
 void CAboutDlg::SetVersion()
 {
 	char* s = new char[256];
-	static const char* pVersion = "Version 1.4.2";
-	static const char* pBuildDate = "Build Date Aug 24, 2025";
+	static const char* pVersion = "Version 1.4.3";
+	static const char* pBuildDate = "Build Date Aug 25, 2025";
 	static const char* pCopyright = "Copyright (c) 2015, 2025";
 
 	sprintf_s(s, 256, "%s\n%s\n%s",

@@ -50,11 +50,13 @@ void CCadRoundRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 	//		Offset...Offset to add to points
 	//		Scale....Sets Units to Pixels ratio
 	//---------------------------------------------
-	CPen *pOld = 0, penLine;
-	CBrush *pOldBr = 0, brushFill;
-	CPoint P1,P2,P3;
+	CPen *pOld = 0, penLine, penPoint;
+	CBrush *pOldBr = 0, brushFill, brushSelect, brushPoint;
+	CPoint P1,P2,P3,pointP3;
 	CRect rect;
 	CSize rectLWcomp;
+	CSize Diff;
+
 	int Lw;
 
 	if (CCadRoundRect::m_RenderEnable)
@@ -71,7 +73,6 @@ void CCadRoundRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 		else
 			rectLWcomp = CSize(Lw / 2, Lw / 2);
 		//	rect.SetRect(P1,P2);
-
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
@@ -83,6 +84,9 @@ void CCadRoundRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 			break;
 		case OBJECT_MODE_SELECTED:
 			penLine.CreatePen(PS_SOLID, Lw, RGB(200, 50, 50));
+			penPoint.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+			brushSelect.CreateSolidBrush(RGB(200, 200, 255));
+			brushPoint.CreateSolidBrush(RGB(0, 0, 255));
 			if (CCadObject::AreShapeFillsDisabled())
 				brushFill.CreateStockObject(NULL_BRUSH);
 			else
@@ -90,7 +94,10 @@ void CCadRoundRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 			break;
 		case OBJECT_MODE_SKETCH:
 			penLine.CreatePen(PS_DOT, 1, m_LineColor);
+			penPoint.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+			brushSelect.CreateSolidBrush(RGB(0, 0, 255));
 			brushFill.CreateStockObject(NULL_BRUSH);
+			brushPoint.CreateSolidBrush(RGB(0, 0, 255));
 			break;
 		}
 		SetRect(rect, P1, P2, rectLWcomp);
@@ -103,23 +110,38 @@ void CCadRoundRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 			break;
 		case OBJECT_MODE_SELECTED:
 		{
+			pDC->SelectObject(&brushSelect);
 			pDC->RoundRect(rect, P3);
-			CRect rect;
-			CSize p = CSize(4, 4);
-			rect.SetRect(P1 - p, P1 + p);
+			Diff = CSize(4, 4);
+			rect.SetRect(P1 - Diff, P1 + Diff);
+			pDC->SelectObject(&penPoint);
+			pDC->SelectObject(&brushPoint);
 			pDC->Rectangle(&rect);
-			rect.SetRect(P2 - p, P2 + p);
+			rect.SetRect(P2 - Diff, P2 + Diff);
 			pDC->Rectangle(&rect);
-			CPoint p3 = P1 + P3;
-			rect.SetRect(p3 - p, p3 + p);
+			pointP3 = P1 + P3;
+			rect.SetRect(pointP3 - Diff, pointP3 + Diff);
 			pDC->Rectangle(&rect);
-			p3 = P2 - P3;
-			rect.SetRect(p3 - p, p3 + p);
+			pointP3 = P2 - P3;
+			rect.SetRect(pointP3 - Diff, pointP3 + Diff);
 			pDC->Rectangle(&rect);
 		}
 		break;
 		case OBJECT_MODE_SKETCH:
 			pDC->RoundRect(rect, P3);
+			Diff = CSize(4, 4);
+			rect.SetRect(P1 - Diff, P1 + Diff);
+			pDC->SelectObject(&penPoint);
+			pDC->SelectObject(&brushPoint);
+			pDC->Rectangle(&rect);
+			rect.SetRect(P2 - Diff, P2 + Diff);
+			pDC->Rectangle(&rect);
+			pointP3 = P1 + P3;
+			rect.SetRect(pointP3 - Diff, pointP3 + Diff);
+			pDC->Rectangle(&rect);
+			pointP3 = P2 - P3;
+			rect.SetRect(pointP3 - Diff, pointP3 + Diff);
+			pDC->Rectangle(&rect);
 			break;
 		case OBJECT_MODE_ERASE:
 			break;

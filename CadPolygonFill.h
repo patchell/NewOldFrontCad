@@ -11,11 +11,16 @@
 
 #include "CadPolygon.h"
 
-typedef struct {
+struct PolygonFillAttributes {
 	int m_Width;
 	COLORREF m_LineColor;
 	COLORREF m_FillColor;
-}PolygonFillAttributes;
+	PolygonFillAttributes() {
+		m_Width = 1;
+		m_LineColor = RGB(0, 0, 0);
+		m_FillColor = RGB(192, 192, 192);
+	}
+};
 
 class CFileParser;
 

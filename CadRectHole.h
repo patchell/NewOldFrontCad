@@ -11,19 +11,25 @@
 
 
 
-typedef struct {
+struct RectHoleAttributes {
 	int m_Width;
 	COLORREF m_LineColor;
 	int m_W;
 	int m_H;
-}RectHoleAttributes;
+	RectHoleAttributes() {
+		m_Width = 1;
+		m_LineColor = RGB(0, 0, 0);
+		m_W = 100;
+		m_H = 100;
+	}
+};
 
 class CFileParser;
 
 class CCadRectHole : public CCadObject  
 {
 	friend CFileParser;
-	inline static int m_RenderEnable = 0;
+	inline static int m_RenderEnable = 1;
 	CPen *m_pPenLine;
 	int m_Width;
 	COLORREF m_LineColor;

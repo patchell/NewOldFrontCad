@@ -48,7 +48,7 @@ void CCadLine::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 	//		Offset...Offset to add to points
 	//		Scale....Sets Units to Pixels ratio
 	//---------------------------------------------
-	CPen *pOld, penLine;
+	CPen *pOld, penLine, penPoint;
 	LOGBRUSH lbMode;
 	CBrush brushFill, * pOldB;
 	CPoint P1,P2,Diff;
@@ -85,6 +85,7 @@ void CCadLine::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 				lbMode.lbHatch = 0;
 			}
 			penLine.CreatePen(PS_GEOMETRIC | PS_ENDCAP_ROUND | PS_JOIN_ROUND, Lw, &lbMode);
+			penPoint.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
 			break;
 		case OBJECT_MODE_SKETCH:
 			penLine.CreatePen(PS_DOT , 1, RGB(0, 0, 255));
@@ -99,22 +100,15 @@ void CCadLine::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 			pDC->LineTo(P2);
 			break;
 		case OBJECT_MODE_SELECTED:
-			Diff = CPoint(4, 4);
-			rect.SetRect(P1 + (-Diff), P1 + Diff);
-			pDC->Rectangle(&rect);
-			rect.SetRect(P2 + (-Diff), P2 + Diff);
-			pDC->Rectangle(&rect);
-			pDC->MoveTo(P1);
-			pDC->LineTo(P2);
-			break;
 		case OBJECT_MODE_SKETCH:
+			pDC->MoveTo(P1);
+			pDC->LineTo(P2);
 			Diff = CPoint(4, 4);
 			rect.SetRect(P1 + (-Diff), P1 + Diff);
+			pDC->SelectObject(&penPoint);
 			pDC->Rectangle(&rect);
 			rect.SetRect(P2 + (-Diff), P2 + Diff);
 			pDC->Rectangle(&rect);
-			pDC->MoveTo(P1);
-			pDC->LineTo(P2);
 			break;
 		case OBJECT_MODE_ERASE:
 			break;
