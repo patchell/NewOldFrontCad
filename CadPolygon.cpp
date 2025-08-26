@@ -1,6 +1,6 @@
 // Polygon.cpp: implementation of the CCadPolygon class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -13,9 +13,9 @@ static char THIS_FILE[]=__FILE__;
 
 static int IDcount = 0;
 
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CCadPolygon::CCadPolygon(): CCadObject(OBJECT_TYPE_POLY)
 {
@@ -538,15 +538,15 @@ CPoint CCadPolygon::GetReference()
 
 void CCadPolygon::AdjustRefernce(CPoint p)
 {
-	///-----------------------------------------
-	///	AdjustRefernce
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	AdjustRefernce
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	int i;
 	for(i=0;i<m_Count;++i)

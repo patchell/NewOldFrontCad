@@ -1,25 +1,25 @@
 // FrontCadView.h : interface of the CFrontCadView class
 //
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 
 #if !defined(AFX_FRONTCADVIEW_H__6489B58A_D163_4F12_A34D_C86273EB1612__INCLUDED_)
 #define AFX_FRONTCADVIEW_H__6489B58A_D163_4F12_A34D_C86273EB1612__INCLUDED_
 
-#include "CadArc.h"	// Added by ClassView
-#include "CadRoundRect.h"	// Added by ClassView
-#include "CadLine.h"	// Added by ClassView
-#include "CadElipse.h"	// Added by ClassView
-#include "CadRect.h"	// Added by ClassView
-#include "CadPolygon.h"	// Added by ClassView
-#include "CadPolygonFill.h"
-#include "CadHoleRound.h"	// Added by ClassView
-#include "CadHoleRnd2Flat.h"
-#include "CadHoleRnd1Flat.h"
-#include "CadRectHole.h"
-#include "ScaleWizDialog.h"
-#include "CadText.h"
+//#include "CadArc.h"	// Added by ClassView
+//#include "CadRoundRect.h"	// Added by ClassView
+//#include "CadLine.h"	// Added by ClassView
+//#include "CadElipse.h"	// Added by ClassView
+//#include "CadRect.h"	// Added by ClassView
+//#include "CadPolygon.h"	// Added by ClassView
+//#include "CadPolygonFill.h"
+//#include "CadHoleRound.h"	// Added by ClassView
+//#include "CadHoleRnd2Flat.h"
+//#include "CadHoleRnd1Flat.h"
+//#include "CadRectHole.h"
+//#include "ScaleWizDialog.h"
+//#include "CadText.h"
 #include "MoveObjects.h"
-#include "CadBitmap.h"
+//#include "CadBitmap.h"
 
 #if _MSC_VER > 1000
 #pragma once
@@ -196,7 +196,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnFilePrinttoclipboard();
-	// ///helper function for printing to clipboard
+	// //helper function for printing to clipboard
 	void PrintToDC(CDC * pDC);
 	int m_nSelRegionLock;
 	afx_msg void OnButtonArrowobj();

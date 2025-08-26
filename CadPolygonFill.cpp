@@ -1,6 +1,6 @@
 // CadPolygonFill.cpp: implementation of the CCadPolygonFill class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -11,9 +11,9 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CCadPolygonFill::CCadPolygonFill():CCadPolygon(100)
 {
@@ -36,17 +36,17 @@ CCadPolygonFill::~CCadPolygonFill()
 
 void CCadPolygonFill::Draw(CDC *pDC,int mode,CPoint Offset,CScale Scale)
 {
-	///---------------------------------------------
-	///	Draw
-	///		This function draws the object onto the
-	///	specified device context.
-	///
-	/// parameters:
-	///		pDC......pointer to the device context
-	///		mode.....mode to use when drawing
-	///		Offset...Offset to add to points
-	///		Scale....Sets Units to Pixels ratio
-	///---------------------------------------------
+	//---------------------------------------------
+	//	Draw
+	//		This function draws the object onto the
+	//	specified device context.
+	//
+	// parameters:
+	//		pDC......pointer to the device context
+	//		mode.....mode to use when drawing
+	//		Offset...Offset to add to points
+	//		Scale....Sets Units to Pixels ratio
+	//---------------------------------------------
 	if (CCadPolygonFill::m_RenderEnable)
 	{
 		CPen *oldpen;

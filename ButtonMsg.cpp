@@ -9,15 +9,15 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CButtonMsg
-///----------------------------------------
-/// This is a special version of CButton
-/// for use with a CheckBox object.  It
-/// will send a message to a specified
-/// Window when the SetCheck() fuction is
-///	called.
-///----------------------------------------
+//----------------------------------------
+// This is a special version of CButton
+// for use with a CheckBox object.  It
+// will send a message to a specified
+// Window when the SetCheck() fuction is
+//	called.
+//----------------------------------------
 CButtonMsg::CButtonMsg()
 {
 	m_pW = 0;
@@ -36,7 +36,7 @@ BEGIN_MESSAGE_MAP(CButtonMsg, CButton)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CButtonMsg message handlers
 
 void CButtonMsg::SetupMessaging(CWnd *pW, int Wmsg, int Smsg)
@@ -57,13 +57,13 @@ void CButtonMsg::SetupMessaging(CWnd *pW, int Wmsg, int Smsg)
 
 void CButtonMsg::SetCheck(int nCheck)
 {
-	///------------------------------------------
-	/// SetCheck
-	///		This function overides the SetCheck
-	///	function in the CButton class.
-	/// parameter:
-	///		nCheck....State to set check box to
-	///-------------------------------------------
+	//------------------------------------------
+	// SetCheck
+	//		This function overides the SetCheck
+	//	function in the CButton class.
+	// parameter:
+	//		nCheck....State to set check box to
+	//-------------------------------------------
 	CButton::SetCheck(nCheck);
 	if(m_pW)m_pW->PostMessageA(m_WMsg,m_ObjMsg,nCheck);
 }

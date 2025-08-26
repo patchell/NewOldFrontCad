@@ -1,6 +1,6 @@
 // MoveObjects.h: interface for the CMoveObjects class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_MOVEOBJECTS_H__9FAA8A52_F3DA_461E_BBF4_DCF31FF02BAA__INCLUDED_)
 #define AFX_MOVEOBJECTS_H__9FAA8A52_F3DA_461E_BBF4_DCF31FF02BAA__INCLUDED_

@@ -1,6 +1,6 @@
 // CadDrawing.cpp: implementation of the CCadDrawing class.
 // This is a top level object for a CAD drawing
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -11,9 +11,9 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CCadDrawing::CCadDrawing():CCadObject(OBJECT_TYPE_DRAWING)
 {
@@ -39,16 +39,16 @@ CCadDrawing::~CCadDrawing()
 
 void CCadDrawing::AddObject(CCadObject *pLO)
 {
-	///----------------------------------------
-	/// AddObject
-	///		This function is used to add a new
-	/// object to a drawing.  It puts the
-	/// object at the endof the list so
-	/// that it will be drawwn last.
-	///
-	/// parameters:
-	///		pLO.....pointer to CCad Object
-	///----------------------------------------
+	//----------------------------------------
+	// AddObject
+	//		This function is used to add a new
+	// object to a drawing.  It puts the
+	// object at the endof the list so
+	// that it will be drawwn last.
+	//
+	// parameters:
+	//		pLO.....pointer to CCad Object
+	//----------------------------------------
 	if(m_pHead == 0)	//nothing in drawing
 	{
 		m_pHead = pLO;
@@ -64,16 +64,16 @@ void CCadDrawing::AddObject(CCadObject *pLO)
 
 void CCadDrawing::InsertObject(CCadObject *pLO)
 {
-	///----------------------------------------
-	/// InsertObject
-	///		This function is used to add a new
-	/// object to a drawing.  It puts the
-	/// object at the front of the list so
-	/// that it will be drawwn first.
-	///
-	/// parameters:
-	///		pLO.....pointer to CCad Object
-	///----------------------------------------
+	//----------------------------------------
+	// InsertObject
+	//		This function is used to add a new
+	// object to a drawing.  It puts the
+	// object at the front of the list so
+	// that it will be drawwn first.
+	//
+	// parameters:
+	//		pLO.....pointer to CCad Object
+	//----------------------------------------
 	if(m_pHead == 0)	//nothing in drawing
 	{
 		m_pHead = pLO;
@@ -89,14 +89,14 @@ void CCadDrawing::InsertObject(CCadObject *pLO)
 
 void CCadDrawing::RemoveObject(CCadObject *pLO)
 {
-	///------------------------------------------
-	/// RemoveObject
-	///			This function removes an object
-	/// from the drawing.  This is a DELETE
-	///
-	///	parameters:
-	///		pLO.....pointer to object to remove
-	///------------------------------------------
+	//------------------------------------------
+	// RemoveObject
+	//			This function removes an object
+	// from the drawing.  This is a DELETE
+	//
+	//	parameters:
+	//		pLO.....pointer to object to remove
+	//------------------------------------------
 	if(pLO == m_pHead)
 	{
 		m_pHead = (CCadObject *)m_pHead->GetNext();
@@ -118,17 +118,17 @@ void CCadDrawing::RemoveObject(CCadObject *pLO)
 
 void CCadDrawing::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 {
-	///-----------------------------------------
-	/// Draw
-	///		This is the function that draws the
-	/// Drawing onto the specified device
-	/// context.
-	///	parameters:
-	///		pDC.....pointer to display context
-	///		mode....Ddrawing Mode
-	///		Offset..Offset to add to objects
-	///		Scale...Ammount to scale objects by
-	///-----------------------------------------
+	//-----------------------------------------
+	// Draw
+	//		This is the function that draws the
+	// Drawing onto the specified device
+	// context.
+	//	parameters:
+	//		pDC.....pointer to display context
+	//		mode....Ddrawing Mode
+	//		Offset..Offset to add to objects
+	//		Scale...Ammount to scale objects by
+	//-----------------------------------------
 	CCadObject *pCO = m_pHead;
 	// TODO: add draw code for native data here
 	while(pCO)
@@ -144,14 +144,14 @@ void CCadDrawing::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 
 void CCadDrawing::Save(FILE *pO,  int Indent)
 {
-	///-------------------------------------------
-	///	Save
-	///		This function is used to save the
-	/// drawing to a computer file
-	///
-	///	parameter:
-	///		pO.....pointer to file tto save to
-	///-------------------------------------------
+	//-------------------------------------------
+	//	Save
+	//		This function is used to save the
+	// drawing to a computer file
+	//
+	//	parameter:
+	//		pO.....pointer to file tto save to
+	//-------------------------------------------
 	char* s = new char[256];
 	char* s1 = new char[64];
 
@@ -173,17 +173,17 @@ void CCadDrawing::Save(FILE *pO,  int Indent)
 
 void CCadDrawing::Print(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 {
-	///-----------------------------------------
-	/// Print
-	///		This is the draw function for drawing
-	///	on the printer.
-	///
-	///	parameters:
-	///		pDC....device context to draw to
-	///		mode...drawing mode
-	///		Offset.offset to add to objects
-	///		Scale.amount to Scale drawing by
-	///-----------------------------------------
+	//-----------------------------------------
+	// Print
+	//		This is the draw function for drawing
+	//	on the printer.
+	//
+	//	parameters:
+	//		pDC....device context to draw to
+	//		mode...drawing mode
+	//		Offset.offset to add to objects
+	//		Scale.amount to Scale drawing by
+	//-----------------------------------------
 	CCadObject *pCO = m_pHead;
 	while(pCO)
 	{
@@ -203,26 +203,26 @@ int CCadDrawing::Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, C
 
 int CCadDrawing::CheckSelected(CPoint p, CCadObject **ppSelList, int n,int flag)
 {
-	///--------------------------------------
-	/// CheckSelected
-	///
-	/// This function is used to see if
-	/// there are any objects under the
-	/// point.  This function returns the
-	/// first 'n' objects it finds.  It does
-	/// not actually select anything.
-	///
-	/// parameters:
-	///		p......point of interest
-	///		ppSelList...pointer to an array of selected objects
-	///		n.....maximum number of objects to check for
-	///		flag..what kind of objects are inlcuded in list
-	///				0-All Objects
-	///				1-Unselected Objects
-	///				2-Selected Objects
-	///	returns:
-	///		number of objects that are under the point
-	///--------------------------------------------
+	//--------------------------------------
+	// CheckSelected
+	//
+	// This function is used to see if
+	// there are any objects under the
+	// point.  This function returns the
+	// first 'n' objects it finds.  It does
+	// not actually select anything.
+	//
+	// parameters:
+	//		p......point of interest
+	//		ppSelList...pointer to an array of selected objects
+	//		n.....maximum number of objects to check for
+	//		flag..what kind of objects are inlcuded in list
+	//				0-All Objects
+	//				1-Unselected Objects
+	//				2-Selected Objects
+	//	returns:
+	//		number of objects that are under the point
+	//--------------------------------------------
 	int count = 0;
 	CCadObject *pCO = m_pHead;
 
@@ -234,20 +234,20 @@ int CCadDrawing::CheckSelected(CPoint p, CCadObject **ppSelList, int n,int flag)
 			{
 				case CADDRAWUBG_CHECKSEL_FLAG_ALL:
 					if(ppSelList) ppSelList[count] = pCO;
-					count++;	///increment count
+					count++;	//increment count
 					break;
 				case CADDRAWUBG_CHECKSEL_FLAG_UNSEL:
 					if (!pCO->GetSelected())
 					{
 						if (ppSelList) ppSelList[count] = pCO;
-						count++;	///increment count
+						count++;	//increment count
 					}
 					break;
 				case CADDRAWUBG_CHECKSEL_FLAG_SEL:
 					if (pCO->GetSelected())
 					{
 						if (ppSelList) ppSelList[count] = pCO;
-						count++;	///increment count
+						count++;	//increment count
 					}
 					break;
 			}
@@ -259,12 +259,12 @@ int CCadDrawing::CheckSelected(CPoint p, CCadObject **ppSelList, int n,int flag)
 
 void CCadDrawing::MakeDirty()
 {
-	///------------------------------------------
-	/// MakeDirty
-	///		This function is used to set the Dirty
-	/// flag in all of the objects.  The Dirty
-	/// flag forces the object to reset pens
-	///------------------------------------------
+	//------------------------------------------
+	// MakeDirty
+	//		This function is used to set the Dirty
+	// flag in all of the objects.  The Dirty
+	// flag forces the object to reset pens
+	//------------------------------------------
 	CCadObject *pObj = m_pHead;
 	while(pObj)
 	{
@@ -275,18 +275,18 @@ void CCadDrawing::MakeDirty()
 
 CCadLibObject * CCadDrawing::CreatePartFromSelected(char *name)
 {
-	///------------------------------------------------
-	/// CreatePartFromSelected
-	///		Thhis function is used to create a library
-	/// part from all of the objects in the drawing that
-	/// are selected.
-	///
-	/// parameters:
-	///		name....name of the new part
-	/// returns:
-	///		pointer to the CCadLibObject that will
-	///		represent the new poart.
-	///------------------------------------------------
+	//------------------------------------------------
+	// CreatePartFromSelected
+	//		Thhis function is used to create a library
+	// part from all of the objects in the drawing that
+	// are selected.
+	//
+	// parameters:
+	//		name....name of the new part
+	// returns:
+	//		pointer to the CCadLibObject that will
+	//		represent the new poart.
+	//------------------------------------------------
 	CCadObject *pObj = m_pHead;
 	CCadLibObject *pPart;
 	if(m_pHead == NULL)

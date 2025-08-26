@@ -1,6 +1,6 @@
 // CadDrawing.h: interface for the CCadDrawing class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADDRAWING_H__158D9EB0_BE4F_471A_B22E_2423339E764A__INCLUDED_)
 #define AFX_CADDRAWING_H__158D9EB0_BE4F_471A_B22E_2423339E764A__INCLUDED_

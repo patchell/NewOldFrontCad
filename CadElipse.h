@@ -1,6 +1,6 @@
 // CadElipse.h: interface for the CCadElipse class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADELIPSE_H__7652BDAC_7D47_420B_92E2_5F93D2617B54__INCLUDED_)
 #define AFX_CADELIPSE_H__7652BDAC_7D47_420B_92E2_5F93D2617B54__INCLUDED_

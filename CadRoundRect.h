@@ -1,6 +1,6 @@
 // CadRoundRect.h: interface for the CCadRoundRect class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADROUNDRECT_H__F387B842_BCD2_4EB4_8F46_B8CBCE99BEB8__INCLUDED_)
 #define AFX_CADROUNDRECT_H__F387B842_BCD2_4EB4_8F46_B8CBCE99BEB8__INCLUDED_

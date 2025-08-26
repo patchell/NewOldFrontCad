@@ -10,7 +10,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CDialogGridSettings dialog
 
 
@@ -40,7 +40,7 @@ BEGIN_MESSAGE_MAP(CDialogGridSettings, CDialog)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CDialogGridSettings message handlers
 
 BOOL CDialogGridSettings::OnInitDialog() 
@@ -60,11 +60,11 @@ BOOL CDialogGridSettings::OnInitDialog()
 void CDialogGridSettings::OnOK() 
 {
 	CWnd *wC;
-	///locate control that has gocus
+	//locate control that has gocus
 	wC = GetFocus();
-	/// Get the ID of that control
+	// Get the ID of that control
 	int id = wC->GetDlgCtrlID();
-	switch(id)							///parse the id
+	switch(id)							//parse the id
 	{
 		case IDOK:
 			m_Snap = m_Edit_Snap.GetValue();

@@ -4,9 +4,9 @@
 #define BLUE(x)		((x & 0x00ff0000) >> 16)
 #define GREEN(x)	((x & 0x0000ff00) >> 8)
 #define RED(x)		(x & 0x000000ff)
-///---------------------------------------
-/// CFrontCadView
-///---------------------------------------
+//---------------------------------------
+// CFrontCadView
+//---------------------------------------
 
 enum DrawMode {
 	NONE,
@@ -41,16 +41,16 @@ enum DrawMode {
 };
 
 /*
-///------------------------------
-/// States for moving selections
-///------------------------------
+//------------------------------
+// States for moving selections
+//------------------------------
 
 #define MOVESTATE_GETREFERENCE		0
 #define MOVESTATE_DRAGSELECTION		1
 */
-///---------------------------
-/// Draw States
-///--------------------------
+//---------------------------
+// Draw States
+//--------------------------
 
 #define DRAWSTATE_WAITMOUSE_DOWN	0
 #define DRAWSTATE_MOVE				1
@@ -103,10 +103,10 @@ enum {
 // Windows Messages
 //------------------------------------
 
-	///message from Utility Pane to Main Pane
+	//message from Utility Pane to Main Pane
 #define WM_UTILMESSAGE		WM_USER+1
 
-	///submessages for WM_UTILMESSAGE
+	//submessages for WM_UTILMESSAGE
 
 enum UtilMsg {
 	DEFAULT,
@@ -138,8 +138,8 @@ enum UtilMsg {
 #define WM_LIBVIEW_GETREF	WM_USER+6
 #define WM_MAINVIEW_GOTREF	WM_USER+7
 
-	///message from Tab1 to 
-	///Pot Scale Wizard Dlg
+	//message from Tab1 to 
+	//Pot Scale Wizard Dlg
 #define WM_TAB1_MESSAGE		WM_USER+2
 
 #define TAB1_ARCSTART		0
@@ -176,9 +176,9 @@ enum UtilMsg {
 
 #define WM_UPDATEDIMENSIONS		WM_USER+8
 
-///------------------------------
-/// Zoom
-///-----------------------------
+//------------------------------
+// Zoom
+//-----------------------------
 
 #define MAX_ZOOM		6
 

@@ -1,6 +1,6 @@
 // CadArc.cpp: implementation of the CCadArc class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -13,9 +13,9 @@ static char THIS_FILE[]=__FILE__;
 
 extern double ArcTan(double X, double Y);
 
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CCadArc::CCadArc():CCadObject(OBJECT_TYPE_ARC)
 {
@@ -42,17 +42,17 @@ CCadArc::~CCadArc()
 
 void CCadArc::Draw(CDC *pDC,int mode,CPoint O,CScale Scale)
 {
-	///------------------------------------------
-	/// Draw
-	///		This function draws an Arc on the
-	///	specified device context
-	///
-	///	parameters:
-	///		pDC......pointer to the device context
-	///		mode.....Drawing mode, Final, Selected, etdc
-	///		O........Offset objects by this amount
-	///		Scale....Scale Drawing by this much
-	///------------------------------------------
+	//------------------------------------------
+	// Draw
+	//		This function draws an Arc on the
+	//	specified device context
+	//
+	//	parameters:
+	//		pDC......pointer to the device context
+	//		mode.....Drawing mode, Final, Selected, etdc
+	//		O........Offset objects by this amount
+	//		Scale....Scale Drawing by this much
+	//------------------------------------------
 	CPen *pOld;
 	CRect rect;
 	CSize rectLWcomp;
@@ -139,20 +139,20 @@ void CCadArc::Draw(CDC *pDC,int mode,CPoint O,CScale Scale)
 
 int CCadArc::CheckSelected(CPoint p,CSize Offset)
 {
-	///------------------------------------------
-	/// CheckSelected
-	///		This function is used to see if the
-	/// the given point is withing the confines
-	/// of the object.  This function does not
-	/// actually check to see if it is selected.
-	/// Guess I did not pick a very good name for
-	/// this function.
-	///
-	///	parameter:
-	///		p......Is this point in this object?
-	///	returns:
-	///		True if point is inside, false if outside
-	///------------------------------------------
+	//------------------------------------------
+	// CheckSelected
+	//		This function is used to see if the
+	// the given point is withing the confines
+	// of the object.  This function does not
+	// actually check to see if it is selected.
+	// Guess I did not pick a very good name for
+	// this function.
+	//
+	//	parameter:
+	//		p......Is this point in this object?
+	//	returns:
+	//		True if point is inside, false if outside
+	//------------------------------------------
 	int rV = 0;
 
 	double StartAngle,EndAngle,Angle;
@@ -174,7 +174,7 @@ int CCadArc::CheckSelected(CPoint p,CSize Offset)
 	rect.SetRect(P1,P2);
 	rect.NormalizeRect();
 
-	/// 1 = x^2/A^2 + y^2/B^2
+	// 1 = x^2/A^2 + y^2/B^2
 	double W = double(this->GetWidth())/2.0;
 	if( W < 50.0) W = 50.0;
 	double A,B;
@@ -216,14 +216,14 @@ int CCadArc::Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, CFile
 
 void CCadArc::Save(FILE *pO,  int Indent)
 {
-	///------------------------------------------
-	/// Save
-	///		This fucntion is called whenever the
-	/// user saves a document of library.
-	///
-	/// parameter:
-	///		pO.....pointer to Output File Stream
-	///------------------------------------------
+	//------------------------------------------
+	// Save
+	//		This fucntion is called whenever the
+	// user saves a document of library.
+	//
+	// parameter:
+	//		pO.....pointer to Output File Stream
+	//------------------------------------------
 	char* s = new char[256];
 	char* s1 = new char[64];
 	char* s2 = new char[64];
@@ -252,11 +252,11 @@ void CCadArc::Save(FILE *pO,  int Indent)
 
 CCadArc CCadArc::operator=(CCadArc &v)
 {
-	///------------------------------------------
-	/// operator=
-	///		This function implements the assign
-	///	operator
-	///------------------------------------------
+	//------------------------------------------
+	// operator=
+	//		This function implements the assign
+	//	operator
+	//------------------------------------------
 	SetP1(v.GetP1());
 	SetP2(v.GetP2());
 	m_atrb.m_Start = v.m_atrb.m_Start;
@@ -344,15 +344,15 @@ void CCadArc::SetEndPoint(CPoint p)
 
 void CCadArc::AdjustRefernce(CPoint p)
 {
-	///-----------------------------------------
-	///	AdjustRefernce
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	AdjustRefernce
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	SetP2(GetP2() - p);
 	this->m_atrb.m_Start -= p;
@@ -366,14 +366,14 @@ void CCadArc::RenderEnable(int e)
 
 CPoint CCadArc::GetCenter()
 {
-	///--------------------------------------
-	/// GetCecnter
-	///		Returns the centerpoint of the ARC
-	///	Because of the nature of the beast, the
-	/// returned point may not be the exact center.
-	///	returns:
-	///		Point in the center of the arc.
-	///--------------------------------------
+	//--------------------------------------
+	// GetCecnter
+	//		Returns the centerpoint of the ARC
+	//	Because of the nature of the beast, the
+	// returned point may not be the exact center.
+	//	returns:
+	//		Point in the center of the arc.
+	//--------------------------------------
 	CRect rect(GetP1(), GetP2());
 	return rect.CenterPoint();
 }

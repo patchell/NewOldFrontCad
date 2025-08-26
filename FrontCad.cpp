@@ -10,7 +10,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadApp
 
 BEGIN_MESSAGE_MAP(CFrontCadApp, CWinApp)
@@ -26,7 +26,7 @@ BEGIN_MESSAGE_MAP(CFrontCadApp, CWinApp)
 	ON_COMMAND(ID_FILE_PRINT_SETUP, CWinApp::OnFilePrintSetup)
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadApp construction
 
 CFrontCadApp::CFrontCadApp()
@@ -40,16 +40,15 @@ CFrontCadApp::CFrontCadApp()
 	m_pMainView = 0;
 	fname = "FrontCad.ini";
 	m_pLogFile = 0;
-	fopen_s(&m_pLogFile,"Log.txt", "w");
  
 }
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // The one and only CFrontCadApp object
 
 CFrontCadApp theApp;
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadApp initialization
 
 BOOL CFrontCadApp::InitInstance()
@@ -59,6 +58,7 @@ BOOL CFrontCadApp::InitInstance()
 	//  of your final executable, you should remove from the following
 	//  the specific initialization routines you do not need.
 
+	fopen_s(&m_pLogFile, "Log.txt", "w");
 	SetRegistryKey(_T("FrontCad_1_0"));
 
 	LoadStdProfileSettings();  // Load standard INI file options (including MRU)
@@ -85,8 +85,8 @@ BOOL CFrontCadApp::InitInstance()
 	// Dispatch commands specified on the command line
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
-//	AllocConsole();
-//	freopen_s(&pConsol, "CONOUT$", "w", stdout);
+	AllocConsole();
+	freopen_s(&pConsol, "CONOUT$", "w", stdout);
 	if (HasConsol())	printf("Ready\n");
 
 	// The one and only window has been initialized, so show and update it.
@@ -100,7 +100,7 @@ BOOL CFrontCadApp::InitInstance()
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CAboutDlg dialog used for App About
 
 class CAboutDlg : public CDialog
@@ -160,7 +160,7 @@ void CFrontCadApp::OnAppAbout()
 	
 }
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadApp message handlers
 
 
@@ -438,7 +438,7 @@ char* CFrontCadApp::ConvertCStringToChar(char* cpDest, CString& csSource)
 void CAboutDlg::SetVersion()
 {
 	char* s = new char[256];
-	static const char* pVersion = "Version 1.4.3";
+	static const char* pVersion = "Version 1.4.4";
 	static const char* pBuildDate = "Build Date Aug 25, 2025";
 	static const char* pCopyright = "Copyright (c) 2015, 2025";
 

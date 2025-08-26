@@ -1,6 +1,6 @@
 // Polygon.h: interface for the CPolygon class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_POLYGON_H__6B41D47F_05BB_4035_A037_9D6862C9C946__INCLUDED_)
 #define AFX_POLYGON_H__6B41D47F_05BB_4035_A037_9D6862C9C946__INCLUDED_

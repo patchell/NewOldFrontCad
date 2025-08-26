@@ -1,6 +1,6 @@
 // CadHoleRnd2Flat.h: interface for the CCadHoleRnd2Flat class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADHOLERND2FLAT_H__EAD08037_7F47_4162_A518_74A7EF370B20__INCLUDED_)
 #define AFX_CADHOLERND2FLAT_H__EAD08037_7F47_4162_A518_74A7EF370B20__INCLUDED_
@@ -11,7 +11,7 @@
 
 struct HoleRnd2FlatAttributes {
 	int m_Width;
-	int m_FlatDist;	///distance from flat to center point
+	int m_FlatDist;	//distance from flat to center point
 	COLORREF m_LineColor;
 	int m_Radius;
 	HoleRnd2FlatAttributes() {

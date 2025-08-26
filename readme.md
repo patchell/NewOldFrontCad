@@ -1,5 +1,16 @@
 Move along folks, nothing to see here, move along.
 
+
+August 25, 2025
+The source code was modified, well actuall brought up to snuff, for C++20.
+That was a mistake.  The code was originally written using Visual Studio 6.0.
+Modernizing it was not exactly what I had in mind to do, but you
+do what you gotta do.
+
+There were several things in the source code that were not a 
+problem earlier.  Some of these were a real pain in the neck to
+track down.  So there may be a few more revision in the guture.
+
 August 24, 2025
 
 Made a few changes.  I wanted to be able to disable object fills.

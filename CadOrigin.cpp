@@ -53,17 +53,17 @@ void CCadOrigin::Save(FILE *pO,  int Indent)
 
 void CCadOrigin::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 {
-	///---------------------------------------------
-	///	Draw
-	///		This function draws the object onto the
-	///	specified device context.
-	///
-	/// parameters:
-	///		pDC......pointer to the device context
-	///		mode.....mode to use when drawing
-	///		Offset...Offset to add to points
-	///		Scale....Sets Units to Pixels ratio
-	///---------------------------------------------
+	//---------------------------------------------
+	//	Draw
+	//		This function draws the object onto the
+	//	specified device context.
+	//
+	// parameters:
+	//		pDC......pointer to the device context
+	//		mode.....mode to use when drawing
+	//		Offset...Offset to add to points
+	//		Scale....Sets Units to Pixels ratio
+	//---------------------------------------------
 	CPen *pOld;
 	CRect rect;
 	CPoint P1, P2;

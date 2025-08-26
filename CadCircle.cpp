@@ -3,6 +3,7 @@
 
 CCadCircle::CCadCircle() :CCadObject(OBJECT_TYPE_CIRCLE)
 {
+	m_Radius = 0.0;
 	m_FillColor = RGB(0, 0, 0);
 	m_LineColor = RGB(0, 0, 0);
 	m_Width = 0;
@@ -17,6 +18,7 @@ CCadCircle::CCadCircle(CCadCircle& e) :CCadObject(OBJECT_TYPE_CIRCLE)
 	this->m_LineColor = e.m_LineColor;
 	this->m_Width = e.m_Width;
 	this->m_bTransparentFill = e.m_bTransparentFill;
+	m_Radius = e.m_Radius;
 }
 
 CCadCircle::~CCadCircle()
@@ -145,7 +147,6 @@ void CCadCircle::Draw(CDC* pDC, int mode, CPoint Offset, CScale Scale)
 
 int CCadCircle::CheckSelected(CPoint p, CSize O)
 {
-	double a, b, xo, yo, v;
 	int rV;
 	static int count = 0;
 	CSize szRadius;
@@ -268,15 +269,15 @@ CPoint CCadCircle::GetReference()
 
 void CCadCircle::AdjustRefernce(CPoint p)
 {
-	///-----------------------------------------
-	///	AdjustRefernce
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	AdjustRefernce
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	SetP2(GetP2() - p);
 }
@@ -295,15 +296,15 @@ CPoint CCadCircle::GetCenter()
 // Moves the center of the object to the spcified point
 void CCadCircle::ChangeCenter(CSize p)
 {
-	///-----------------------------------------
-	///	ChangeCenter
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	ChangeCenter
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	SetP2(GetP2() - p);
 }

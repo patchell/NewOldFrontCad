@@ -1,6 +1,6 @@
 // CadArcCentered.cpp: implementation of the CCadArcCentered class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -10,9 +10,9 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CCadArcCentered::CCadArcCentered():CCadObject(OBJECT_TYPE_ARCCENTERED)
 {
@@ -241,7 +241,7 @@ int CCadArcCentered::CheckSelected(CPoint p,CSize Offset)
 	Angle = ArcTan(double(p.x-P1.x),double(P1.y - p.y));
 	rV = CheckAngle(StartAngle,EndAngle,Angle);
 
-	/// 1 = x^2/A^2 + y^2/B^2
+	// 1 = x^2/A^2 + y^2/B^2
 	double W = double(this->GetWidth())/2.0;
 	if( W < 50.0) W = 50.0;
 	double A,B;
@@ -324,15 +324,15 @@ void CCadArcCentered::SetEndPoint(CPoint p)
 
 void CCadArcCentered::AdjustRefernce(CPoint p)
 {
-	///-----------------------------------------
-	///	AdjustRefernce
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	AdjustRefernce
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	SetP2(GetP2() - p);
 	this->m_atrb.m_Start -= p;

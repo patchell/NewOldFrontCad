@@ -1,6 +1,6 @@
 // MoveObjects.cpp: implementation of the CMoveObjects class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -10,9 +10,9 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CMoveObjects::CMoveObjects()
 {
@@ -30,14 +30,14 @@ void CMoveObjects::AddObject(CCadObject *pObj)
 {
 	if(GetHead())
 	{
-		///--------------------------
-		///add object to end of list
-		///--------------------------
+		//--------------------------
+		//add object to end of list
+		//--------------------------
 		GetTail()->SetNext(pObj);
 		pObj->SetPrev(GetTail());
 		SetTail(pObj);
 	}
-	else	///first object
+	else	//first object
 	{
 		SetHead(pObj);
 		SetTail(pObj);
@@ -46,14 +46,14 @@ void CMoveObjects::AddObject(CCadObject *pObj)
 
 CCadObject * CMoveObjects::RemoveObject(CCadObject *pLO)
 {
-	///------------------------------------------
-	/// RemoveObject
-	///			This function removes an object
-	/// from the move buffer.  This is a DELETE
-	///
-	///	parameters:
-	///		pLO.....pointer to object to remove
-	///------------------------------------------
+	//------------------------------------------
+	// RemoveObject
+	//			This function removes an object
+	// from the move buffer.  This is a DELETE
+	//
+	//	parameters:
+	//		pLO.....pointer to object to remove
+	//------------------------------------------
 	if(pLO == GetHead())
 	{
 		SetHead(GetHead()->GetNext());

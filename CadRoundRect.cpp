@@ -1,6 +1,6 @@
 // CadRoundRect.cpp: implementation of the CCadRoundRect class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -11,9 +11,9 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CCadRoundRect::CCadRoundRect():CCadObject(OBJECT_TYPE_RNDRECT)
 {
@@ -153,14 +153,14 @@ void CCadRoundRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 
 int CCadRoundRect::CheckSelected(CPoint p,CSize O)
 {
-	///------------------------------------------
-	/// CheckSelected
-	///		This function checks to seeif the
-	/// given point is withing the object.
-	///
-	/// parameters:
-	///		p......point of interest
-	///------------------------------------------
+	//------------------------------------------
+	// CheckSelected
+	//		This function checks to seeif the
+	// given point is withing the object.
+	//
+	// parameters:
+	//		p......point of interest
+	//------------------------------------------
 	CRect rect;
 	int rV;
 	CPoint P1 = GetP1() + O;
@@ -192,14 +192,14 @@ CCadRoundRect CCadRoundRect::operator=(CCadRoundRect &v)
 
 void CCadRoundRect::Move(CPoint p)
 {
-	///----------------------------------------
-	///	Move
-	///		This function is used to move the
-	/// object.
-	///
-	/// parameters:
-	///		p.....point to move object to
-	///----------------------------------------
+	//----------------------------------------
+	//	Move
+	//		This function is used to move the
+	// object.
+	//
+	// parameters:
+	//		p.....point to move object to
+	//----------------------------------------
 
 	CSize Diff = p - GetP1();
 	SetP1(GetP1() + Diff);
@@ -228,15 +228,15 @@ int CCadRoundRect::Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing,
 
 void CCadRoundRect::Save(FILE* pO, int Indent)
 {
-	///----------------------------------------
-	/// Save
-	///		This function is used to save this
-	/// this object to a file.  Used by save
-	/// save file and save library.
-	///
-	/// parameters:
-	///		pO....pointer to file to save to
-	///---------------------------------------
+	//----------------------------------------
+	// Save
+	//		This function is used to save this
+	// this object to a file.  Used by save
+	// save file and save library.
+	//
+	// parameters:
+	//		pO....pointer to file to save to
+	//---------------------------------------
 	char* s = new char[256];
 	char* s1 = new char[64];
 	char* s2 = new char[64];
@@ -265,20 +265,20 @@ void CCadRoundRect::Save(FILE* pO, int Indent)
 
 int CCadRoundRect::GrabVertex(CPoint point)
 {
-	///----------------------------------------
-	/// Grab Vertex
-	///		When the object is selected, there
-	/// are three different verticies that can
-	/// be grabbed to change the shape of the
-	/// object.
-	///
-	///	parameters:
-	///		point......point where moused is at
-	///		S..........Scale factor
-	///	returns:
-	///		index to the vertex if point was over a vertex
-	///		-1 if no vertex was selected.
-	///----------------------------------------
+	//----------------------------------------
+	// Grab Vertex
+	//		When the object is selected, there
+	// are three different verticies that can
+	// be grabbed to change the shape of the
+	// object.
+	//
+	//	parameters:
+	//		point......point where moused is at
+	//		S..........Scale factor
+	//	returns:
+	//		index to the vertex if point was over a vertex
+	//		-1 if no vertex was selected.
+	//----------------------------------------
 	int rV = -1;
 	CSize Diff(4,4);
 	CRect rect;
@@ -315,15 +315,15 @@ int CCadRoundRect::GrabVertex(CPoint point)
 
 void CCadRoundRect::SetVertex(int Vi, CPoint p)
 {
-	///----------------------------------------
-	/// SetVertex
-	///		This function is used to change the
-	/// value of the specified vertex.
-	///
-	///	parameter:
-	///		Vi.....Vertex Index
-	///		p......New value of vertex
-	///----------------------------------------
+	//----------------------------------------
+	// SetVertex
+	//		This function is used to change the
+	// value of the specified vertex.
+	//
+	//	parameter:
+	//		Vi.....Vertex Index
+	//		p......New value of vertex
+	//----------------------------------------
 
 	CSize Diff;
 	switch(Vi)
@@ -354,15 +354,15 @@ CPoint CCadRoundRect::GetReference()
 
 void CCadRoundRect::AdjustRefernce(CPoint p)
 {
-	///-----------------------------------------
-	///	AdjustRefernce
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	AdjustRefernce
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	SetP2(GetP2() - p);
 }
@@ -381,15 +381,15 @@ CPoint CCadRoundRect::GetCenter()
 // Moves the center of the object to the spcified point
 void CCadRoundRect::ChangeCenter(CSize p)
 {
-	///-----------------------------------------
-	///	ChangeCenter
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	ChangeCenter
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	SetP2(GetP2() - p);
 }

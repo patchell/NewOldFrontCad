@@ -1,6 +1,6 @@
 // CadBitmap.h: interface for the CCadBitmap class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADBITMAP_H__3EC14653_FD58_4A43_B114_7859DFD4EDC6__INCLUDED_)
 #define AFX_CADBITMAP_H__3EC14653_FD58_4A43_B114_7859DFD4EDC6__INCLUDED_

@@ -1,6 +1,6 @@
 // CadBitmap.cpp: implementation of the CCadBitmap class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -11,9 +11,9 @@ static char THIS_FILE[]=__FILE__;
 #endif
 
 
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CCadBitmap::CCadBitmap():CCadObject(OBJECT_TYPE_BITMAP)
 {
@@ -225,15 +225,15 @@ void CCadBitmap::SetSelected(int Flag)
 
 void CCadBitmap::AdjustRefernce(CPoint p)
 {
-	///-----------------------------------------
-	///	AdjustRefernce
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	AdjustRefernce
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	SetP2(GetP2() - p);
 }
@@ -280,15 +280,15 @@ CPoint CCadBitmap::GetCenter()
 // Moves the center of the object to the spcified point
 void CCadBitmap::ChangeCenter(CSize p)
 {
-	///-----------------------------------------
-	///	ChangeCenter
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	ChangeCenter
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	SetP2(GetP2() - p);
 }

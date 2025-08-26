@@ -1,6 +1,6 @@
 // CadObject.h: interface for the CCadObject class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADOBJECT_H__9AC56957_97CD_408B_B000_B41BC4FF00F9__INCLUDED_)
 #define AFX_CADOBJECT_H__9AC56957_97CD_408B_B000_B41BC4FF00F9__INCLUDED_

@@ -9,7 +9,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CMainFrame
 
 int m_Splits = 0;
@@ -33,7 +33,7 @@ static UINT indicators[] =
 	ID_INDICATOR_SCRL,
 };
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CMainFrame construction/destruction
 
 CMainFrame::CMainFrame()
@@ -84,7 +84,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CMainFrame diagnostics
 
 #ifdef _DEBUG
@@ -100,7 +100,7 @@ void CMainFrame::Dump(CDumpContext& dc) const
 
 #endif //_DEBUG
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CMainFrame message handlers
 
 
@@ -143,10 +143,10 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	GetClientRect(&rect);
 	if(m_Splits)
 	{
-		///------------------------------------------
-		/// here we set the width of the library
-		/// panel
-		///------------------------------------------
+		//------------------------------------------
+		// here we set the width of the library
+		// panel
+		//------------------------------------------
 		m_Libpane.SetColumnInfo(0,rect.Width()-285,50);
 		m_Libpane.SetColumnInfo(1,285,50);
 		m_Libpane.RecalcLayout();

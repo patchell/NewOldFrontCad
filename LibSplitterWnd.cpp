@@ -10,7 +10,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CLibSplitterWnd
 
 IMPLEMENT_DYNCREATE(CLibSplitterWnd, CSplitterWnd)
@@ -32,7 +32,7 @@ BEGIN_MESSAGE_MAP(CLibSplitterWnd, CSplitterWnd)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CLibSplitterWnd message handlers
 
 BOOL CLibSplitterWnd::CreateLibraryPane(CWnd* pParent, CCreateContext* pContext,DWORD dwStyle,UINT nID)

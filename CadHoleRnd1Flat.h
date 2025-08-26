@@ -1,6 +1,6 @@
 // CadHoleRnd1Flat.h: interface for the CCadHoleRnd1Flat class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADHOLERND1FLAT_H__A9C94EAC_1F36_421C_A9F3_8B94ED066B9B__INCLUDED_)
 #define AFX_CADHOLERND1FLAT_H__A9C94EAC_1F36_421C_A9F3_8B94ED066B9B__INCLUDED_
@@ -13,7 +13,7 @@ class CFileParser;
 
 struct HoleRnd1FlatAttributes {
 	int m_Width;
-	int m_FlatDist;	///distance from flat to center point
+	int m_FlatDist;	//distance from flat to center point
 	COLORREF m_LineColor;
 	int m_Radius;
 	HoleRnd1FlatAttributes() {
@@ -30,7 +30,7 @@ class CCadHoleRnd1Flat : public CCadObject
 	inline static int m_RenderEnable = 1;
 	CPen *m_pPenLine;
 	int m_Width;
-	int m_FlatDist;	///distance from flat to center point
+	int m_FlatDist;	//distance from flat to center point
 	int m_Radius;
 	COLORREF m_LineColor;
 public:

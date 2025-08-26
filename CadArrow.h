@@ -24,7 +24,7 @@ private:
 	CBrush *m_pBrFill;
 	CPen *m_pPen;
 	CPoint m_P3, m_P4;
-private:	///methodes
+private:	//methodes
 	void CalcPoints(CPoint & a, CPoint & b, CPoint Offset, CScale Scale);
 public:
 	CCadArrow();

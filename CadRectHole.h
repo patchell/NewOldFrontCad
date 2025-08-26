@@ -1,6 +1,6 @@
 // CadRectHole.h: interface for the CCadRectHole class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADRECTHOLE_H__7D533B79_BB3B_4DFF_8AD2_D368D3DD1871__INCLUDED_)
 #define AFX_CADRECTHOLE_H__7D533B79_BB3B_4DFF_8AD2_D368D3DD1871__INCLUDED_

@@ -31,7 +31,6 @@
 #include "CadObject.h"
 #include "CadArc.h"
 #include "CadArcCentered.h"
-#include "CadArc.h"
 #include "CadBitmap.h"
 #include "CadCircle.h"
 #include "CadElipse.h"

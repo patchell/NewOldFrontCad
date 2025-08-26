@@ -1,6 +1,6 @@
 // CadLibObject.cpp: implementation of the CCadLibObject class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -13,9 +13,9 @@ static char THIS_FILE[]=__FILE__;
 #endif
 
 
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CCadLibObject::CCadLibObject():CCadObject(OBJECT_TYPE_LIBCOMP)
 {
@@ -282,17 +282,17 @@ CCadLibObject::~CCadLibObject()
 
 void CCadLibObject::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 {
-	///---------------------------------------------
-	///	Draw
-	///		This function draws the object onto the
-	///	specified device context.
-	///
-	/// parameters:
-	///		pDC......pointer to the device context
-	///		mode.....mode to use when drawing
-	///		Offset...Offset to add to points
-	///		Scale....Sets Units to Pixels ratio
-	///---------------------------------------------
+	//---------------------------------------------
+	//	Draw
+	//		This function draws the object onto the
+	//	specified device context.
+	//
+	// parameters:
+	//		pDC......pointer to the device context
+	//		mode.....mode to use when drawing
+	//		Offset...Offset to add to points
+	//		Scale....Sets Units to Pixels ratio
+	//---------------------------------------------
 	if (CCadLibObject::m_RenderEnable)
 	{
 		CCadObject *pO = m_pStart;
@@ -341,14 +341,14 @@ void CCadLibObject::AddObject(CCadObject *pObj)
 {
 	if(m_pStart)
 	{
-		///--------------------------
-		///add object to end of list
-		///--------------------------
+		//--------------------------
+		//add object to end of list
+		//--------------------------
 		m_pEnd->SetNext(pObj);
 		pObj->SetPrev(m_pEnd);
 		m_pEnd = pObj;
 	}
-	else	///first object
+	else	//first object
 	{
 		m_pStart = pObj;
 		m_pEnd = pObj;
@@ -474,15 +474,15 @@ CPoint CCadLibObject::GetCenter()
 // Moves the center of the object to the spcified point
 void CCadLibObject::ChangeCenter(CSize p)
 {
-	///-----------------------------------------
-	///	ChangeCenter
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	ChangeCenter
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 }
 

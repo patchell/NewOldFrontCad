@@ -142,17 +142,17 @@ int CCadDimension::GrabVertex(CPoint p)
 
 void CCadDimension::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 {
-	///---------------------------------------------
-	///	Draw
-	///		This function draws the object onto the
-	///	specified device context.
-	///
-	/// parameters:
-	///		pDC......pointer to the device context
-	///		mode.....mode to use when drawing
-	///		Offset...Offset to add to points
-	///		Scale....Sets Units to Pixels ratio
-	///---------------------------------------------
+	//---------------------------------------------
+	//	Draw
+	//		This function draws the object onto the
+	//	specified device context.
+	//
+	// parameters:
+	//		pDC......pointer to the device context
+	//		mode.....mode to use when drawing
+	//		Offset...Offset to add to points
+	//		Scale....Sets Units to Pixels ratio
+	//---------------------------------------------
 	CPen *pOld;
 	CRect rect;
 	CPoint P1, P2;
@@ -250,15 +250,15 @@ void CCadDimension::SetSelected(int Flag)
 
 void CCadDimension::AdjustRefernce(CPoint Ref)
 {
-	///-----------------------------------------
-	///	AdjustRefernce
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		Ref.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	AdjustRefernce
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		Ref.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - Ref);
 	SetP2(GetP2() - Ref);
 	m_pText->AdjustRefernce(Ref);

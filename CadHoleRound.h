@@ -1,6 +1,6 @@
 // CadHoleRound.h: interface for the CCadHoleRound class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADHOLEROUND_H__14A455ED_1405_4CBA_BD0F_79D1203DB952__INCLUDED_)
 #define AFX_CADHOLEROUND_H__14A455ED_1405_4CBA_BD0F_79D1203DB952__INCLUDED_

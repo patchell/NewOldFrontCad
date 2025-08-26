@@ -3,23 +3,23 @@
 
 double ArcTan(double X, double Y)
 {
-	///------------------------------------
-	/// ArcTan
-	///		This function calculates the
-	///	Arctangent of X/Y.  The resulting
-	///	angle will be between 0 and 2*PI
-	///
-	///	parameters
-	///		X.......X coordinate of vector
-	///		Y.......Y coordinate of vector
-	///	returns
-	///		The angle whose tangent is X/Y
-	///------------------------------------
+	//------------------------------------
+	// ArcTan
+	//		This function calculates the
+	//	Arctangent of X/Y.  The resulting
+	//	angle will be between 0 and 2*PI
+	//
+	//	parameters
+	//		X.......X coordinate of vector
+	//		Y.......Y coordinate of vector
+	//	returns
+	//		The angle whose tangent is X/Y
+	//------------------------------------
 	double Pi = atan(1.0) * 4.0;
      double Angle;
-    ///-------------------------------------------------------
-    /// Calculate the initial phase
-    ///-------------------------------------------------------
+    //-------------------------------------------------------
+    // Calculate the initial phase
+    //-------------------------------------------------------
     if((X > 0) && (Y > 0)) Angle =atan2(Y,X);
     else if ((X > 0) && (Y < 0)) Angle = Pi - atan2(Y,-X);
     else if ((X < 0) && (Y > 0)) Angle = - atan2(-Y,X);
@@ -34,18 +34,18 @@ double ArcTan(double X, double Y)
 
 int CheckAngle(double Start, double End,double Angle)
 {
-	///-------------------------------------
-	/// CheckAngle
-	///		Determines if an angle is between
-	///	two other angles.
-	///
-	///	parameters:
-	///		Start.......First angle to compare to
-	///		End.........Second Angle to compare to
-	///		Angle.......Is Angle between Start and End
-	///	Returns:
-	///		True is Angle is between Start and End
-	///-------------------------------------
+	//-------------------------------------
+	// CheckAngle
+	//		Determines if an angle is between
+	//	two other angles.
+	//
+	//	parameters:
+	//		Start.......First angle to compare to
+	//		End.........Second Angle to compare to
+	//		Angle.......Is Angle between Start and End
+	//	Returns:
+	//		True is Angle is between Start and End
+	//-------------------------------------
 	int rV = 0;
 	if(Start > End)
 	{

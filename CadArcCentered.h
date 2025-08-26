@@ -1,6 +1,6 @@
 // CadArcCentered.h: interface for the CCadArcCentered class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADARCCENTERED_H__C255DC18_CFC6_498A_B1C8_B1C63146AA03__INCLUDED_)
 #define AFX_CADARCCENTERED_H__C255DC18_CFC6_498A_B1C8_B1C63146AA03__INCLUDED_

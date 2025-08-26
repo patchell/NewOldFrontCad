@@ -62,9 +62,9 @@ void CRepeatDlg::OnOK()
 	CWnd *wC;
 	// locate control that has gocus
 	wC = GetFocus();
-	/// Get the ID of that control
+	// Get the ID of that control
 	int id = wC->GetDlgCtrlID();
-	switch (id)							///parse the id
+	switch (id)							//parse the id
 	{
 	case IDOK:
 		m_Xinc = m_Edit_Xinc.GetValue();

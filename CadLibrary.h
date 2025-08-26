@@ -1,6 +1,6 @@
 // CadLibrary.h: interface for the CCadLibrary class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADLIBRARY_H__F7C7788A_44D0_4810_AAFB_4C5053AF21FE__INCLUDED_)
 #define AFX_CADLIBRARY_H__F7C7788A_44D0_4810_AAFB_4C5053AF21FE__INCLUDED_

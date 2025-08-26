@@ -1,6 +1,6 @@
 // CadPolygonFill.h: interface for the CCadPolygonFill class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADPOLYGONFILL_H__651BD531_2526_4268_936A_C9B80A183CD3__INCLUDED_)
 #define AFX_CADPOLYGONFILL_H__651BD531_2526_4268_936A_C9B80A183CD3__INCLUDED_

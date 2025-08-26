@@ -45,7 +45,7 @@ int ZoomScaleDiv[MAX_ZOOM] = {
 
 
 
-////////////////////////////////////////////////////
+///////////////////////////////////
 // CFrontCadView
 
 IMPLEMENT_DYNCREATE(CFrontCadView, CView)
@@ -135,7 +135,7 @@ ON_WM_SYSKEYDOWN()
 ON_WM_SYSKEYUP()
 END_MESSAGE_MAP()
 
-////////////////////////////////////////////////////
+///////////////////////////////////
 // CFrontCadView construction/destruction
 
 CFrontCadView::CFrontCadView()
@@ -185,7 +185,7 @@ BOOL CFrontCadView::PreCreateWindow(CREATESTRUCT& cs)
 	return CView::PreCreateWindow(cs);
 }
 
-////////////////////////////////////////////////////
+///////////////////////////////////
 // CFrontCadView drawing
 
 void CFrontCadView::OnPrint(CDC* pDC, CPrintInfo* pInfo)
@@ -401,7 +401,7 @@ void CFrontCadView::OnInitialUpdate()
     OnUpdate(NULL, 0, NULL);
 }
 
-////////////////////////////////////////////////////
+///////////////////////////////////
 // CFrontCadView printing
 
 BOOL CFrontCadView::OnPreparePrinting(CPrintInfo* pInfo)
@@ -418,7 +418,7 @@ void CFrontCadView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 {
 }
 
-////////////////////////////////////////////////////
+///////////////////////////////////
 // CFrontCadView diagnostics
 
 #ifdef _DEBUG
@@ -439,7 +439,7 @@ CFrontCadDoc* CFrontCadView::GetDocument() // non-debug version is inline
 }
 #endif //_DEBUG
 
-////////////////////////////////////////////////////
+///////////////////////////////////
 // CFrontCadView message handlers
 
 BOOL CFrontCadView::OnEraseBkgnd(CDC* pDC)
@@ -460,7 +460,7 @@ void CFrontCadView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	// key presses, looking for  HHotkeys
 	// that do certain funcrtions
 	//----------------------------------------
-	printf("OnKEYDOWN KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+	if(theApp.HasConsol()) printf("OnKEYDOWN KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 
 	switch(nChar)	//check the key press
 	{
@@ -489,7 +489,7 @@ void CFrontCadView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	//--------------------------------------------
 	int id;
 
-	printf("OnKEYUP KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+	if (theApp.HasConsol()) printf("OnKEYUP KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 	switch(nChar)	//check released character
 	{
 		case VK_CONTROL:	//control key
@@ -557,7 +557,7 @@ void CFrontCadView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 			m_Drawmode = DrawMode::SELECT;
 			break;
 		case VK_MENU: //alt key
-			printf("\nOnKEYUP ALT-KEY:%04x Repeat:%d FLAGS:%04x\n\n", nChar, nRepCnt, nFlags);
+			if (theApp.HasConsol()) printf("\nOnKEYUP ALT-KEY:%04x Repeat:%d FLAGS:%04x\n\n", nChar, nRepCnt, nFlags);
 			m_SnapOff = 0; //turn off snap grid
 			break;
 	}
@@ -1856,6 +1856,7 @@ void CFrontCadView::OnMouseMove(UINT nFlags, CPoint point)
 					Invalidate();
 					break;
 			}
+			break;
 		case DrawMode::CIRCLE:	// OnMouseMove
 			switch (m_DrawState)
 			{
@@ -2775,7 +2776,7 @@ void CFrontCadView::OnToolbarPolygon()
 
 void CFrontCadView::OnToolbarScalewiz()
 {
-	CFrontCadApp *pA = (CFrontCadApp *)AfxGetApp();
+	CFrontCadApp *pA = &theApp;
 	CScaleWizDialog dlg;
 	int Id;
 
@@ -2824,7 +2825,7 @@ void CFrontCadView::OnToolbarScalewiz()
 		pA->m_SCALEWIZattributes.m_HoleType = dlg.m_atrb.m_HoleType;
 		pA->m_SCALEWIZattributes.m_DistToTick = dlg.m_atrb.m_DistToTick;
 		for(int i=0;i< pA->m_SCALEWIZattributes.m_Divisions+1;++i)
-			strcpy_s(pA->m_SCALEWIZattributes.m_pLabels[i], SCALE_LABELS_SIZE,dlg.m_atrb.m_pLabels[i]);
+			strcpy_s(pA->m_SCALEWIZattributes.m_pLabels[i], SCALE_LABELS_STRING_SIZE,dlg.m_atrb.m_pLabels[i]);
 		pA->m_SCALEWIZattributes.m_FontSize = dlg.m_atrb.m_FontSize;
 		pA->m_SCALEWIZattributes.m_BkColor = dlg.m_atrb.m_BkColor;
 		pA->m_SCALEWIZattributes.m_TextColor = dlg.m_atrb.m_TextColor;
@@ -4259,7 +4260,7 @@ void CFrontCadView::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CFrontCadView::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	printf("OnSysKeyDown KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+	if (theApp.HasConsol()) printf("OnSysKeyDown KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 	switch (nChar)
 	{
 	case VK_MENU:
@@ -4271,7 +4272,7 @@ void CFrontCadView::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CFrontCadView::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	printf("OnSysKeyUp KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+	if (theApp.HasConsol()) printf("OnSysKeyUp KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 	switch (nChar)
 	{
 	case VK_MENU:

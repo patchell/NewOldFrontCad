@@ -1,6 +1,6 @@
 // CadObject.cpp: implementation of the CCadObject class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -57,9 +57,9 @@ const char* CCadObject::LookupTypeName(int TypeToken)
 	return s;
 }
 
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CCadObject::CCadObject()
 {
@@ -94,18 +94,18 @@ CCadObject::~CCadObject()
 
 void CCadObject::Draw(CDC *pDC,int mode,CPoint Offset,CScale Scale)
 {
-	///---------------------------------------------
-	///	Draw
-	///		This function draws the object onto the
-	///	specified device context.
-	/// Base Class Methode does nothing
-	///
-	/// parameters:
-	///		pDC......pointer to the device context
-	///		mode.....mode to use when drawing
-	///		Offset...Offset to add to points
-	///		Scale....Sets Units to Pixels ratio
-	///---------------------------------------------
+	//---------------------------------------------
+	//	Draw
+	//		This function draws the object onto the
+	//	specified device context.
+	// Base Class Methode does nothing
+	//
+	// parameters:
+	//		pDC......pointer to the device context
+	//		mode.....mode to use when drawing
+	//		Offset...Offset to add to points
+	//		Scale....Sets Units to Pixels ratio
+	//---------------------------------------------
 
 }
 

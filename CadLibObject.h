@@ -1,6 +1,6 @@
 // CadLibObject.h: interface for the CCadLibObject class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADLIBOBJECT_H__291CD60B_9372_480F_9754_8061ECEFF91F__INCLUDED_)
 #define AFX_CADLIBOBJECT_H__291CD60B_9372_480F_9754_8061ECEFF91F__INCLUDED_

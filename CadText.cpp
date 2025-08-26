@@ -1,6 +1,6 @@
 // CadText.cpp: implementation of the CCadText class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #include "stdafx.h"
 
@@ -11,9 +11,9 @@ static char THIS_FILE[]=__FILE__;
 #endif
 
 extern FILE *pO;
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 CCadText::CCadText():CCadObject(OBJECT_TYPE_TEXT)
 {
@@ -47,17 +47,17 @@ CCadText::~CCadText()
 
 void CCadText::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 {
-	///---------------------------------------------
-	///	Draw
-	///		This function draws the object onto the
-	///	specified device context.
-	///
-	/// parameters:
-	///		pDC......pointer to the device context
-	///		mode.....mode to use when drawing
-	///		Offset...Offset to add to points
-	///		Scale....Sets Units to Pixels ratio
-	///---------------------------------------------
+	//---------------------------------------------
+	//	Draw
+	//		This function draws the object onto the
+	//	specified device context.
+	//
+	// parameters:
+	//		pDC......pointer to the device context
+	//		mode.....mode to use when drawing
+	//		Offset...Offset to add to points
+	//		Scale....Sets Units to Pixels ratio
+	//---------------------------------------------
 	CFont *pOldFont;
 	CPen *pOldPen;
 	COLORREF OldColor,OldBk;
@@ -130,33 +130,33 @@ void CCadText::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 
 void CCadText::SetText(char *s)
 {
-	///----------------------------------------
-	/// SetText
-	///		This function changes the text that
-	/// is displayed by the CCadTexst oibject
-	///
-	/// parameter:
-	///		s......pointer to string to display
-	///----------------------------------------
+	//----------------------------------------
+	// SetText
+	//		This function changes the text that
+	// is displayed by the CCadTexst oibject
+	//
+	// parameter:
+	//		s......pointer to string to display
+	//----------------------------------------
 	if(m_atrb.m_pText) delete[] m_atrb.m_pText;
 	int len = strlen(s) + 1;
 	m_atrb.m_pText = new char[len];
 	strcpy_s(m_atrb.m_pText,len,s);
-	/// create the selection rectangle
+	// create the selection rectangle
 	CRect rect = GetTextRectangle();
 	Rotate(m_atrb.m_Angle,rect,m_SelRect);
 }
 
 void CCadText::SetAngle(int e)
 {
-	///----------------------------------------
-	/// SetAngle
-	///		This function sets the angle to paint
-	/// the text at.
-	///
-	/// parameters:
-	///		e.....Angle, in tenths of a degree
-	///----------------------------------------
+	//----------------------------------------
+	// SetAngle
+	//		This function sets the angle to paint
+	// the text at.
+	//
+	// parameters:
+	//		e.....Angle, in tenths of a degree
+	//----------------------------------------
 	m_atrb.m_Angle = e;
 	CRect rect = GetTextRectangle();
 	this->Rotate(m_atrb.m_Angle,rect,this->m_SelRect);
@@ -164,29 +164,29 @@ void CCadText::SetAngle(int e)
 
 void CCadText::GetText(char *s,int n)
 {
-	///---------------------------------------
-	/// GetText
-	///		This function retrieves the text
-	/// thatis being displayed.
-	///
-	/// parameters:
-	///		s.....pointer to array to put text into
-	///		n.....maximum number of chars to copy
-	///---------------------------------------
+	//---------------------------------------
+	// GetText
+	//		This function retrieves the text
+	// thatis being displayed.
+	//
+	// parameters:
+	//		s.....pointer to array to put text into
+	//		n.....maximum number of chars to copy
+	//---------------------------------------
 	strcpy_s(s, n, (const char *)m_atrb.m_pText);
 }
 
 void CCadText::SettAttrib(TextAttributes &atrb)
 {
-	///--------------------------------------
-	/// AetAttrib
-	///
-	///		This function sets the CCadText
-	/// attributes.
-	///
-	/// parameters:
-	///		atrb....reference to attribute structure
-	///--------------------------------------
+	//--------------------------------------
+	// AetAttrib
+	//
+	//		This function sets the CCadText
+	// attributes.
+	//
+	// parameters:
+	//		atrb....reference to attribute structure
+	//--------------------------------------
 	m_atrb.m_Color = atrb.m_Color;
 	m_atrb.m_BkColor = atrb.m_BkColor;
 	m_atrb.m_Angle = atrb.m_Angle;
@@ -200,30 +200,30 @@ void CCadText::SettAttrib(TextAttributes &atrb)
 
 void CCadText::SetFontName(char *s)
 {
-	///-----------------------------------------
-	/// SetFontName
-	///		This function is useed to set the
-	/// name of the font that is used to paint
-	/// the text.
-	///
-	/// parameter:
-	///		s.....pointer to new font name
-	///-----------------------------------------
+	//-----------------------------------------
+	// SetFontName
+	//		This function is useed to set the
+	// name of the font that is used to paint
+	// the text.
+	//
+	// parameter:
+	//		s.....pointer to new font name
+	//-----------------------------------------
 	strcpy_s(m_atrb.m_pFontName,LF_FACESIZE,s);
 }
 
 int CCadText::CheckSelected(CPoint p,CSize O)
 {
-	///-------------------------------------------
-	/// CheckSelected
-	///		This function is used to check to see
-	/// if the mouse pointer is over this object.
-	/// It does not check to see if the m_Selected
-	/// is set and does not set that flag.
-	///
-	/// parameter:
-	///		p......point to check
-	///-------------------------------------------
+	//-------------------------------------------
+	// CheckSelected
+	//		This function is used to check to see
+	// if the mouse pointer is over this object.
+	// It does not check to see if the m_Selected
+	// is set and does not set that flag.
+	//
+	// parameter:
+	//		p......point to check
+	//-------------------------------------------
 	return m_SelRect.PointEnclosed(p);
 }
 
@@ -263,14 +263,14 @@ int CCadText::Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, CFil
 
 void CCadText::Save(FILE* pO, int Indent)
 {
-	///-----------------------------------------
-	/// Save
-	///		This is the functtion that is called
-	/// when ever you save a file or library
-	///
-	/// parameter:
-	///		pO...Pointer to file to store data
-	///-----------------------------------------
+	//-----------------------------------------
+	// Save
+	//		This is the functtion that is called
+	// when ever you save a file or library
+	//
+	// parameter:
+	//		pO...Pointer to file to store data
+	//-----------------------------------------
 	char* s = new char[256];
 	char* s1 = new char[64];
 	char* s2 = new char[64];
@@ -309,27 +309,27 @@ void CCadText::Save(FILE* pO, int Indent)
 
 TextAttributes * CCadText::GetAttributes()
 {
-	///-------------------------------------------
-	/// GetAttributes
-	///		This function gets a pointer to the
-	///	text attribute structure
-	///-------------------------------------------
+	//-------------------------------------------
+	// GetAttributes
+	//		This function gets a pointer to the
+	//	text attribute structure
+	//-------------------------------------------
 	return &m_atrb;
 }
 
 void CCadText::Rotate(int Angle,CRect rect,CCadPolygon &Poly)
 {
-	///----------------------------------------------
-	/// Rotate
-	///		Thhis function rotates the selection
-	/// rectangle.
-	///
-	///		parameters:
-	///			Angle....Angle to rotate by in tenths of a degree
-	///			rect.....None Rotated Rectangle
-	///			Poly.....Reference to a Polygon that
-	///						The rotated rectangle is put in
-	///----------------------------------------------
+	//----------------------------------------------
+	// Rotate
+	//		Thhis function rotates the selection
+	// rectangle.
+	//
+	//		parameters:
+	//			Angle....Angle to rotate by in tenths of a degree
+	//			rect.....None Rotated Rectangle
+	//			Poly.....Reference to a Polygon that
+	//						The rotated rectangle is put in
+	//----------------------------------------------
 	Poly.Reset();
 	double Ang = double(Angle)/ 10.0;
 	double Pi = atan(1.0) * 4;
@@ -350,15 +350,15 @@ void CCadText::Rotate(int Angle,CRect rect,CCadPolygon &Poly)
 
 CCadText CCadText::operator=(CCadText &v)
 {
-	///-----------------------------------------------
-	/// operator=
-	///		This function overides the assignment
-	///	operator to make a copy of the CCadText
-	/// object.
-	///
-	/// parameter:
-	///		v.....reference to CCadText object to copy
-	///-----------------------------------------------
+	//-----------------------------------------------
+	// operator=
+	//		This function overides the assignment
+	//	operator to make a copy of the CCadText
+	// object.
+	//
+	// parameter:
+	//		v.....reference to CCadText object to copy
+	//-----------------------------------------------
 	m_atrb.m_pText = 0;
 	m_pFont = 0;
 	m_pSelPen = 0;
@@ -370,15 +370,15 @@ CCadText CCadText::operator=(CCadText &v)
 
 void CCadText::CopyAttributes(TextAttributes *d, TextAttributes *s)
 {
-	///------------------------------------------------
-	/// CopyAttriutes
-	///		This function copies a TextAttributes
-	/// Structure.
-	///
-	///	parameters:
-	///		d.....Detination pointer
-	///		s.....Source Pointer
-	///------------------------------------------------
+	//------------------------------------------------
+	// CopyAttriutes
+	//		This function copies a TextAttributes
+	// Structure.
+	//
+	//	parameters:
+	//		d.....Detination pointer
+	//		s.....Source Pointer
+	//------------------------------------------------
 	d->m_Color = s->m_Color;
 	d->m_BkColor = s->m_BkColor;
 	d->m_Angle = s->m_Angle;
@@ -399,13 +399,13 @@ void CCadText::CopyAttributes(TextAttributes *d, TextAttributes *s)
 
 void CCadText::Move(CPoint p)
 {
-	///-----------------------------------------------
-	/// Move
-	///		Move the object to a new location.
-	///
-	/// parameters:
-	///		p.....New location.
-	///-----------------------------------------------
+	//-----------------------------------------------
+	// Move
+	//		Move the object to a new location.
+	//
+	// parameters:
+	//		p.....New location.
+	//-----------------------------------------------
 	SetP1(p);
 	CRect rect = GetTextRectangle();
 	Rotate(m_atrb.m_Angle,rect,m_SelRect);
@@ -413,71 +413,71 @@ void CCadText::Move(CPoint p)
 
 int CCadText::GrabVertex(CPoint point)
 {
-	///-----------------------------------------------
-	/// GrabVertex
-	///		This function returns an index to a vertex
-	/// that the mouse is over.  CCadText does not
-	/// have any so it always returns negatory.
-	///
-	/// parameters:
-	///		point....point to check against.
-	///		Scale....current scale factor
-	/// returns:
-	///		Returns -1 if no vertex is selected
-	///		Returns an index , starting at 0 and uup
-	///		if a vertex is selected
-	///-----------------------------------------------
+	//-----------------------------------------------
+	// GrabVertex
+	//		This function returns an index to a vertex
+	// that the mouse is over.  CCadText does not
+	// have any so it always returns negatory.
+	//
+	// parameters:
+	//		point....point to check against.
+	//		Scale....current scale factor
+	// returns:
+	//		Returns -1 if no vertex is selected
+	//		Returns an index , starting at 0 and uup
+	//		if a vertex is selected
+	//-----------------------------------------------
 	return -1;
 }
 
 void CCadText::SetVertex(int Vi, CPoint p)
 {
-	///-----------------------------------------------
-	/// SetVertex
-	///		This function is used to move a vertex to
-	/// a new location.
-	///
-	///	parameters:
-	///		Vi.....Vertex Index
-	///		p......New location
-	///-----------------------------------------------
+	//-----------------------------------------------
+	// SetVertex
+	//		This function is used to move a vertex to
+	// a new location.
+	//
+	//	parameters:
+	//		Vi.....Vertex Index
+	//		p......New location
+	//-----------------------------------------------
 }
 
 CPoint CCadText::GetReference()
 {
-	///-----------------------------------------
-	///	GetReference
-	///		This function was added mostly so that
-	/// I could have a virtual function to do this
-	/// for all CCadObjects.  Generally, it is jmust
-	/// m_P1.
-	///
-	///	returns:
-	///		m_P1
-	///-----------------------------------------
+	//-----------------------------------------
+	//	GetReference
+	//		This function was added mostly so that
+	// I could have a virtual function to do this
+	// for all CCadObjects.  Generally, it is jmust
+	// m_P1.
+	//
+	//	returns:
+	//		m_P1
+	//-----------------------------------------
 	return GetP1();
 }
 
 char * CCadText::GetText()
 {
-	///----------------------------------------
-	/// GetText
-	///		This function returns a pointer to
-	/// the string that is being displayed by
-	/// by the text object
-	///----------------------------------------
+	//----------------------------------------
+	// GetText
+	//		This function returns a pointer to
+	// the string that is being displayed by
+	// by the text object
+	//----------------------------------------
 	return this->m_atrb.m_pText;
 }
 
 
 CRect CCadText::GetTextRectangle()
 {
-	///------------------------------------------
-	/// GetTextRectangle
-	///		This function is used to get the
-	/// rectangle that surrounds the text displayed
-	/// bu the text object.
-	///------------------------------------------
+	//------------------------------------------
+	// GetTextRectangle
+	//		This function is used to get the
+	// rectangle that surrounds the text displayed
+	// bu the text object.
+	//------------------------------------------
 	CWnd *pW = CWnd::GetActiveWindow();
 	CDC *pDC = pW->GetDC();
 	//	CDC *pDC = ((CFrontCadApp *)AfxGetApp())->m_pMainView->GetDC();
@@ -501,16 +501,16 @@ CRect CCadText::GetTextRectangle()
 
 CRect CCadText::GetTextRectangle(CDC *pDC, CScale Scale)
 {
-	///------------------------------------------
-	/// GetTextRectangle
-	///		This function is used to get the
-	/// rectangle that surrounds the text displayed
-	/// bu the text object.
-	///
-	///	parameters:
-	///		pDC.....pointer to the device context
-	///		Scale...Scale factor for display
-	///------------------------------------------
+	//------------------------------------------
+	// GetTextRectangle
+	//		This function is used to get the
+	// rectangle that surrounds the text displayed
+	// bu the text object.
+	//
+	//	parameters:
+	//		pDC.....pointer to the device context
+	//		Scale...Scale factor for display
+	//------------------------------------------
 	CFont font,*old;
 	font.CreateFont(int(m_atrb.m_FontHeight * Scale.m_ScaleX),int(m_atrb.m_FontWidth * Scale.m_ScaleX),0,0,
 			m_atrb.m_Weight,0,0,0,DEFAULT_CHARSET,OUT_CHARACTER_PRECIS,
@@ -529,23 +529,23 @@ CRect CCadText::GetTextRectangle(CDC *pDC, CScale Scale)
 
 CPoint CCadText::CalcTextShiftonRotation(CPoint p1, CPoint Center, double angle)
 {
-	///--------------------------------------------
-	///	CalcTextShiftonRotation
-	///		This function is just a little complicated.
-	/// What this does is it calculates the point to
-	/// draw text at for a rotated text object.  This
-	/// makes it so the text apears to be centered
-	/// at point p1 at the given angle from the
-	/// center.
-	///
-	/// parameters:
-	///		p1...place you want text
-	///		Center...Center of the text rectangle
-	///		Angle...Angle in degree
-	///
-	/// returns:
-	///		point at wich to paint text.
-	///--------------------------------------------
+	//--------------------------------------------
+	//	CalcTextShiftonRotation
+	//		This function is just a little complicated.
+	// What this does is it calculates the point to
+	// draw text at for a rotated text object.  This
+	// makes it so the text apears to be centered
+	// at point p1 at the given angle from the
+	// center.
+	//
+	// parameters:
+	//		p1...place you want text
+	//		Center...Center of the text rectangle
+	//		Angle...Angle in degree
+	//
+	// returns:
+	//		point at wich to paint text.
+	//--------------------------------------------
 	CPoint rP;
 	double r2;
 	double dx = double(p1.x - Center.x);
@@ -559,15 +559,15 @@ CPoint CCadText::CalcTextShiftonRotation(CPoint p1, CPoint Center, double angle)
 
 void CCadText::AdjustRefernce(CPoint p)
 {
-	///-----------------------------------------
-	///	AdjustRefernce
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	AdjustRefernce
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	SetP2(GetP2() - p);
 }
@@ -592,15 +592,15 @@ CPoint CCadText::GetCenter()
 // Moves the center of the object to the spcified point
 void CCadText::ChangeCenter(CSize p)
 {
-	///-----------------------------------------
-	///	ChangeCenter
-	///		Thhis function is used to normalize
-	///	the location of points in the object
-	/// relative to a point choseen on the
-	/// drawing.
-	///	parameters:
-	///		p.....selected reference point
-	///-----------------------------------------
+	//-----------------------------------------
+	//	ChangeCenter
+	//		Thhis function is used to normalize
+	//	the location of points in the object
+	// relative to a point choseen on the
+	// drawing.
+	//	parameters:
+	//		p.....selected reference point
+	//-----------------------------------------
 	SetP1(GetP1() - p);
 	SetP2(GetP2() - p);
 }

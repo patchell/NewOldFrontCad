@@ -1,6 +1,6 @@
 // FrontCadDoc.h : interface of the CFrontCadDoc class
 //
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 
 #if !defined(AFX_FRONTCADDOC_H__A897E098_6F57_478C_952F_DF84F475B43E__INCLUDED_)
 #define AFX_FRONTCADDOC_H__A897E098_6F57_478C_952F_DF84F475B43E__INCLUDED_

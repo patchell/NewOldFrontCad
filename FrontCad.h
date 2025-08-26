@@ -14,7 +14,7 @@
 
 
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CFrontCadApp:
 // See FrontCad.cpp for the implementation of this class
 //
@@ -28,9 +28,9 @@ class CFrontCadApp : public CWinApp
 	CFrontCadDoc* m_pDoc;
 	FILE* pConsol;
 public:
-	///------------------------------
-	/// Program settings
-	///------------------------------
+	//------------------------------
+	// Program settings
+	//------------------------------
 	RndRectAttb m_RndRectAttributes;
 	TextAttributes m_TextAttributes;
 	SCALEWIZattributes m_SCALEWIZattributes;
@@ -73,10 +73,10 @@ public:
 	FILE *m_pLogFile;
 public:
 	FILE* GetLog() { return m_pLogFile; }
-	bool HasConsol() {
-		bool rV = false;
+	BOOL HasConsol() {
+		BOOL rV = FALSE;
 		if (pConsol)
-			rV = true;
+			rV = TRUE;
 		return rV;
 	}
 };

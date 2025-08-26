@@ -1,6 +1,6 @@
 // MainFrm.h : interface of the CMainFrame class
 //
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 
 #if !defined(AFX_MAINFRM_H__1F82F443_D91F_4BC5_9D41_58CC1A523A51__INCLUDED_)
 #define AFX_MAINFRM_H__1F82F443_D91F_4BC5_9D41_58CC1A523A51__INCLUDED_

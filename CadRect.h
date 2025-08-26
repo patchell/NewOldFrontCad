@@ -1,6 +1,6 @@
 // CadRect.h: interface for the CCadRect class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADRECT_H__65FA097A_DD30_4DCD_A691_E90895F5F2BC__INCLUDED_)
 #define AFX_CADRECT_H__65FA097A_DD30_4DCD_A691_E90895F5F2BC__INCLUDED_

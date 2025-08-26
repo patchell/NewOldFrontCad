@@ -1,6 +1,6 @@
 // FileParser.h: interface for the CFileParser class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_FILEPARSER_H__6A884CBF_F824_4989_ABE1_0126A175C1F8__INCLUDED_)
 #define AFX_FILEPARSER_H__6A884CBF_F824_4989_ABE1_0126A175C1F8__INCLUDED_

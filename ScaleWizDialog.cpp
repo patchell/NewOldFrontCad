@@ -9,7 +9,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CScaleWizDialog dialog
 
 
@@ -33,8 +33,6 @@ CScaleWizDialog::CScaleWizDialog(CWnd* pParent /*=NULL*/)
 
 CScaleWizDialog::~CScaleWizDialog()
 {
-	delete[] m_atrb.m_pFont;
-	for(int i=0;i<SCALE_LABELS_SIZE;++i) delete [] m_atrb.m_pLabels[i];
 }
 
 
@@ -66,7 +64,7 @@ BEGIN_MESSAGE_MAP(CScaleWizDialog, CDialog)
 	ON_MESSAGE(WM_TAB2_LABELSEL,OnLabelSelScrollBar)
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // CScaleWizDialog message handlers
 
 BOOL CScaleWizDialog::OnInitDialog() 
@@ -191,13 +189,13 @@ BOOL CScaleWizDialog::OnInitDialog()
 void CScaleWizDialog::OnOK() 
 {
 	CWnd *wC;
-	char *s = new char[256];
+//	char *s = new char[256];
 
-	///locate control that has gocus
+	//locate control that has gocus
 	wC = GetFocus();
-	/// Get the ID of that control
+	// Get the ID of that control
 	int id = wC->GetDlgCtrlID();
-	switch(id)							///parse the id
+	switch(id)							//parse the id
 	{
 		case IDOK:
 			CDialog::OnOK();
@@ -207,7 +205,7 @@ void CScaleWizDialog::OnOK()
 			wC->SetFocus();
 			break;
 	}
-	delete[] s;
+//	delete[] s;
 }
 
 void CScaleWizDialog::OnSelchangeTabScalewiz(NMHDR* pNMHDR, LRESULT* pResult) 

@@ -1,6 +1,6 @@
 // CadLine.h: interface for the CCadLine class.
 //
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////
 
 #if !defined(AFX_CADLINE_H__B86774F1_566B_4664_8176_344A2AC8B46E__INCLUDED_)
 #define AFX_CADLINE_H__B86774F1_566B_4664_8176_344A2AC8B46E__INCLUDED_
