@@ -438,8 +438,8 @@ char* CFrontCadApp::ConvertCStringToChar(char* cpDest, CString& csSource)
 void CAboutDlg::SetVersion()
 {
 	char* s = new char[256];
-	static const char* pVersion = "Version 1.4.4";
-	static const char* pBuildDate = "Build Date Aug 25, 2025";
+	static const char* pVersion = "Version 1.4.5";
+	static const char* pBuildDate = "Build Date Aug 26, 2025";
 	static const char* pCopyright = "Copyright (c) 2015, 2025";
 
 	sprintf_s(s, 256, "%s\n%s\n%s",
@@ -456,5 +456,5 @@ BOOL CAboutDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	SetVersion();
-	return TRUE;  // return TRUE unless you set the focus to a control
+	return TRUE;  
 }

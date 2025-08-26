@@ -37,6 +37,7 @@ void CDialogRenderEnable::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_CHECK_TEXTENABLED, m_Check_TextEnable);
     DDX_Control(pDX, IDC_CHECK_TWOFLATENABLE, m_Check_TwoFlatRoundHoleEnable);
     DDX_Control(pDX, IDC_CHECKBOX_SHAPE_FILL_ENABLE, m_CheckBox_ShapeFill);
+    DDX_Control(pDX, IDC_CHECK_RENDER_CIRCLE, m_Check_Circlle);
 }
 
 
@@ -58,6 +59,7 @@ BEGIN_MESSAGE_MAP(CDialogRenderEnable, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_TEXTENABLED, &CDialogRenderEnable::OnClickedCheckTextenabled)
 	ON_BN_CLICKED(IDC_CHECK_TWOFLATENABLE, &CDialogRenderEnable::OnClickedCheckTwoflatenable)
 	ON_BN_CLICKED(IDC_CHECKBOX_SHAPE_FILL_ENABLE, &CDialogRenderEnable::OnClickedCheckboxShapeFillEnable)
+    ON_BN_CLICKED(IDC_CHECK_RENDER_CIRCLE, &CDialogRenderEnable::OnClickedCheckRenderCircle)
 END_MESSAGE_MAP()
 
 
@@ -180,6 +182,7 @@ BOOL CDialogRenderEnable::OnInitDialog()
 	m_Check_RoundHole.SetCheck(CCadHoleRound::IsRenderEnabled());
 	m_Check_TextEnable.SetCheck(CCadText::IsRenderEnabled());
 	m_Check_TwoFlatRoundHoleEnable.SetCheck(CCadHoleRnd2Flat::IsRenderEnabled());
+	m_Check_Circlle.SetCheck(CCadCircle::IsRenderEnabled());
 	if (CCadObject::AreShapeFillsEnable())
 	{
 		m_CheckBox_ShapeFill.SetCheck(BST_CHECKED);
@@ -194,4 +197,9 @@ void CDialogRenderEnable::OnClickedCheckboxShapeFillEnable()
 		CCadObject::EnableRenderFills();
 	else
 		CCadObject::DisableRenderFills();
+}
+
+void CDialogRenderEnable::OnClickedCheckRenderCircle()
+{
+	CCadCircle::SetRenderEnable(m_Check_Circlle.GetCheck());
 }

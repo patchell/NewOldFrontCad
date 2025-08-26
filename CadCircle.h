@@ -15,7 +15,7 @@ struct CircleAttributes {
 
 class CCadCircle : public CCadObject
 {
-	inline static int m_RenderEnable = 0;
+	inline static int m_RenderEnable = 1;
 	double m_Radius;
 	int m_Width;
 	COLORREF m_LineColor;

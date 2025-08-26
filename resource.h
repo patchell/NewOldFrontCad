@@ -141,6 +141,8 @@
 #define IDC_STATIC_ABOUT_VERSION        1130
 #define IDC_CHECK1                      1131
 #define IDC_CHECKBOX_SHAPE_FILL_ENABLE  1131
+#define IDC_CHECK2                      1132
+#define IDC_CHECK_RENDER_CIRCLE         1132
 #define ID_TOOLBAR_LINE                 32771
 #define ID_TOOLBAR_RECT                 32772
 #define ID_TOOLBAR_ELLIPSE              32773
@@ -193,7 +195,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        148
 #define _APS_NEXT_COMMAND_VALUE         32817
-#define _APS_NEXT_CONTROL_VALUE         1132
+#define _APS_NEXT_CONTROL_VALUE         1133
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -57,4 +57,6 @@ public:
 	afx_msg void OnClickedCheckTwoflatenable();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnClickedCheckboxShapeFillEnable();
+    CButton m_Check_Circlle;
+    afx_msg void OnClickedCheckRenderCircle();
 };
