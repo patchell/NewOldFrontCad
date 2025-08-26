@@ -5,8 +5,6 @@ CCadArrow::CCadArrow() :CCadObject(OBJECT_TYPE_ARROW)
 	m_Attrib.m_Len = 0;
 	m_Attrib.m_ArrowWidth = 0;
 	m_Attrib.m_Color = RGB(0, 0, 0);
-	m_pPen = 0;
-	m_pBrFill = 0;
 }
 
 CCadArrow::CCadArrow(CCadArrow &ca):CCadObject(OBJECT_TYPE_ARROW)
@@ -14,8 +12,6 @@ CCadArrow::CCadArrow(CCadArrow &ca):CCadObject(OBJECT_TYPE_ARROW)
 	m_Attrib.m_Len = ca.m_Attrib.m_Len;
 	m_Attrib.m_ArrowWidth = ca.m_Attrib.m_ArrowWidth;
 	m_Attrib.m_Color = ca.m_Attrib.m_Color;
-	m_pPen = 0;
-	m_pBrFill = 0;
 	SetP1(ca.GetP1());
 	SetP2(ca.GetP2());
 }
@@ -23,8 +19,6 @@ CCadArrow::CCadArrow(CCadArrow &ca):CCadObject(OBJECT_TYPE_ARROW)
 
 CCadArrow::~CCadArrow()
 {
-	if (m_pPen) delete m_pPen;
-	if (m_pBrFill) delete m_pBrFill;
 }
 
 void CCadArrow::Move(CPoint p)
@@ -104,10 +98,11 @@ void CCadArrow::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 	//		Offset...Offset to add to points
 	//		Scale....Sets Units to Pixels ratio
 	//---------------------------------------------
-	CPen *pOldPen;
-	CBrush *pOldBr;
+	CPen *penOLD = 0, penLine, penPoint;
+	CBrush *brushOld = 0, brushFill, brushPoint;
 	CRect rect;
 	CPoint P1, P2,P3,P4;
+	CSize szDiff = CSize(4,4);
 
 	if (CCadArrow::m_RenderEnable)
 	{
@@ -122,55 +117,51 @@ void CCadArrow::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 		pP[1] = P3;
 		pP[2] = P4;
 
-		if ((GetLastMode() != mode) || GetDirty())
-		{
-			SetDirty(0);
-			switch (mode)
-			{
-			case OBJECT_MODE_FINAL:
-				if (m_pPen) delete m_pPen;
-				m_pPen = new CPen();
-				m_pPen->CreatePen(PS_SOLID, 1, m_Attrib.m_Color);
-				if (m_pBrFill) delete m_pBrFill;
-				m_pBrFill = new CBrush(m_Attrib.m_Color);
-				break;
-			case OBJECT_MODE_SELECTED:
-				if (m_pPen) delete m_pPen;
-				m_pPen = new CPen();
-				m_pPen->CreatePen(PS_SOLID, 1, m_Attrib.m_Color ^ 0x00ff00);
-				if (m_pBrFill) delete m_pBrFill;
-				m_pBrFill = new CBrush(m_Attrib.m_Color ^ 0x00ff00);
-				break;
-			case OBJECT_MODE_SKETCH:
-				if (m_pPen) delete m_pPen;
-				m_pPen = new CPen();
-				m_pPen->CreatePen(PS_SOLID, 1, m_Attrib.m_Color);
-				if (m_pBrFill) delete m_pBrFill;
-				m_pBrFill = new CBrush(m_Attrib.m_Color);
-				break;
-			}
-		}
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
+			penLine.CreatePen(PS_SOLID, 1, m_Attrib.m_Color);
+			brushFill.CreateSolidBrush(m_Attrib.m_Color);
+			break;
 		case OBJECT_MODE_SELECTED:
-			pOldPen = pDC->SelectObject(m_pPen);
-			pOldBr = pDC->SelectObject(m_pBrFill);
-			pDC->Polygon(pP, 3);
-			pDC->SelectObject(pOldPen);
-			pDC->SelectObject(pOldBr);
+			penLine.CreatePen(PS_SOLID, 1, m_Attrib.m_Color ^ 0x00ff00);
+			brushFill.CreateSolidBrush(m_Attrib.m_Color ^ 0x00ff00);
 			break;
 		case OBJECT_MODE_SKETCH:
-			pOldPen = pDC->SelectObject(m_pPen);
-			pOldBr = pDC->SelectObject(m_pBrFill);
+			penLine.CreatePen(PS_SOLID, 1, m_Attrib.m_Color);
+			brushFill.CreateStockObject(NULL_BRUSH);
+			break;
+		}
+		brushPoint.CreateSolidBrush(RGB(0, 0, 255));
+		penPoint.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+		penOLD = pDC->SelectObject(&penLine);
+		brushOld = pDC->SelectObject(&brushFill);
+		switch (mode)
+		{
+		case OBJECT_MODE_FINAL:
 			pDC->Polygon(pP, 3);
-			pDC->SelectObject(pOldPen);
-			pDC->SelectObject(pOldBr);
+			break;
+		case OBJECT_MODE_SELECTED:
+			pDC->Polygon(pP, 3);
+			pDC->SelectObject(&penPoint);
+			pDC->SelectObject(&brushPoint);
+			pDC->Rectangle(CRect(pP[0] - szDiff, pP[0] + szDiff));
+			pDC->Rectangle(CRect(pP[1] - szDiff, pP[1] + szDiff));
+			pDC->Rectangle(CRect(pP[2] - szDiff, pP[2] + szDiff));
+			break;
+		case OBJECT_MODE_SKETCH:
+			pDC->Polygon(pP, 3);
+			pDC->SelectObject(&penPoint);
+			pDC->SelectObject(&brushPoint);
+			pDC->Rectangle(CRect(pP[0] - szDiff, pP[0] + szDiff));
+			pDC->Rectangle(CRect(pP[1] - szDiff, pP[1] + szDiff));
+			pDC->Rectangle(CRect(pP[2] - szDiff, pP[2] + szDiff));
 			break;
 		case OBJECT_MODE_ERASE:
 			break;
 		}
-		SetLastMode(mode);
+		pDC->SelectObject(penOLD);
+		pDC->SelectObject(brushOld);
 	}
 }
 

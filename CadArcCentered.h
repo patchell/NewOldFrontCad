@@ -57,7 +57,6 @@ public:
 	virtual void ChangeCenter(CSize p);
 private:
 	ArcAttributes m_atrb;
-	CPen * m_pPenLine;
 public:
 	virtual CSize GetSize();
 	virtual void ChangeSize(CSize Sz);

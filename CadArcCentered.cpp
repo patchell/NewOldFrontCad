@@ -16,7 +16,6 @@ static char THIS_FILE[]=__FILE__;
 
 CCadArcCentered::CCadArcCentered():CCadObject(OBJECT_TYPE_ARCCENTERED)
 {
-	m_pPenLine = 0;
 }
 
 CCadArcCentered::CCadArcCentered(CCadArcCentered &arc):CCadObject(OBJECT_TYPE_ARCCENTERED)
@@ -29,22 +28,22 @@ CCadArcCentered::CCadArcCentered(CCadArcCentered &arc):CCadObject(OBJECT_TYPE_AR
 	m_atrb.m_Start = arc.m_atrb.m_Start;
 	m_atrb.m_StartAngle = arc.m_atrb.m_StartAngle;
 	m_atrb.m_Width = arc.m_atrb.m_Width;
-	m_pPenLine = 0;
 }
 
 CCadArcCentered::~CCadArcCentered()
 {
-	if(m_pPenLine) delete m_pPenLine;
 }
 
 void CCadArcCentered::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 {
-	CPen *pOld;
+	CPen *pOld, penLine, penPoint;
+	CBrush brushNULL, brushPointFill, * pOldBrush = 0;
 	CRect rect;
 	CSize rectLWcomp;
 	CPoint p1,p2;
 	int dx,dy;
 	CPoint P1,P2,Start,End;
+	CSize szDiff(4, 4);
 	int Lw;
 
 	if (CCadArcCentered::m_RenderEnable)
@@ -102,62 +101,74 @@ void CCadArcCentered::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 		p2 = P1 + CPoint(dx, dy);
 		SetRect(rect, p1, p2, rectLWcomp);
 		//	rect.SetRect(p1,p2);
-		if ((GetLastMode() != mode) || GetDirty())
-		{
-			if (m_pPenLine) delete m_pPenLine;
-			switch (mode)
-			{
-			case OBJECT_MODE_FINAL:
-				m_pPenLine = new CPen(PS_SOLID, Lw, m_atrb.m_LineColor);
-				break;
-			case OBJECT_MODE_SELECTED:
-				m_pPenLine = new CPen(PS_SOLID, Lw, RGB(200, 50, 50));
-				break;
-			case OBJECT_MODE_SKETCH:
-				m_pPenLine = new CPen(PS_DOT, 1, m_atrb.m_LineColor);
-				break;
-			case OBJECT_MODE_ARCSTART:
-			case OBJECT_MODE_ARCEND:
-				m_pPenLine = new CPen(PS_DOT, 1, m_atrb.m_LineColor);
-				break;
-			}
-			SetDirty(0);
-		}
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
-			pOld = pDC->SelectObject(m_pPenLine);
-			pDC->Arc(&rect, Start, End);
-			pDC->SelectObject(pOld);
+			penLine.CreatePen(PS_SOLID, Lw, m_atrb.m_LineColor);
 			break;
 		case OBJECT_MODE_SELECTED:
-			pOld = pDC->SelectObject(m_pPenLine);
-			pDC->Arc(&rect, Start, End);
-			pDC->SelectObject(pOld);
+			penLine.CreatePen(PS_DOT, Lw, RGB(200, 0, 0));
 			break;
 		case OBJECT_MODE_SKETCH:
-			pOld = pDC->SelectObject(m_pPenLine);
+			penLine.CreatePen(PS_DOT, 1, m_atrb.m_LineColor);
+			break;
+		case OBJECT_MODE_ARCSTART:
+		case OBJECT_MODE_ARCEND:
+			penLine.CreatePen(PS_DOT, 1, m_atrb.m_LineColor);
+			break;
+		}
+		pOld = pDC->SelectObject(&penLine);
+		penPoint.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+		brushPointFill.CreateSolidBrush(RGB(0, 0, 255));
+		brushNULL.CreateStockObject(NULL_BRUSH);
+		pOldBrush = (CBrush*)pDC->SelectObject(&brushNULL);
+		switch (mode)
+		{
+		case OBJECT_MODE_FINAL:
+			pDC->Arc(&rect, Start, End);
+			break;
+		case OBJECT_MODE_SELECTED:
+			pDC->Arc(&rect, Start, End);
+			break;
+		case OBJECT_MODE_SKETCH:
 			pDC->Rectangle(&rect);
-			pDC->SelectObject(pOld);
+			pDC->SelectObject(&brushPointFill);
+			pDC->SelectObject(&brushPointFill);
+			pDC->Rectangle(CRect(Start - szDiff, Start + szDiff));
+			pDC->Rectangle(CRect(End - szDiff, End + szDiff));
+			pDC->Rectangle(CRect(p1 - szDiff, p1 + szDiff));
+			pDC->Rectangle(CRect(p2 - szDiff, p2 + szDiff));
+			pDC->Rectangle(CRect(P1 - szDiff, P1 + szDiff));	//Center point
 			break;
 		case OBJECT_MODE_ERASE:
 			break;
 		case OBJECT_MODE_ARCSTART:
-			pOld = pDC->SelectObject(m_pPenLine);
 			pDC->Ellipse(&rect);
 			pDC->MoveTo(P1);
 			pDC->LineTo(Start);
-			pDC->SelectObject(pOld);
+			pDC->SelectObject(&brushPointFill);
+			pDC->SelectObject(&brushPointFill);
+			pDC->Rectangle(CRect(Start - szDiff, Start + szDiff));
+			pDC->Rectangle(CRect(End - szDiff, End + szDiff));
+			pDC->Rectangle(CRect(p1 - szDiff, p1 + szDiff));
+			pDC->Rectangle(CRect(p2 - szDiff, p2 + szDiff));
+			pDC->Rectangle(CRect(P1 - szDiff, P1 + szDiff));	//Center point
 			break;
 		case OBJECT_MODE_ARCEND:
-			pOld = pDC->SelectObject(m_pPenLine);
 			pDC->Arc(&rect, Start, End);
 			pDC->MoveTo(P1);
 			pDC->LineTo(End);
-			pDC->SelectObject(pOld);
+			pDC->SelectObject(&brushPointFill);
+			pDC->SelectObject(&brushPointFill);
+			pDC->Rectangle(CRect(Start - szDiff, Start + szDiff));
+			pDC->Rectangle(CRect(End - szDiff, End + szDiff));
+			pDC->Rectangle(CRect(p1 - szDiff, p1 + szDiff));
+			pDC->Rectangle(CRect(p2 - szDiff, p2 + szDiff));
+			pDC->Rectangle(CRect(P1 - szDiff, P1 + szDiff));	//Center point
 			break;
 		}
-		SetLastMode(mode);
+		pDC->SelectObject(pOld);
+		pDC->SelectObject(pOldBrush);
 	}
 }
 
