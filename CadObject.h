@@ -31,6 +31,7 @@ struct ObjectTypeMembers {
 		return rV;
 	}
 };
+
 class CCadObject
 {
 	int m_Dirty;

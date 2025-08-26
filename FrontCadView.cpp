@@ -3452,8 +3452,16 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 				Invalidate();
 				break;
 			case OBJECT_TYPE_ARC:
+				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
+				pO->SetP2(CPoint(pUV->m_Edit_X2.GetValue(), pUV->m_Edit_Y2.GetValue()));
+				((CCadArc*)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
+				((CCadArc*)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
 				break;
 			case OBJECT_TYPE_ARCCENTERED:
+				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
+				pO->SetP2(CPoint(pUV->m_Edit_X2.GetValue(), pUV->m_Edit_Y2.GetValue()));
+				((CCadArcCentered*)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
+				((CCadArcCentered*)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
 				break;
 			case OBJECT_TYPE_ARROW:
 				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
