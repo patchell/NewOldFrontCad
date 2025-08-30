@@ -58,7 +58,7 @@ BOOL CFrontCadApp::InitInstance()
 	//  of your final executable, you should remove from the following
 	//  the specific initialization routines you do not need.
 
-	fopen_s(&m_pLogFile, "Log.txt", "w");
+//	fopen_s(&m_pLogFile, "Log.txt", "w");
 	SetRegistryKey(_T("FrontCad_1_0"));
 
 	LoadStdProfileSettings();  // Load standard INI file options (including MRU)
@@ -85,9 +85,9 @@ BOOL CFrontCadApp::InitInstance()
 	// Dispatch commands specified on the command line
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
-	AllocConsole();
-	freopen_s(&pConsol, "CONOUT$", "w", stdout);
-	if (HasConsol())	printf("Ready\n");
+//	AllocConsole();
+//	freopen_s(&pConsol, "CONOUT$", "w", stdout);
+//	if (HasConsol())	printf("Ready\n");
 
 	// The one and only window has been initialized, so show and update it.
 	m_pMainWnd->ShowWindow(SW_SHOW);
@@ -434,7 +434,7 @@ char* CFrontCadApp::ConvertCStringToChar(char* cpDest, CString& csSource)
 void CAboutDlg::SetVersion()
 {
 	char* s = new char[256];
-	static const char* pVersion = "Version 1.5.0";
+	static const char* pVersion = "Version 1.5.1";
 	static const char* pBuildDate = "Build Date Aug 29, 2025";
 	static const char* pCopyright = "Copyright (c) 2015, 2025";
 

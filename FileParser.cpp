@@ -628,7 +628,6 @@ int CFileParser::Point(int TargeToken, FILE* pIN, CPoint& Point, int Token)
 	Token = Expect(TOKEN_NUM, Token, pIN);
 	Token = Expect(')', Token, pIN);
 	Point = CPoint(x, y);
-	fprintf(theApp.LogFile(), "CParser::Point(%d,%d)\n", x, y);
 	return Token;
 }
 

@@ -234,7 +234,6 @@ void CCadCircle::Save(FILE* pO, int Indent)
 	char* s5 = new char[64];
 	char* s6 = new char[64];
 
-	fprintf(theApp.LogFile(), "CCadCircle::Save  P2(%d,%d)\n", GetP2().x, GetP2().y);
 	fprintf(pO, "%s%s(%s,%s,%s,%s,%s, %s)\n",
 		theApp.IndentString(s, 256, Indent),
 		CFileParser::TokenLookup(TOKEN_CIRCLE),

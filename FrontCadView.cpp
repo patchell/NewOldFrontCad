@@ -454,7 +454,6 @@ void CFrontCadView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	// that do certain funcrtions
 	//----------------------------------------
 	//if(theApp.HasConsol()) p
-	fprintf(theApp.LogFile(), "OnKEYDOWN KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 
 	switch(nChar)	//check the key press
 	{
@@ -484,7 +483,6 @@ void CFrontCadView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	int id;
 
 //	if (theApp.HasConsol()) 
-		fprintf(theApp.LogFile(), "OnKEYUP KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 	switch(nChar)	//check released character
 	{
 		case VK_CONTROL:	//control key
@@ -732,7 +730,6 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 							pCP->SetLineWidth(pA->m_PolyAttributes.m_LineWidth);
 							pCP->SetFillColor(pA->m_PolyAttributes.m_FillColor);
 							pCP->SetTransparent(pA->m_PolyAttributes.m_Transparent);
-							fprintf(theApp.LogFile(), "Mouse DOWN:Move:");
 							pCP->AddPoint(m_SnapPos, FALSE, TRUE);
 							m_pDrawObject = (CCadObject *)pCP;
 							m_PolyStart = m_SnapPos;
@@ -742,7 +739,6 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 						if (!((m_SnapPos.x == m_PolyStart.x) && (m_SnapPos.y == m_PolyStart.y)))
 						{
 
-							fprintf(theApp.LogFile(), "Mouse DOWN:MOVESTATE:");
 							CCadPolygon* pCP = (CCadPolygon*)m_pDrawObject;
 							pCP->AddPoint(m_SnapPos, FALSE, TRUE);
 						}
@@ -1303,32 +1299,26 @@ void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 					case DRAWSTATE_WAITMOUSE_DOWN:
 						// 
 						m_DrawState = DRAWSTATE_MOVE;
-						fprintf(theApp.LogFile(), "Mouse Up FRIST POINT:Wait Mouse Down:");
 						pCP->AddPoint(m_SnapPos, TRUE, TRUE);	// first point
 						pCP->AddPoint(m_SnapPos, FALSE, FALSE); //rubber band point
 						theApp.GetMainFrame()->UpdateStatusBar("PolyGon:Place Next Point");
 						break;
 					case DRAWSTATE_MOVE:
 						{
-//							pCP->DeleteLastPoint();
 							if ((m_SnapPos.x == m_PolyStart.x) && (m_SnapPos.y == m_PolyStart.y))
 							{
-								fprintf(theApp.LogFile(),"Mouse Up:End Move:");
 								//-----------------------------------------------
 								// So, at this point, this poloyggon is finished
 								//-----------------------------------------------
 								//we are back at the start point, terminate
-								fprintf(theApp.LogFile(), "Size:%d  Count:%d\n", pCP->GetAttributes()->m_Size, pCP->GetAttributes()->m_Count);
 								pCP->GetAttributes()->m_Size--;	//remove rubber band point from count
 								pCP->GetAttributes()->m_Count--;
 								pDoc->AddObject(m_pDrawObject);
 								m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
-								theApp.GetMainFrame()->UpdateStatusBar("PolyGon:Place First Point");
 								m_pDrawObject = 0;
 							}
 							else
 							{
-								fprintf(theApp.LogFile(), "Mouse Up:Move:");
 								pCP->AddPoint(m_SnapPos, TRUE, FALSE);
 								pCP->AddPoint(m_SnapPos, FALSE, FALSE);
 							}
@@ -1851,7 +1841,6 @@ void CFrontCadView::OnMouseMove(UINT nFlags, CPoint point)
 						Invalidate();
 						break;
 					case DRAWSTATE_MOVE:
-						fprintf(theApp.LogFile(), "*Mouse Moving:");
 						pCP->AddPoint(m_SnapPos,FALSE,FALSE);
 						Invalidate();
 						break;
@@ -4178,7 +4167,6 @@ void CFrontCadView::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 void CFrontCadView::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	//if (theApp.HasConsol()) 
-		fprintf(theApp.LogFile(), "OnSysKeyDown KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 	switch (nChar)
 	{
 	case VK_MENU:
@@ -4191,7 +4179,6 @@ void CFrontCadView::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 void CFrontCadView::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	//if (theApp.HasConsol()) 
-		fprintf(theApp.LogFile(), "OnSysKeyUp KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 	switch (nChar)
 	{
 	case VK_MENU:

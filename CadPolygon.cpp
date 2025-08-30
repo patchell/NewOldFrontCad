@@ -67,13 +67,10 @@ void CCadPolygon::Draw(CDC *pDC,int mode,CPoint Offset,CScale Scale)
 		// verticies
 		//-----------------------
 		pP = new CPoint[GetAttributes()->m_Size];
-		fprintf(theApp.LogFile(), "----------------------------\n");
 		for (i = 0; i < GetAttributes()->m_Size; ++i)
 		{
-			fprintf(theApp.LogFile(), "Vertex %d: %d,%d\n", i, GetAttributes()->m_pVertex[i].x, GetAttributes()->m_pVertex[i].y);
 			pP[i] = Scale * GetAttributes()->m_pVertex[i] + Offset;
 		}
-		fprintf(theApp.LogFile(), "----------------------------\n");
 
 		switch (mode)
 		{
@@ -326,7 +323,6 @@ CRect CCadPolygon::GetRect()
 
 void CCadPolygon::SetCurPoint(CPoint newPoint)
 {
-	fprintf(theApp.LogFile(), "SetCurPoint (%d,%d) Count:%d  Size:%d\n", newPoint.x, newPoint.y, GetAttributes()->m_Count, GetAttributes()->m_Size);
 	GetAttributes()->m_pVertex[GetAttributes()->m_Count] = newPoint;
 }
 
@@ -467,16 +463,20 @@ void CCadPolygon::Save(FILE* pO, int Indent)
 	char* s3 = new char[64];
 	char* s4 = new char[64];
 	char* s5 = new char[64];
+	char* s6 = new char[64];
+	char* s7 = new char[64];
 
 	Indent1 = theApp.IndentString(Indent1, 256, Indent);
 	Indent2 = theApp.IndentString(Indent2, 256, Indent + 4);
 	Indent3 = theApp.IndentString(Indent3, 256, Indent + 8);
 
-	fprintf(pO, "%s%s(%s,%s)\n%s{\n%s%s\n%s[\n",
+	fprintf(pO, "%s%s(%s,%s,%s,%s)\n%s{\n%s%s\n%s[\n",
 		Indent1,
 		CFileParser::TokenLookup(TOKEN_POLY),
 		CFileParser::SaveColor(s3, 64, GetAttributes()->m_LineColor, TOKEN_LINE_COLOR),
 		CFileParser::SaveDecimalValue(s4, 64, TOKEN_LINE_WIDTH, GetAttributes()->m_LineWidth),
+		CFileParser::SaveColor(s6, 64, GetAttributes()->m_FillColor, TOKEN_FILL_COLOR),
+		CFileParser::SaveDecimalValue(s7, 64, TOKEN_TRANSPARENT, GetAttributes()->m_Transparent),
 		Indent1,
 		Indent2,
 		CFileParser::SaveDecimalValue(s5, 64, TOKEN_VERTEX, GetAttributes()->m_Size),
@@ -493,6 +493,8 @@ void CCadPolygon::Save(FILE* pO, int Indent)
 		else
 			fprintf(pO, "\n%s]\n%s}\n", Indent2,Indent1);
 	}
+	delete[]s7;
+	delete[]s6;
 	delete[]s5;
 	delete[]s4;
 	delete[]s3;
@@ -631,6 +633,5 @@ BOOL PolyAttributes::AddPoint(CPoint p, BOOL bInc, BOOL bIncSizeToo)
 			++m_Size;
 
 	}
-	fprintf(theApp.LogFile(), "AddPoint: (OldCount:%d OldSize:%d) Count=%d Size=%d  P(%d,%d)\n", c, s,m_Count, m_Size, p.x, p.y);
 	return rV;
 }
