@@ -3,23 +3,18 @@
 CCadOrigin::CCadOrigin() :CCadObject(OBJECT_TYPE_ORIGIN)
 {
 	m_pMainView = 0;
-	m_pPenLine = 0;
-	m_Atrib.m_Width = 1;
-	m_Atrib.m_Color = RGB(0, 0, 0);
 }
 
 CCadOrigin::CCadOrigin(CCadOrigin &v) : CCadObject(OBJECT_TYPE_ORIGIN)
 {
 	m_pMainView = 0;
-	m_pPenLine = 0;
-	m_Atrib.m_Width = 1;
+	m_Atrib.m_LineWidth = v.GetAttributes()->m_LineWidth;
 	m_Atrib.m_Color = v.m_Atrib.m_Color;
 	SetP1(v.GetP1());
 }
 
 CCadOrigin::~CCadOrigin()
 {
-	if (m_pPenLine) delete m_pPenLine;
 }
 
 void CCadOrigin::Move(CPoint p)
@@ -64,7 +59,7 @@ void CCadOrigin::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 	//		Offset...Offset to add to points
 	//		Scale....Sets Units to Pixels ratio
 	//---------------------------------------------
-	CPen *pOld;
+	CPen *pOld = 0, penLine;
 	CRect rect;
 	CPoint P1, P2;
 	int Lw;
@@ -73,44 +68,39 @@ void CCadOrigin::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 	{
 		P1 = (Scale * GetP1()) + Offset + CSize(10, 10);
 		P2 = (Scale * GetP1()) + Offset - CSize(10, 10);
-		Lw = int(Scale.m_ScaleX * m_Atrib.m_Width);
+		Lw = int(Scale.m_ScaleX * m_Atrib.m_LineWidth);
 		if (Lw < 1) Lw = 1;
 		rect.SetRect(P1, P2);
 		rect.NormalizeRect();
-		if ((GetLastMode() != mode) || GetDirty())
+		pOld = pDC->SelectObject(&penLine);
+		switch (mode)
 		{
-			if (m_pPenLine) delete m_pPenLine;
-			switch (mode)
-			{
-			case OBJECT_MODE_FINAL:
-				m_pPenLine = new CPen(PS_SOLID, Lw, m_Atrib.m_Color);
-				break;
-			case OBJECT_MODE_SELECTED:
-				m_pPenLine = new CPen(PS_SOLID, Lw, RGB(0, 255, 50));
-				break;
-			case OBJECT_MODE_SKETCH:
-				m_pPenLine = new CPen(PS_DOT, 1, RGB(0, 0, 255));
-				break;
-			}
+		case OBJECT_MODE_FINAL:
+			penLine.CreatePen(PS_SOLID, Lw, m_Atrib.m_Color);
+			break;
+		case OBJECT_MODE_SELECTED:
+			penLine.CreatePen(PS_SOLID, Lw, RGB(0, 255, 50));
+			break;
+		case OBJECT_MODE_SKETCH:
+			penLine.CreatePen(PS_DOT, 1, RGB(0, 0, 255));
+			break;
 		}
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
 		case OBJECT_MODE_SELECTED:
 		case OBJECT_MODE_SKETCH:
-			pOld = pDC->SelectObject(m_pPenLine);
 			pDC->Ellipse(&rect);
 			P1 = (Scale * GetP1()) + Offset;
 			pDC->MoveTo(P1.x, P1.y + 15);
 			pDC->LineTo(P1.x, P1.y - 15);
 			pDC->MoveTo(P1.x + 15, P1.y);
 			pDC->LineTo(P1.x - 15, P1.y);
-			pDC->SelectObject(pOld);
 			break;
 		case OBJECT_MODE_ERASE:
 			break;
 		}
-		SetLastMode(mode);
+		pDC->SelectObject(pOld);
 	}
 }
 
@@ -132,11 +122,6 @@ int CCadOrigin::CheckSelected(CPoint p,CSize O)
 CPoint CCadOrigin::GetReference()
 {
 	return GetP1();
-}
-
-void CCadOrigin::MakeDirty(void)
-{
-	SetDirty(1);
 }
 
 void CCadOrigin::SetSelected(int Flag)

@@ -27,6 +27,7 @@ class CFrontCadApp : public CWinApp
 	CUtilView* m_UtilView;
 	CFrontCadDoc* m_pDoc;
 	FILE* pConsol;
+	FILE* m_pLogFile;
 public:
 	//------------------------------
 	// Program settings
@@ -40,7 +41,6 @@ public:
 	HoleRnd2FlatAttributes m_HoleRnd2FlatAttributes;
 	HoleRoundAttributes m_HoleRoundAttributes;
 	ArcAttributes m_ArcAttributes;
-	PolygonFillAttributes m_PolyFillAttributes;
 	RectAttributes m_RectAttributes;
 	CircleAttributes m_CircleAttributs;
 	ElipseAttributes m_EllipseAttributes;
@@ -70,9 +70,8 @@ public:
 	virtual int ExitInstance();
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
-	FILE *m_pLogFile;
 public:
-	FILE* GetLog() { return m_pLogFile; }
+	FILE* LogFile() { return m_pLogFile; }
 	BOOL HasConsol() {
 		BOOL rV = FALSE;
 		if (pConsol)

@@ -151,9 +151,3 @@ void CFrontCadDoc::SetBkColor(COLORREF color)
 {
 	m_pDrawing->SetBkColor(color);
 }
-
-
-void CFrontCadDoc::MakeDirty()
-{
-	m_pDrawing->MakeDirty();
-}

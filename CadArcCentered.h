@@ -38,8 +38,8 @@ public:
 	virtual void SetVertex(int Vi,CPoint p);
 	virtual int GrabVertex(CPoint p);
 	virtual void AdjustRefernce(CPoint Ref);
-	void SetWidth(int w){m_atrb.m_Width = w;}
-	int GetWidth(void){return m_atrb.m_Width;}
+	void SetLineWidth(int w){m_atrb.m_LineWidth = w;}
+	int GetLineWidth(void){return m_atrb.m_LineWidth;}
 	void SetLineColor(COLORREF c){m_atrb.m_LineColor = c;}
 	COLORREF GetLineColor(void){return m_atrb.m_LineColor;}
 	void SetEndAngle(int Angle);

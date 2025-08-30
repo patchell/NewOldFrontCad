@@ -77,7 +77,6 @@ BEGIN_MESSAGE_MAP(CFrontCadView, CView)
 	ON_COMMAND(ID_TOOLBAR_POLYGON, OnToolbarPolygon)
 	ON_COMMAND(ID_TOOLBAR_SCALEWIZ, OnToolbarScalewiz)
 	ON_COMMAND(ID_TOOLBAR_ARC, OnToolbarArc)
-	ON_COMMAND(ID_TOOLBAR_POLYWITHFILL, OnToolbarPolywithfill)
 	ON_COMMAND(ID_TOOLBAR_ARC_CENTER, OnToolbarArcCenter)
 	ON_COMMAND(ID_TOOLBAR_HOLERND, OnToolbarHolernd)
 	ON_COMMAND(ID_TOOLBAR_RECTHOLE, OnToolbarRecthole)
@@ -225,18 +224,12 @@ void CFrontCadView::OnPrint(CDC* pDC, CPrintInfo* pInfo)
 	br.CreateSolidBrush(pDoc->GetBkColor());
 	pDC->FillRect(&rect,&br);
 	//----------------------------------
-	// Make all of the objects dirty
-	//---------------------------------
-	pDoc->MakeDirty();
-	//----------------------------------
 	// Print the document
 	//----------------------------------
 	offset.x = -offset.x;
 	pDoc->Print(pDC,OBJECT_MODE_FINAL,offset,CScale(1.0,-1.0));
 	//make dirty all over again.
 	if (pagerect)pagerect->RenderEnable(1);
-
-	pDoc->MakeDirty();
 
 
 	CView::OnPrint(pDC, pInfo);
@@ -460,7 +453,8 @@ void CFrontCadView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	// key presses, looking for  HHotkeys
 	// that do certain funcrtions
 	//----------------------------------------
-	if(theApp.HasConsol()) printf("OnKEYDOWN KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+	//if(theApp.HasConsol()) p
+	fprintf(theApp.LogFile(), "OnKEYDOWN KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 
 	switch(nChar)	//check the key press
 	{
@@ -489,7 +483,8 @@ void CFrontCadView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	//--------------------------------------------
 	int id;
 
-	if (theApp.HasConsol()) printf("OnKEYUP KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+//	if (theApp.HasConsol()) 
+		fprintf(theApp.LogFile(), "OnKEYUP KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 	switch(nChar)	//check released character
 	{
 		case VK_CONTROL:	//control key
@@ -545,7 +540,7 @@ void CFrontCadView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 			OnToolbarLine();
 			break;
 		case 'P':	//P key, draw polygon
-			OnToolbarPolywithfill();
+			OnToolbarPolygon();
 			break;
 		case 'R':	//R key, draw rectangle
 			OnToolbarRect();
@@ -557,7 +552,7 @@ void CFrontCadView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 			m_Drawmode = DrawMode::SELECT;
 			break;
 		case VK_MENU: //alt key
-			if (theApp.HasConsol()) printf("\nOnKEYUP ALT-KEY:%04x Repeat:%d FLAGS:%04x\n\n", nChar, nRepCnt, nFlags);
+			//if (theApp.HasConsol()) printf("\nOnKEYUP ALT-KEY:%04x Repeat:%d FLAGS:%04x\n\n", nChar, nRepCnt, nFlags);
 			m_SnapOff = 0; //turn off snap grid
 			break;
 	}
@@ -596,11 +591,11 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 					{
 						CCadLine *pLine;
 
-						pA->m_LineAttrib.m_Width = pUV->m_Edit_LineThickness.GetValue();
-						pA->m_LineAttrib.m_Color = pUV->m_Static_LineColor.GetColor();
+						pA->m_LineAttrib.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();
+						pA->m_LineAttrib.m_LineColor = pUV->m_Static_LineColor.GetColor();
 						pLine = new CCadLine();
-						pLine->SetLineColor(pA->m_LineAttrib.m_Color);
-						pLine->SetOutLineWidth(pA->m_LineAttrib.m_Width);
+						pLine->SetLineColor(pA->m_LineAttrib.m_LineColor);
+						pLine->SetLineWidth(pA->m_LineAttrib.m_LineWidth);
 						this->m_pDrawObject = (CCadObject *)pLine;
 						m_pDrawObject->SetP1(m_SnapPos);
 						m_pDrawObject->SetP2(m_pDrawObject->GetP1());
@@ -616,12 +611,12 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 				case DRAWSTATE_WAITMOUSE_DOWN:
 					{
 						CCadRect *pCR = new CCadRect();
-						pA->m_RectAttributes.m_Width = pUV->m_Edit_LineThickness.GetValue();
+						pA->m_RectAttributes.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();
 						pA->m_RectAttributes.m_LineColor = pUV->m_Static_LineColor.GetColor();
 						pA->m_RectAttributes.m_FillColor = pUV->m_Static_FillColor.GetColor();
 						pCR->SetFillColor(pA->m_RectAttributes.m_FillColor);
 						pCR->SetLineColor(pA->m_RectAttributes.m_LineColor);
-						pCR->SetOutLineWidth(pA->m_RectAttributes.m_Width);
+						pCR->SetLineWidth(pA->m_RectAttributes.m_LineWidth);
 						m_pDrawObject = (CCadObject *)pCR;
 						m_pDrawObject->SetP1(m_SnapPos);
 						m_pDrawObject->SetP2(m_pDrawObject->GetP1());
@@ -641,11 +636,11 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 				pA->m_CircleAttributs.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();
 				pA->m_CircleAttributs.m_LineColor = pUV->m_Static_LineColor.GetColor();
 				pA->m_CircleAttributs.m_FillColor = pUV->m_Static_FillColor.GetColor();
-				pA->m_CircleAttributs.m_Transparent = pUV->m_Check_TransparentFill.GetCheck();
-				pCC->SetOutLineWidth(pA->m_CircleAttributs.m_LineWidth);
+				pA->m_CircleAttributs.m_bTransparent = pUV->m_Check_TransparentFill.GetCheck();
+				pCC->SetLineWidth(pA->m_CircleAttributs.m_LineWidth);
 				pCC->SetFillColor(pA->m_CircleAttributs.m_FillColor);
 				pCC->SetLineColor(pA->m_CircleAttributs.m_LineColor);
-				pCC->SetTransparent(pA->m_CircleAttributs.m_Transparent);
+				pCC->SetTransparent(pA->m_CircleAttributs.m_bTransparent);
 				m_pDrawObject = (CCadObject*)pCC;
 				m_pDrawObject->SetP1(m_SnapPos);
 				m_pDrawObject->SetP2(m_SnapPos);
@@ -665,7 +660,7 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 						pA->m_EllipseAttributes.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();
 						pA->m_EllipseAttributes.m_LineColor = pUV->m_Static_LineColor.GetColor();
 						pA->m_EllipseAttributes.m_FillColor = pUV->m_Static_FillColor.GetColor();
-						pCE->SetOutLineWidth(pA->m_EllipseAttributes.m_LineWidth);
+						pCE->SetLineWidth(pA->m_EllipseAttributes.m_LineWidth);
 						pCE->SetFillColor(pA->m_EllipseAttributes.m_FillColor);
 						pCE->SetLineColor(pA->m_EllipseAttributes.m_LineColor);
 						m_pDrawObject = (CCadObject *)pCE;
@@ -728,48 +723,28 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 					case DRAWSTATE_WAITMOUSE_DOWN:	//This is where we start
 						{
 							CUtilView *pUV = this->GetUtilityView();
-							pA->m_PolyAttributes.m_Width = pUV->m_Edit_LineThickness.GetValue();;
+							pA->m_PolyAttributes.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();;
 							pA->m_PolyAttributes.m_LineColor = pUV->m_Static_LineColor.GetColor();
-							CCadPolygon *pCP = new CCadPolygon(100);
-							pCP->AddPoint(m_SnapPos);
+							pA->m_PolyAttributes.m_FillColor = pUV->m_Static_FillColor.GetColor();	
+							pA->m_PolyAttributes.m_Transparent = pUV->m_Check_TransparentFill.GetCheck();	
+							CCadPolygon *pCP = new CCadPolygon;
 							pCP->SetLineColor(pA->m_PolyAttributes.m_LineColor);
-							pCP->SetWidth(pA->m_PolyAttributes.m_Width);
+							pCP->SetLineWidth(pA->m_PolyAttributes.m_LineWidth);
+							pCP->SetFillColor(pA->m_PolyAttributes.m_FillColor);
+							pCP->SetTransparent(pA->m_PolyAttributes.m_Transparent);
+							fprintf(theApp.LogFile(), "Mouse DOWN:Move:");
+							pCP->AddPoint(m_SnapPos, FALSE, TRUE);
 							m_pDrawObject = (CCadObject *)pCP;
 							m_PolyStart = m_SnapPos;
 						}
 						break;
 					case DRAWSTATE_MOVE:
+						if (!((m_SnapPos.x == m_PolyStart.x) && (m_SnapPos.y == m_PolyStart.y)))
 						{
-							CCadPolygon *pCP = (CCadPolygon *)m_pDrawObject;
-							pCP->AddPoint(m_SnapPos);
-						}
-						break;
-				}
-			}
-			break;
-		case DrawMode::POLYFILL:	//mouse down
-			{
-				switch(m_DrawState)
-				{
-					case DRAWSTATE_WAITMOUSE_DOWN:
-						{
-							CUtilView *pUV = this->GetUtilityView();
-							pA->m_PolyFillAttributes.m_Width = pUV->m_Edit_LineThickness.GetValue();;
-							pA->m_PolyFillAttributes.m_LineColor = pUV->m_Static_LineColor.GetColor();
-							pA->m_PolyFillAttributes.m_FillColor = pUV->m_Static_FillColor.GetColor();
-							CCadPolygonFill *pCP = new CCadPolygonFill(100);
-							pCP->AddPoint(m_SnapPos);
-							pCP->SetLineColor(pA->m_PolyFillAttributes.m_LineColor);
-							pCP->SetFillColor(pA->m_PolyFillAttributes.m_FillColor);
-							pCP->SetWidth(pA->m_PolyFillAttributes.m_Width);
-							m_pDrawObject = (CCadObject *)pCP;
-							m_PolyStart = m_SnapPos;
-						}
-						break;
-					case DRAWSTATE_MOVE:
-						{
-							CCadPolygonFill *pCP = (CCadPolygonFill *)m_pDrawObject;
-							pCP->AddPoint(m_SnapPos);
+
+							fprintf(theApp.LogFile(), "Mouse DOWN:MOVESTATE:");
+							CCadPolygon* pCP = (CCadPolygon*)m_pDrawObject;
+							pCP->AddPoint(m_SnapPos, FALSE, TRUE);
 						}
 						break;
 				}
@@ -782,13 +757,13 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 				{
 					case DRAWSTATE_WAITMOUSE_DOWN:
 						{
-							pA->m_ArcAttributes.m_Width = pUV->m_Edit_LineThickness.GetValue();;
+							pA->m_ArcAttributes.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();;
 							pA->m_ArcAttributes.m_LineColor = pUV->m_Static_LineColor.GetColor();
 							pCA = new CCadArc;
 							pCA->SetLineColor(pA->m_ArcAttributes.m_LineColor);
 							pCA->SetP1(m_SnapPos); ;
 							pCA->SetP2(m_SnapPos);
-							pCA->SetWidth(pA->m_ArcAttributes.m_Width);
+							pCA->SetLineWidth(pA->m_ArcAttributes.m_LineWidth);
 							m_pDrawObject = (CCadObject *)pCA;
 						}
 						break;
@@ -809,13 +784,13 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 				{
 					case DRAWSTATE_WAITMOUSE_DOWN:
 						{
-							pA->m_ArcAttributes.m_Width = pUV->m_Edit_LineThickness.GetValue();
+							pA->m_ArcAttributes.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();
 							pA->m_ArcAttributes.m_LineColor = pUV->m_Static_LineColor.GetColor();
 							CCadArcCentered *pCA = new CCadArcCentered;
 							pCA->SetLineColor(pA->m_ArcAttributes.m_LineColor);
 							pCA->SetP1(m_SnapPos);
 							pCA->SetP2(m_SnapPos);
-							pCA->SetWidth(pA->m_ArcAttributes.m_Width);
+							pCA->SetLineWidth(pA->m_ArcAttributes.m_LineWidth);
 							m_pDrawObject = (CCadObject *)pCA;
 						}
 						break;
@@ -843,13 +818,13 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 				{
 					case DRAWSTATE_WAITMOUSE_DOWN:
 						pA->m_HoleRoundAttributes.m_Radius = pUV->m_Edit_HoleRadius.GetValue();
-						pA->m_HoleRoundAttributes.m_Width = pUV->m_Edit_LineThickness.GetValue();
+						pA->m_HoleRoundAttributes.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();
 						pA->m_HoleRoundAttributes.m_LineColor = pUV->m_Static_LineColor.GetColor();
 						pHR = new CCadHoleRound;
 						pHR->SetP1(m_SnapPos);
 						pHR->SetRadius(pA->m_HoleRoundAttributes.m_Radius);
 						pHR->SetLineColor(pA->m_HoleRoundAttributes.m_LineColor);
-						pHR->SetWidth(pA->m_HoleRoundAttributes.m_Width);
+						pHR->SetLineWidth(pA->m_HoleRoundAttributes.m_LineWidth);
 						m_pDrawObject = (CCadObject *)pHR;
 						Invalidate();
 						break;
@@ -869,12 +844,12 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 						pRH = new CCadRectHole;
 						pA->m_RectHoleAttributes.m_H = pUV->m_Edit_X2.GetValue();
 						pA->m_RectHoleAttributes.m_W = pUV->m_Edit_Y2.GetValue();
-						pA->m_RectHoleAttributes.m_Width = pUV->m_Edit_LineThickness.GetValue();
+						pA->m_RectHoleAttributes.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();
 						pA->m_RectHoleAttributes.m_LineColor = pUV->m_Static_LineColor.GetColor();
 						pRH->SetP1(m_SnapPos);
 						pRH->SetHieghtWidth(pA->m_RectHoleAttributes.m_H, pA->m_RectHoleAttributes.m_W);
 						pRH->SetLineColor(pA->m_RectHoleAttributes.m_LineColor);
-						pRH->SetOutLineWidth(pA->m_RectHoleAttributes.m_Width);
+						pRH->SetLineWidth(pA->m_RectHoleAttributes.m_LineWidth);
 						m_pDrawObject = (CCadObject*)pRH;
 						Invalidate();
 						break;
@@ -892,14 +867,14 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 				{
 					case DRAWSTATE_WAITMOUSE_DOWN:
 						pA->m_HoleRnd1FlatAttributes.m_Radius = pUV->m_Edit_HoleRadius.GetValue();
-						pA->m_HoleRnd1FlatAttributes.m_Width = pUV->m_Edit_LineThickness.GetValue();;
+						pA->m_HoleRnd1FlatAttributes.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();;
 						pA->m_HoleRnd1FlatAttributes.m_LineColor = pUV->m_Static_LineColor.GetColor();
 						pA->m_HoleRnd1FlatAttributes.m_FlatDist = pUV->m_Edit_FlatToCenterDist.GetValue();
 						pHR = new CCadHoleRnd1Flat;
 						pHR->SetP1(m_SnapPos);
 						pHR->SetRadius(pA->m_HoleRnd1FlatAttributes.m_Radius);
 						pHR->SetLineColor(pA->m_HoleRnd1FlatAttributes.m_LineColor);
-						pHR->SetWidth(pA->m_HoleRnd1FlatAttributes.m_Width);
+						pHR->SetLineWidth(pA->m_HoleRnd1FlatAttributes.m_LineWidth);
 						pHR->SetFlatDist(pA->m_HoleRnd1FlatAttributes.m_FlatDist);
 						m_pDrawObject = (CCadObject *)pHR;
 						Invalidate();
@@ -917,14 +892,14 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 				{
 					case DRAWSTATE_WAITMOUSE_DOWN:
 						pA->m_HoleRnd2FlatAttributes.m_Radius = pUV->m_Edit_HoleRadius.GetValue();
-						pA->m_HoleRnd2FlatAttributes.m_Width = pUV->m_Edit_LineThickness.GetValue();
+						pA->m_HoleRnd2FlatAttributes.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();
 						pA->m_HoleRnd2FlatAttributes.m_LineColor = pUV->m_Static_LineColor.GetColor();
 						pA->m_HoleRnd2FlatAttributes.m_FlatDist = pUV->m_Edit_FlatToCenterDist.GetValue();
 						pHR = new CCadHoleRnd2Flat;
 						pHR->SetP1(m_SnapPos);
 						pHR->SetRadius(pA->m_HoleRnd2FlatAttributes.m_Radius);
 						pHR->SetLineColor(pA->m_HoleRnd2FlatAttributes.m_LineColor);
-						pHR->SetWidth(pA->m_HoleRnd2FlatAttributes.m_Width);
+						pHR->SetLineWidth(pA->m_HoleRnd2FlatAttributes.m_LineWidth);
 						pHR->SetFlatDist(pA->m_HoleRnd2FlatAttributes.m_FlatDist);
 						m_pDrawObject = (CCadObject *)pHR;
 						Invalidate();
@@ -1132,11 +1107,11 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 				case DRAWSTATE_WAITMOUSE_DOWN:
 					{
 						pA->m_OriginAttrib.m_Color = pUV->m_Static_LineColor.GetColor();
-						pA->m_OriginAttrib.m_Width = pUV->m_Edit_LineThickness.GetValue();
+						pA->m_OriginAttrib.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();
 						CCadOrigin *pOrg = new CCadOrigin;
 						pOrg->SetParent(this);
 						pOrg->SetColor(pA->m_OriginAttrib.m_Color);
-						pOrg->SetWidth(pA->m_OriginAttrib.m_Width);
+						pOrg->SetLineWidth(pA->m_OriginAttrib.m_LineWidth);
 						m_pDrawObject = (CCadObject *)pOrg;
 						m_pDrawObject->SetP1(m_SnapPos);
 					}
@@ -1161,7 +1136,7 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 						// Line Attributes
 						//---------------------------------
 						pA->m_DimAttrib.m_Color = pUV->m_Static_LineColor.GetColor();
-						pA->m_DimAttrib.m_Width = pUV->m_Edit_LineThickness.GetValue();
+						pA->m_DimAttrib.m_LineWidth = pUV->m_Edit_LineThickness.GetValue();
 						//----------------------------------
 						// Text Attributes
 						//-----------------------------------
@@ -1187,7 +1162,7 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 						pCD->SetP2(m_SnapPos);
 						pCD->SetP1(m_SnapPos);
 						pCD->SetColor(pA->m_DimAttrib.m_Color);
-						pCD->SetWidth(pA->m_DimAttrib.m_Width);
+						pCD->SetLineWidth(pA->m_DimAttrib.m_LineWidth);
 						pCD->GetText()->SetAngle(pA->m_DimAttrib.m_Text.m_Angle);
 						pCD->GetText()->SetBkColor(pA->m_DimAttrib.m_Text.m_BkColor);
 						pCD->GetText()->SetColor(pA->m_DimAttrib.m_Text.m_Color);
@@ -1221,7 +1196,7 @@ void CFrontCadView::OnLButtonDown(UINT nFlags, CPoint point)
 			{
 				CCadPrintRect *pPR = new CCadPrintRect;
 				pPR->SetP1(m_SnapPos);
-				pPR->SetOutLineWidth(40);
+				pPR->SetLineWidth(40);
 				pPR->SetLineColor(RGB(0, 0, 0));
 				pPR->SetSize(pUV->m_Combo_PrintRect.GetPrintRectSize());
 				m_pDrawObject = (CCadObject *)pPR;
@@ -1326,15 +1301,26 @@ void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 				switch(m_DrawState)
 				{
 					case DRAWSTATE_WAITMOUSE_DOWN:
+						// 
 						m_DrawState = DRAWSTATE_MOVE;
-						pCP->AddPoint(m_SnapPos);
+						fprintf(theApp.LogFile(), "Mouse Up FRIST POINT:Wait Mouse Down:");
+						pCP->AddPoint(m_SnapPos, TRUE, TRUE);	// first point
+						pCP->AddPoint(m_SnapPos, FALSE, FALSE); //rubber band point
 						theApp.GetMainFrame()->UpdateStatusBar("PolyGon:Place Next Point");
 						break;
 					case DRAWSTATE_MOVE:
 						{
-							pCP->DeleteLastPoint();
+//							pCP->DeleteLastPoint();
 							if ((m_SnapPos.x == m_PolyStart.x) && (m_SnapPos.y == m_PolyStart.y))
-							{	//we are back at the start point, terminate
+							{
+								fprintf(theApp.LogFile(),"Mouse Up:End Move:");
+								//-----------------------------------------------
+								// So, at this point, this poloyggon is finished
+								//-----------------------------------------------
+								//we are back at the start point, terminate
+								fprintf(theApp.LogFile(), "Size:%d  Count:%d\n", pCP->GetAttributes()->m_Size, pCP->GetAttributes()->m_Count);
+								pCP->GetAttributes()->m_Size--;	//remove rubber band point from count
+								pCP->GetAttributes()->m_Count--;
 								pDoc->AddObject(m_pDrawObject);
 								m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
 								theApp.GetMainFrame()->UpdateStatusBar("PolyGon:Place First Point");
@@ -1342,41 +1328,12 @@ void CFrontCadView::OnLButtonUp(UINT nFlags, CPoint point)
 							}
 							else
 							{
-								pCP->AddPoint(m_SnapPos);
-//								m_DrawState = DRAWSTATE_NEXTSEGMENT;
+								fprintf(theApp.LogFile(), "Mouse Up:Move:");
+								pCP->AddPoint(m_SnapPos, TRUE, FALSE);
+								pCP->AddPoint(m_SnapPos, FALSE, FALSE);
 							}
 						}
 						Invalidate();
-						break;
-				}
-			}
-			Invalidate();
-			break;
-		case DrawMode::POLYFILL:	//mouse up
-			{
-				CCadPolygonFill *pCP = (CCadPolygonFill *)m_pDrawObject;
-				switch(m_DrawState)
-				{
-					case DRAWSTATE_WAITMOUSE_DOWN:
-						m_DrawState = DRAWSTATE_MOVE;
-						pCP->AddPoint(m_SnapPos);
-						theApp.GetMainFrame()->UpdateStatusBar("PolyGon:Place Next Point");
-						break;
-					case DRAWSTATE_MOVE:
-						{
-							pCP->DeleteLastPoint();
-							if((m_SnapPos.x == m_PolyStart.x) && (m_SnapPos.y == m_PolyStart.y))
-							{
-								pDoc->AddObject(m_pDrawObject);
-								m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
-								theApp.GetMainFrame()->UpdateStatusBar("PolyGon:Place First Point");
-								m_pDrawObject = 0;
-							}
-							else
-							{
-								pCP->AddPoint(m_SnapPos);
-							}
-						}
 						break;
 				}
 			}
@@ -1894,24 +1851,8 @@ void CFrontCadView::OnMouseMove(UINT nFlags, CPoint point)
 						Invalidate();
 						break;
 					case DRAWSTATE_MOVE:
-						pCP->DeleteLastPoint();
-						pCP->SetCurPoint(m_SnapPos);
-						Invalidate();
-						break;
-				}
-			}
-			break;
-		case DrawMode::POLYFILL:	//mouse move
-			{
-				CCadPolygonFill *pCP = (CCadPolygonFill *)m_pDrawObject;
-				switch(m_DrawState)
-				{
-					case DRAWSTATE_WAITMOUSE_DOWN:
-						Invalidate();
-						break;
-					case DRAWSTATE_MOVE:
-						pCP->DeleteLastPoint();
-						pCP->SetCurPoint(m_SnapPos);
+						fprintf(theApp.LogFile(), "*Mouse Moving:");
+						pCP->AddPoint(m_SnapPos,FALSE,FALSE);
 						Invalidate();
 						break;
 				}
@@ -2304,7 +2245,6 @@ void CFrontCadView::OnToolbarZoomout()
 	UpdateRulerInfo(RW_ZOOM, CPoint(m_HScrollPos,m_VScrollPos), SnapToScreen(m_SnapPos));
 	UpdateScrollbarInfo();
 	CFrontCadDoc *pDoc = GetDocument();
-	pDoc->MakeDirty();
 	Invalidate();
 }
 
@@ -2335,7 +2275,6 @@ void CFrontCadView::OnToolbarZoomin()
 	UpdateRulerInfo(RW_ZOOM,CPoint(m_HScrollPos,m_VScrollPos), SnapToScreen(m_SnapPos));
 	UpdateScrollbarInfo();
 	CFrontCadDoc *pDoc = GetDocument();
-	pDoc->MakeDirty();
 	Invalidate();
 }
 
@@ -2382,7 +2321,7 @@ void CFrontCadView::OnButtonDimension()
 	//------------------------------------------------
 	// Line attributes
 	//------------------------------------------------
-	pUV->m_Edit_LineThickness.SetValue(pA->m_DimAttrib.m_Width);
+	pUV->m_Edit_LineThickness.SetValue(pA->m_DimAttrib.m_LineWidth);
 	pUV->m_Static_LineColor.SetColor(pA->m_DimAttrib.m_Color);
 	//------------------------------------------------
 	// Text Attributes
@@ -2410,7 +2349,7 @@ void CFrontCadView::OnButtonOrigin()
 	CFrontCadApp *pA = (CFrontCadApp *)AfxGetApp();
 	m_Drawmode = DrawMode::ORIGIN;
 	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
-	pUV->m_Edit_LineThickness.SetValue(pA->m_OriginAttrib.m_Width);
+	pUV->m_Edit_LineThickness.SetValue(pA->m_OriginAttrib.m_LineWidth);
 	pUV->m_Static_LineColor.SetColor(pA->m_OriginAttrib.m_Color);
 	pUV->ShowHide(m_Drawmode);
 	theApp.GetMainFrame()->UpdateStatusBar("Origin:Place Location of Point");
@@ -2427,7 +2366,7 @@ void CFrontCadView::OnToolbarRect()
 	CFrontCadApp *pA = (CFrontCadApp *)AfxGetApp();
 	m_Drawmode = DrawMode::RECTANGLE;
 	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
-	pUV->m_Edit_LineThickness.SetValue(pA->m_RectAttributes.m_Width);
+	pUV->m_Edit_LineThickness.SetValue(pA->m_RectAttributes.m_LineWidth);
 	pUV->m_Static_FillColor.SetColor(pA->m_RectAttributes.m_FillColor);
 	pUV->m_Static_LineColor.SetColor(pA->m_RectAttributes.m_LineColor);
 	pUV->ShowHide(m_Drawmode);
@@ -2481,8 +2420,8 @@ void CFrontCadView::OnToolbarLine()
 	m_Drawmode = DrawMode::LINE;
 	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
 	CUtilView *pUV = GetUtilityView();
-	pUV->m_Edit_LineThickness.SetValue(pA->m_LineAttrib.m_Width);
-	pUV->m_Static_LineColor.SetColor(pA->m_LineAttrib.m_Color );
+	pUV->m_Edit_LineThickness.SetValue(pA->m_LineAttrib.m_LineWidth);
+	pUV->m_Static_LineColor.SetColor(pA->m_LineAttrib.m_LineColor );
 	pUV->ShowHide(m_Drawmode);
 	pUV->SetUpText(m_Drawmode);
 	theApp.GetMainFrame()->UpdateStatusBar("Line:Place First Point");
@@ -2767,8 +2706,10 @@ void CFrontCadView::OnToolbarPolygon()
 	this->m_Drawmode = DrawMode::POLYGON;
 	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
 	CUtilView *pUV = GetUtilityView();
-	pUV->m_Edit_LineThickness.SetValue(pA->m_PolyAttributes.m_Width);
+	pUV->m_Edit_LineThickness.SetValue(pA->m_PolyAttributes.m_LineWidth);
 	pUV->m_Static_LineColor.SetColor(pA->m_PolyAttributes.m_LineColor);
+	pUV->m_Static_FillColor.SetColor(pA->m_PolyAttributes.m_FillColor);
+	pUV->m_Check_TransparentFill.SetCheck(pA->m_PolyAttributes.m_Transparent, 0);	
 	pUV->ShowHide(m_Drawmode);
 	pUV->SetUpText(m_Drawmode);
 	theApp.GetMainFrame()->UpdateStatusBar("Polygon:Place First Point");
@@ -2848,29 +2789,13 @@ void CFrontCadView::DrawCrosshairs(CDC *pDC,CRect *pRect,CPoint pos)
 	pDC->SelectObject(pOldPen);
 }
 
-void CFrontCadView::OnToolbarPolywithfill()
-{
-	CFrontCadApp *pA = (CFrontCadApp *)AfxGetApp();
-	m_Drawmode = DrawMode::POLYFILL;
-	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
-	CUtilView *pUV = GetUtilityView();
-	pUV->m_Edit_LineThickness.SetValue(pA->m_PolyFillAttributes.m_Width);
-	pUV->m_Static_LineColor.SetColor(pA->m_PolyFillAttributes.m_LineColor);
-	pUV->m_Static_FillColor.SetColor(pA->m_PolyFillAttributes.m_FillColor);
-	pUV->ShowHide(m_Drawmode);
-	pUV->SetUpText(m_Drawmode);
-	theApp.GetMainFrame()->UpdateStatusBar("Filled Polygon:Place First Point");
-
-}
-
-
 void CFrontCadView::OnToolbarArcCenter()
 {
 	CFrontCadApp *pA = (CFrontCadApp *)AfxGetApp();
 	m_Drawmode = DrawMode::ARC_CENTER;
 	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
 	CUtilView *pUV = GetUtilityView();
-	pUV->m_Edit_LineThickness.SetValue(pA->m_ArcAttributes.m_Width);
+	pUV->m_Edit_LineThickness.SetValue(pA->m_ArcAttributes.m_LineWidth);
 	pUV->m_Static_LineColor.SetColor(pA->m_ArcAttributes.m_LineColor);
 	pUV->ShowHide(m_Drawmode);
 	pUV->SetUpText(m_Drawmode);
@@ -2884,7 +2809,7 @@ void CFrontCadView::OnToolbarArc()
 	m_Drawmode = DrawMode::ARC;
 	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
 	CUtilView *pUV = GetUtilityView();
-	pUV->m_Edit_LineThickness.SetValue(pA->m_ArcAttributes.m_Width);
+	pUV->m_Edit_LineThickness.SetValue(pA->m_ArcAttributes.m_LineWidth);
 	pUV->m_Static_LineColor.SetColor(pA->m_ArcAttributes.m_LineColor);
 	pUV->ShowHide(m_Drawmode);
 	pUV->SetUpText(m_Drawmode);
@@ -2898,7 +2823,7 @@ void CFrontCadView::OnToolbarHolernd()
 	m_Drawmode = DrawMode::HOLE_ROUND;
 	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
 	pUV->m_Static_LineColor.SetColor(pA->m_HoleRoundAttributes.m_LineColor);
-	pUV->m_Edit_LineThickness.SetValue(pA->m_HoleRoundAttributes.m_Width);
+	pUV->m_Edit_LineThickness.SetValue(pA->m_HoleRoundAttributes.m_LineWidth);
 	pUV->m_Edit_HoleRadius.SetValue(pA->m_HoleRoundAttributes.m_Radius);
 	pUV->ShowHide(m_Drawmode);
 	pUV->SetUpText(m_Drawmode);
@@ -2913,7 +2838,7 @@ void CFrontCadView::OnToolbarRecthole()
 	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
 	pUV->m_Edit_X2.SetValue(pA->m_RectHoleAttributes.m_H);
 	pUV->m_Edit_Y2.SetValue(pA->m_RectHoleAttributes.m_W);
-	pUV->m_Edit_LineThickness.SetValue(pA->m_RectHoleAttributes.m_Width);
+	pUV->m_Edit_LineThickness.SetValue(pA->m_RectHoleAttributes.m_LineWidth);
 	pUV->m_Static_LineColor.SetColor(pA->m_RectHoleAttributes.m_LineColor);
 	pUV->ShowHide(m_Drawmode);
 	pUV->SetUpText(m_Drawmode);
@@ -2927,7 +2852,7 @@ void CFrontCadView::OnToolbarRnd1flat()
 	m_Drawmode = DrawMode::HOLE_RND1F;
 	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
 	pUV->m_Static_LineColor.SetColor(pA->m_HoleRnd1FlatAttributes.m_LineColor);
-	pUV->m_Edit_LineThickness.SetValue(pA->m_HoleRnd1FlatAttributes.m_Width);
+	pUV->m_Edit_LineThickness.SetValue(pA->m_HoleRnd1FlatAttributes.m_LineWidth);
 	pUV->m_Edit_HoleRadius.SetValue(pA->m_HoleRnd1FlatAttributes.m_Radius);
 	pUV->m_Edit_FlatToCenterDist.SetValue(pA->m_HoleRnd1FlatAttributes.m_FlatDist);
 	pUV->ShowHide(m_Drawmode);
@@ -2942,7 +2867,7 @@ void CFrontCadView::OnToolbarTwoflats()
 	m_Drawmode = DrawMode::HOLE_RND2F;
 	m_DrawState = DRAWSTATE_WAITMOUSE_DOWN;
 	pUV->m_Static_LineColor.SetColor(pA->m_HoleRnd2FlatAttributes.m_LineColor);
-	pUV->m_Edit_LineThickness.SetValue(pA->m_HoleRnd2FlatAttributes.m_Width);
+	pUV->m_Edit_LineThickness.SetValue(pA->m_HoleRnd2FlatAttributes.m_LineWidth);
 	pUV->m_Edit_HoleRadius.SetValue(pA->m_HoleRnd2FlatAttributes.m_Radius);
 	pUV->m_Edit_FlatToCenterDist.SetValue(pA->m_HoleRnd2FlatAttributes.m_FlatDist);
 	pUV->ShowHide(m_Drawmode);
@@ -3002,7 +2927,6 @@ LRESULT CFrontCadView::OnUtilMessage(WPARAM wP, LPARAM lP)
 		case UtilMsg::HOLERADIUS:
 			if (GetTopSelection())
 			{
-				GetTopSelection()->MakeDirty();
 				ChangeObject(this->GetUtilityView(), GetTopSelection());
 				Invalidate();
 			}
@@ -3020,7 +2944,6 @@ LRESULT CFrontCadView::OnUtilMessage(WPARAM wP, LPARAM lP)
 		case UtilMsg::_PRINTRECT:
 			if(GetTopSelection())
 			{
-				GetTopSelection()->MakeDirty();
 				ChangeObject(GetUtilityView(),GetTopSelection());
 				Invalidate();
 			}
@@ -3034,7 +2957,6 @@ LRESULT CFrontCadView::OnUtilMessage(WPARAM wP, LPARAM lP)
 		case UtilMsg::TRANSPARENT_FILL:
 			if(GetTopSelection())
 			{
-				this->GetTopSelection()->MakeDirty();
 				ChangeObject(GetUtilityView(),GetTopSelection());
 				Invalidate();
 			}
@@ -3058,7 +2980,7 @@ void CFrontCadView::FillInUtilView(CUtilView *pUV, CCadObject *pSel)
 			pUV->m_Edit_X2.SetValue(((CCadLine *)pSel)->GetP2().x);
 			pUV->m_Edit_X2.SetValue(((CCadLine *)pSel)->GetP2().x);
 			pUV->m_Edit_Y2.SetValue(((CCadLine *)pSel)->GetP2().y);
-			pUV->m_Edit_LineThickness.SetValue(((CCadLine *)pSel)->GetOutLineWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadLine *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor( ((CCadLine *)pSel)->GetLineColor());
 			break;
 		case OBJECT_TYPE_RECT:
@@ -3067,7 +2989,7 @@ void CFrontCadView::FillInUtilView(CUtilView *pUV, CCadObject *pSel)
 			pUV->m_Edit_X2.SetValue(((CCadRect *)pSel)->GetP2().x);
 			pUV->m_Edit_X2.SetValue(((CCadRect *)pSel)->GetP2().x);
 			pUV->m_Edit_Y2.SetValue(((CCadRect *)pSel)->GetP2().y);
-			pUV->m_Edit_LineThickness.SetValue(((CCadRect *)pSel)->GetOutLineWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadRect *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor( ((CCadRect *)pSel)->GetLineColor() );
 			pUV->m_Static_FillColor.SetColor( ((CCadRect *)pSel)->GetFillColor() );
 			break;
@@ -3077,7 +2999,7 @@ void CFrontCadView::FillInUtilView(CUtilView *pUV, CCadObject *pSel)
 			pUV->m_Edit_X2.SetValue(((CCadElipse *)pSel)->GetP2().x);
 			pUV->m_Edit_X2.SetValue(((CCadElipse *)pSel)->GetP2().x);
 			pUV->m_Edit_Y2.SetValue(((CCadElipse *)pSel)->GetP2().y);
-			pUV->m_Edit_LineThickness.SetValue(((CCadElipse *)pSel)->GetOutLineWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadElipse *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor( ((CCadElipse *)pSel)->GetLineColor() );
 			pUV->m_Static_FillColor.SetColor( ((CCadElipse *)pSel)->GetFillColor() );
 			break;
@@ -3088,25 +3010,22 @@ void CFrontCadView::FillInUtilView(CUtilView *pUV, CCadObject *pSel)
 			pUV->m_Edit_Y2.SetValue(((CCadRoundRect *)pSel)->GetP2().y);
 			pUV->m_Edit_X3.SetValue(((CCadRoundRect *)pSel)->GetArc().x);
 			pUV->m_Edit_Y3.SetValue(((CCadRoundRect *)pSel)->GetArc().y);
-			pUV->m_Edit_LineThickness.SetValue(((CCadRoundRect *)pSel)->GetOutLineWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadRoundRect *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor( ((CCadRoundRect *)pSel)->GetLineColor() );
 			pUV->m_Static_FillColor.SetColor( ((CCadRoundRect *)pSel)->GetFillColor() );
 			break;
 		case OBJECT_TYPE_POLY:
-			pUV->m_Edit_LineThickness.SetValue(((CCadPolygon *)pSel)->GetWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadPolygon *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor( ((CCadPolygon *)pSel)->GetLineColor() );
-			break;
-		case OBJECT_TYPE_POLYFILL:
-			pUV->m_Edit_LineThickness.SetValue(((CCadPolygonFill *)pSel)->GetWidth());
-			pUV->m_Static_LineColor.SetColor( ((CCadPolygonFill *)pSel)->GetLineColor() );
-			pUV->m_Static_FillColor.SetColor( ((CCadPolygonFill *)pSel)->GetFillColor() );
+			pUV->m_Static_FillColor.SetColor(((CCadPolygon*)pSel)->GetFillColor());
+			pUV->m_Check_TransparentFill.SetCheck(((CCadPolygon*)pSel)->GetTransparent(), 0);		
 			break;
 		case OBJECT_TYPE_LIBCOMP:
 			break;
 		case OBJECT_TYPE_HOLEROUND:
 			pUV->m_Edit_X1.SetValue(((CCadHoleRound *)pSel)->GetP1().x);
 			pUV->m_Edit_Y1.SetValue(((CCadHoleRound *)pSel)->GetP1().y);
-			pUV->m_Edit_LineThickness.SetValue(((CCadHoleRound *)pSel)->GetWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadHoleRound *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor( ((CCadHoleRound *)pSel)->GetLineColor() );
 			pUV->m_Edit_HoleRadius.SetValue(((CCadHoleRound *)pSel)->GetRadius());
 			break;
@@ -3114,14 +3033,14 @@ void CFrontCadView::FillInUtilView(CUtilView *pUV, CCadObject *pSel)
 			pUV->m_Edit_X1.SetValue(((CCadRectHole *)pSel)->GetP1().x);
 			pUV->m_Edit_Y1.SetValue(((CCadRectHole *)pSel)->GetP1().y);
 			pUV->m_Edit_X2.SetValue(((CCadRectHole *)pSel)->GetHieght());
-			pUV->m_Edit_Y2.SetValue(((CCadRectHole *)pSel)->GetWidth());
-			pUV->m_Edit_LineThickness.SetValue(((CCadRectHole *)pSel)->GetOutLineWidth());
+			pUV->m_Edit_Y2.SetValue(((CCadRectHole *)pSel)->GetLineWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadRectHole *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor( ((CCadRectHole *)pSel)->GetLineColor() );
 			break;
 		case OBJECT_TYPE_HOLERND1FLAT:
 			pUV->m_Edit_X1.SetValue(((CCadHoleRnd1Flat *)pSel)->GetP1().x);
 			pUV->m_Edit_Y1.SetValue(((CCadHoleRnd1Flat *)pSel)->GetP1().y);
-			pUV->m_Edit_LineThickness.SetValue(((CCadHoleRnd1Flat *)pSel)->GetWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadHoleRnd1Flat *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor( ((CCadHoleRnd1Flat *)pSel)->GetLineColor() );
 			pUV->m_Edit_HoleRadius.SetValue(((CCadHoleRnd1Flat *)pSel)->GetRadius());
 			pUV->m_Edit_FlatToCenterDist.SetValue(((CCadHoleRnd1Flat *)pSel)->GetFlatDist());
@@ -3129,7 +3048,7 @@ void CFrontCadView::FillInUtilView(CUtilView *pUV, CCadObject *pSel)
 		case OBJECT_TYPE_HOLERND2FLAT:
 			pUV->m_Edit_X1.SetValue(((CCadHoleRnd2Flat *)pSel)->GetP1().x);
 			pUV->m_Edit_Y1.SetValue(((CCadHoleRnd2Flat *)pSel)->GetP1().y);
-			pUV->m_Edit_LineThickness.SetValue(((CCadHoleRnd2Flat *)pSel)->GetWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadHoleRnd2Flat *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor( ((CCadHoleRnd2Flat *)pSel)->GetLineColor() );
 			pUV->m_Edit_HoleRadius.SetValue(((CCadHoleRnd2Flat *)pSel)->GetRadius());
 			pUV->m_Edit_FlatToCenterDist.SetValue(((CCadHoleRnd2Flat *)pSel)->GetFlatDist());
@@ -3154,7 +3073,7 @@ void CFrontCadView::FillInUtilView(CUtilView *pUV, CCadObject *pSel)
 			pUV->m_Edit_Y1.SetValue(((CCadArc *)pSel)->GetP1().y);
 			pUV->m_Edit_X3.SetValue(((CCadArc *)pSel)->GetStartAngle());
 			pUV->m_Edit_Y3.SetValue(((CCadArc *)pSel)->GetEndAngle());
-			pUV->m_Edit_LineThickness.SetValue(((CCadArc *)pSel)->GetWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadArc *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor(((CCadArc *)pSel)->GetLineColor());
 			break;
 		case OBJECT_TYPE_ARCCENTERED:
@@ -3164,7 +3083,7 @@ void CFrontCadView::FillInUtilView(CUtilView *pUV, CCadObject *pSel)
 			pUV->m_Edit_Y1.SetValue(((CCadArcCentered *)pSel)->GetP1().y);
 			pUV->m_Edit_X3.SetValue(((CCadArcCentered *)pSel)->GetStartAngle());
 			pUV->m_Edit_Y3.SetValue(((CCadArcCentered *)pSel)->GetEndAngle());
-			pUV->m_Edit_LineThickness.SetValue(((CCadArcCentered *)pSel)->GetWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadArcCentered *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor(((CCadArcCentered *)pSel)->GetLineColor());
 			break;
 		case OBJECT_TYPE_ARROW:
@@ -3173,13 +3092,13 @@ void CFrontCadView::FillInUtilView(CUtilView *pUV, CCadObject *pSel)
 			pUV->m_Edit_Y2.SetValue(((CCadArrow *)pSel)->GetP2().y);
 			pUV->m_Edit_Y1.SetValue(((CCadArrow *)pSel)->GetP1().y);
 			pUV->m_Edit_X3.SetValue(((CCadArrow *)pSel)->GetArrowLegnth());
-			pUV->m_Edit_Y3.SetValue(((CCadArrow *)pSel)->GetWidth());
+			pUV->m_Edit_Y3.SetValue(((CCadArrow *)pSel)->GetLineWidth());
 			pUV->m_Static_FillColor.SetColor(((CCadArrow *)pSel)->GetColor() );
 			break;
 		case OBJECT_TYPE_ORIGIN:
 			break;
 		case OBJECT_TYPE_DIMENSION:
-			pUV->m_Edit_LineThickness.SetValue(((CCadDimension *)pSel)->GetWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadDimension *)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor(((CCadDimension *)pSel)->GetColor());
 
 			pUV->m_Button_Font.SetWindowText( ( (CCadDimension *)pSel)->GetText()->GetFontName() );
@@ -3194,7 +3113,7 @@ void CFrontCadView::FillInUtilView(CUtilView *pUV, CCadObject *pSel)
 			pUV->m_Edit_Y1.SetValue(((CCadCircle*)pSel)->GetP1().y);
 			// Radius is entered into the X3 field in the utility view
 			pUV->m_Edit_X3.SetValue(((CCadCircle*)pSel)->GetRadius());
-			pUV->m_Edit_LineThickness.SetValue(((CCadCircle*)pSel)->GetOutLineWidth());
+			pUV->m_Edit_LineThickness.SetValue(((CCadCircle*)pSel)->GetLineWidth());
 			pUV->m_Static_LineColor.SetColor(((CCadCircle*)pSel)->GetLineColor());
 			pUV->m_Static_FillColor.SetColor(((CCadCircle*)pSel)->GetFillColor());
 			pUV->m_Check_TransparentFill.SetCheck(((CCadCircle*)pSel)->GetTransparent());
@@ -3365,7 +3284,7 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
 				pO->SetP2(CPoint(pUV->m_Edit_X2.GetValue(), pUV->m_Edit_Y2.GetValue()));
 				((CCadLine *)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
-				((CCadLine *)pO)->SetOutLineWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadLine *)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				Invalidate();
 				break;
 			case OBJECT_TYPE_RECT:
@@ -3373,7 +3292,7 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 				pO->SetP2(CPoint(pUV->m_Edit_X2.GetValue(), pUV->m_Edit_Y2.GetValue()));
 				((CCadRect *)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
 				((CCadRect *)pO)->SetFillColor(pUV->m_Static_FillColor.GetColor());
-				((CCadRect *)pO)->SetOutLineWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadRect *)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				Invalidate();
 				break;
 			case OBJECT_TYPE_ELLIPSE:
@@ -3381,7 +3300,7 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 				pO->SetP2(CPoint(pUV->m_Edit_X2.GetValue(), pUV->m_Edit_Y2.GetValue()));
 				((CCadElipse *)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
 				((CCadElipse *)pO)->SetFillColor(pUV->m_Static_FillColor.GetColor());
-				((CCadElipse *)pO)->SetOutLineWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadElipse *)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				Invalidate();
 				break;
 			case OBJECT_TYPE_RNDRECT:
@@ -3395,13 +3314,9 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 				break;
 			case OBJECT_TYPE_POLY:
 				((CCadPolygon *)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
-				((CCadPolygon *)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
-				Invalidate();
-				break;
-			case OBJECT_TYPE_POLYFILL:
-				((CCadPolygonFill *)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
-				((CCadPolygonFill *)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
-				((CCadPolygonFill *)pO)->SetFillColor(pUV->m_Static_FillColor.GetColor());
+				((CCadPolygon *)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadPolygon*)pO)->SetFillColor(pUV->m_Static_FillColor.GetColor());
+				((CCadPolygon*)pO)->SetTransparent(pUV->m_Check_TransparentFill.GetCheck());
 				Invalidate();
 				break;
 			case OBJECT_TYPE_LIBCOMP:
@@ -3409,14 +3324,14 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 			case OBJECT_TYPE_HOLEROUND:
 				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
 				((CCadHoleRound *)pO)->SetRadius(pUV->m_Edit_HoleRadius.GetValue());
-				((CCadHoleRound *)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadHoleRound *)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				((CCadHoleRound *)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
 				Invalidate();
 				break;
 			case OBJECT_TYPE_HOLERECT:
 				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
 				((CCadRectHole *)pO)->SetHieghtWidth(pUV->m_Edit_X2.GetValue(),pUV->m_Edit_Y2.GetValue());
-				((CCadRectHole *)pO)->SetOutLineWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadRectHole *)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				((CCadRectHole *)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
 				Invalidate();
 				break;
@@ -3424,7 +3339,7 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
 				((CCadHoleRnd1Flat *)pO)->SetRadius(pUV->m_Edit_HoleRadius.GetValue());
 				((CCadHoleRnd1Flat *)pO)->SetFlatDist(pUV->m_Edit_FlatToCenterDist.GetValue());
-				((CCadHoleRnd1Flat *)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadHoleRnd1Flat *)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				((CCadHoleRnd1Flat *)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
 				Invalidate();
 				break;
@@ -3432,7 +3347,7 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
 				((CCadHoleRnd2Flat *)pO)->SetRadius(pUV->m_Edit_HoleRadius.GetValue());
 				((CCadHoleRnd2Flat *)pO)->SetFlatDist(pUV->m_Edit_FlatToCenterDist.GetValue());
-				((CCadHoleRnd2Flat *)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadHoleRnd2Flat *)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				((CCadHoleRnd1Flat *)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
 				Invalidate();
 				break;
@@ -3455,13 +3370,13 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
 				pO->SetP2(CPoint(pUV->m_Edit_X2.GetValue(), pUV->m_Edit_Y2.GetValue()));
 				((CCadArc*)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
-				((CCadArc*)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadArc*)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				break;
 			case OBJECT_TYPE_ARCCENTERED:
 				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
 				pO->SetP2(CPoint(pUV->m_Edit_X2.GetValue(), pUV->m_Edit_Y2.GetValue()));
 				((CCadArcCentered*)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
-				((CCadArcCentered*)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadArcCentered*)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				break;
 			case OBJECT_TYPE_ARROW:
 				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
@@ -3473,12 +3388,12 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 				break;
 			case OBJECT_TYPE_ORIGIN:
 				((CCadOrigin *)pO)->SetColor(pUV->m_Static_LineColor.GetColor());
-				((CCadOrigin *)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadOrigin *)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				Invalidate();
 				break;
 			case OBJECT_TYPE_DIMENSION:
 				((CCadDimension *)pO)->SetColor(pUV->m_Static_LineColor.GetColor());
-				((CCadDimension *)pO)->SetWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadDimension *)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				((CCadDimension *)pO)->GetText()->SetFontHeight(pUV->m_Edit_FontHeight.GetValue());
 				pUV->m_Button_Font.GetWindowTextA(s, 255);
 				((CCadDimension *)pO)->GetText()->SetFontName(s);
@@ -3493,7 +3408,7 @@ void CFrontCadView::ChangeObject(CUtilView *pUV,CCadObject *pO)
 				pO->SetP1(CPoint(pUV->m_Edit_X1.GetValue(), pUV->m_Edit_Y1.GetValue()));
 				((CCadCircle*)pO)->SetLineColor(pUV->m_Static_LineColor.GetColor());
 				((CCadCircle*)pO)->SetFillColor(pUV->m_Static_FillColor.GetColor());
-				((CCadCircle*)pO)->SetOutLineWidth(pUV->m_Edit_LineThickness.GetValue());
+				((CCadCircle*)pO)->SetLineWidth(pUV->m_Edit_LineThickness.GetValue());
 				((CCadCircle*)pO)->SetTransparent(pUV->m_Check_TransparentFill.GetCheck());
 				// Radius is in the X3 field
 				Radius = pUV->m_Edit_X3.GetValue();
@@ -3822,15 +3737,9 @@ void CFrontCadView::PrintToDC(CDC * pDC)
 	br.CreateSolidBrush(pDoc->GetBkColor());
 	pDC->FillRect(&rect, &br);
 	//----------------------------------
-	// Make all of the objects dirty
-	//---------------------------------
-	pDoc->MakeDirty();
-	//----------------------------------
 	// Print to the clipboard
 	//----------------------------------
 	pDoc->Print(pDC, OBJECT_MODE_FINAL, Offset, CScale(ZF[m_ZoomLevel], ZF[m_ZoomLevel]));
-	//make dirty all over again.
-	pDoc->MakeDirty();
 
 }
 
@@ -4268,7 +4177,8 @@ void CFrontCadView::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CFrontCadView::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if (theApp.HasConsol()) printf("OnSysKeyDown KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+	//if (theApp.HasConsol()) 
+		fprintf(theApp.LogFile(), "OnSysKeyDown KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 	switch (nChar)
 	{
 	case VK_MENU:
@@ -4280,7 +4190,8 @@ void CFrontCadView::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CFrontCadView::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if (theApp.HasConsol()) printf("OnSysKeyUp KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
+	//if (theApp.HasConsol()) 
+		fprintf(theApp.LogFile(), "OnSysKeyUp KEY:%04x Repeat:%d FLAGS:%04x\n", nChar, nRepCnt, nFlags);
 	switch (nChar)
 	{
 	case VK_MENU:

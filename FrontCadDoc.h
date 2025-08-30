@@ -33,7 +33,6 @@ public:
 	CCadPrintRect* GetPrintRect();
 	COLORREF GetBkColor();
 	void SetBkColor(COLORREF color);
-	void MakeDirty();
 	int CheckSelected(CPoint p, CCadObject** ppSelList, int n, int flag = 0) { return m_pDrawing->CheckSelected(p, ppSelList, n, flag); }
 	CCadObject* GetHead(void) { return m_pDrawing->GetHead(); }
 	void Print(CDC* pDC, int mode, CPoint Offset, CScale Scale) { m_pDrawing->Print(pDC, mode, Offset, Scale); }

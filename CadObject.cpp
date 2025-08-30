@@ -36,8 +36,6 @@ ObjectTypeMembers TypeLUT[] = {
 	{NULL,-1}
 };
 
-BOOL CCadObject::RenderObjectFillsEnable = TRUE;
-
 const char* CCadObject::LookupTypeName(int TypeToken)
 {
 	int i;
@@ -66,10 +64,8 @@ CCadObject::CCadObject()
 	m_pNext = 0;
 	m_pPrev = 0;
 	m_pSelNext = 0;
-	m_LastMode = -1;
 	SetSelected(0);
 	m_Type = OBJECT_TYPE_NONE;
-	SetDirty(0);
 	m_P1 = CPoint(0,0);
 	m_P2 = CPoint(0,0);
 }
@@ -79,10 +75,8 @@ CCadObject::CCadObject(int type)
 	m_pNext = 0;
 	m_pPrev = 0;
 	m_pSelNext = 0;
-	m_LastMode = -1;
 	SetSelected(0);
 	m_Type = type;
-	SetDirty(0);
 	m_P1 = CPoint(0,0);
 	m_P2 = CPoint(0,0);
 }
@@ -163,11 +157,6 @@ void CCadObject::RemoveObject(CCadObject *pO)
 {
 }
 
-void CCadObject::MakeDirty()
-{
-	this->SetDirty(1);
-}
-
 const char * CCadObject::GetTypeString()
 {
 	return LookupTypeName(m_Type);
@@ -222,13 +211,6 @@ CCadObject * CCadObject::CopyObject(void)
 	{
 		CCadPolygon *pP = new CCadPolygon;
 		*pP = *(CCadPolygon *)this;
-		pRobj = pP;
-	}
-	break;
-	case OBJECT_TYPE_POLYFILL:
-	{
-		CCadPolygonFill *pP = new CCadPolygonFill;
-		*pP = *(CCadPolygonFill *)this;
 		pRobj = pP;
 	}
 	break;

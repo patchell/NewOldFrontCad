@@ -4,23 +4,20 @@ struct CircleAttributes {
 	int m_LineWidth;
 	COLORREF m_LineColor;
 	COLORREF m_FillColor;
-	BOOL m_Transparent;
+	BOOL m_bTransparent;
 	CircleAttributes() {
 		m_LineWidth = 0;
 		m_LineColor = RGB(0, 0, 0);
 		m_FillColor = RGB(0, 0, 0);
-		m_Transparent = 0;
+		m_bTransparent = 0;
 	}
 };
 
 class CCadCircle : public CCadObject
 {
 	inline static int m_RenderEnable = 1;
+	CircleAttributes m_atrb;
 	double m_Radius;
-	int m_Width;
-	COLORREF m_LineColor;
-	COLORREF m_FillColor;
-	BOOL m_bTransparentFill;
 public:
 	CCadCircle();
 	CCadCircle(CCadCircle& e);
@@ -40,14 +37,14 @@ public:
 	virtual void SetVertex(int Vi, CPoint p);
 	virtual int GrabVertex(CPoint p);
 	virtual void AdjustRefernce(CPoint Ref);
-	void SetOutLineWidth(int w) { m_Width = w; }
-	int GetOutLineWidth(void) { return m_Width; }
-	void SetLineColor(COLORREF c) { m_LineColor = c; }
-	COLORREF GetLineColor(void) { return m_LineColor; }
-	void SetFillColor(COLORREF c) { m_FillColor = c; }
-	COLORREF GetFillColor(void) { return m_FillColor; }
-	void SetTransparent(BOOL bT) { m_bTransparentFill = bT; }
-	BOOL GetTransparent() { return m_bTransparentFill; }
+	void SetLineWidth(int w) { GetAttributes()->m_LineWidth = w; }
+	int GetLineWidth(void) { return GetAttributes()->m_LineWidth; }
+	void SetLineColor(COLORREF c) { GetAttributes()->m_LineColor = c; }
+	COLORREF GetLineColor(void) { return GetAttributes()->m_LineColor; }
+	void SetFillColor(COLORREF c) { GetAttributes()->m_FillColor = c; }
+	COLORREF GetFillColor(void) { return GetAttributes()->m_FillColor; }
+	void SetTransparent(BOOL bT) { GetAttributes()->m_bTransparent = bT; }
+	BOOL GetTransparent() { return GetAttributes()->m_bTransparent; }
 	CCadCircle operator=(CCadCircle& v);
 	virtual void RenderEnable(int e);
 	virtual CPoint GetCenter();
@@ -55,5 +52,6 @@ public:
 	virtual void ChangeCenter(CSize p);
 	virtual CSize GetSize();
 	virtual void ChangeSize(CSize Sz);
+	CircleAttributes* GetAttributes(void) { return &m_atrb; }
 };
 

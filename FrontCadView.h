@@ -175,7 +175,6 @@ protected:
 	afx_msg void OnToolbarPolygon();
 	afx_msg void OnToolbarScalewiz();
 	afx_msg void OnToolbarArc();
-	afx_msg void OnToolbarPolywithfill();
 	afx_msg void OnToolbarArcCenter();
 	afx_msg void OnToolbarHolernd();
 	afx_msg void OnToolbarRecthole();

@@ -36,16 +36,19 @@ void CCadArrow::Save(FILE *pO,  int Indent)
 	char* s3 = new char[64];
 	char* s4 = new char[64];
 	char* s5 = new char[64];
+	char* s6 = new char[64];
 
-	fprintf(pO, "%s%s(%s,%s,%s,%s,%s)\n",
+	fprintf(pO, "%s%s(%s,%s,%s,%s,%s,%s)\n",
 		theApp.IndentString(s,256,Indent),
 		CFileParser::TokenLookup(TOKEN_ARROW),
 		CFileParser::SavePoint(s1, 64, TOKEN_POINT_1, GetP1()),
 		CFileParser::SavePoint(s2, 64, TOKEN_POINT_2, GetP2()),
 		CFileParser::SaveDecimalValue(s4,64,TOKEN_ARROW_LENGTH, m_Attrib.m_Len),
 		CFileParser::SaveDecimalValue(s5, 64, TOKEN_ARROW_WIDTH, m_Attrib.m_ArrowWidth),
-		CFileParser::SaveColor(s3,64, m_Attrib.m_Color, TOKEN_COLOR)
+		CFileParser::SaveColor(s3,64, m_Attrib.m_Color, TOKEN_COLOR),
+		CFileParser::SaveDecimalValue(s4, 64, TOKEN_TRANSPARENT, m_Attrib.m_bTransparent)
 	);
+	delete[]s6;
 	delete[]s5;
 	delete[]s4;
 	delete[]s3;
@@ -56,18 +59,43 @@ void CCadArrow::Save(FILE *pO,  int Indent)
 
 int CCadArrow::Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, CFileParser* pParser)
 {
+	BOOL bLoop = TRUE;
+
 	LookAHeadToken = pParser->Expect(TOKEN_ARROW, LookAHeadToken, pIN);
 	LookAHeadToken = pParser->Expect('(', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Point(TOKEN_POINT_1, pIN, GetP1(), LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Point(TOKEN_POINT_2, pIN, GetP2(), LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_ARROW_LENGTH, pIN, m_Attrib.m_Len, LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_ARROW_WIDTH, pIN, m_Attrib.m_ArrowWidth, LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Color(TOKEN_COLOR, pIN, m_Attrib.m_Color, LookAHeadToken);
-	LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
+	while (bLoop)
+	{
+		switch (LookAHeadToken)
+		{
+		case TOKEN_POINT_1:
+			LookAHeadToken = pParser->Point(TOKEN_POINT_1, pIN, GetP1(), LookAHeadToken);
+			break;
+		case TOKEN_POINT_2:
+			LookAHeadToken = pParser->Point(TOKEN_POINT_2, pIN, GetP2(), LookAHeadToken);
+			break;
+		case TOKEN_ARROW_LENGTH:
+			LookAHeadToken = pParser->DecimalValue(TOKEN_ARROW_LENGTH, pIN, m_Attrib.m_Len, LookAHeadToken);
+			break;
+		case TOKEN_ARROW_WIDTH:
+			LookAHeadToken = pParser->DecimalValue(TOKEN_ARROW_WIDTH, pIN, m_Attrib.m_ArrowWidth, LookAHeadToken);
+			break;
+		case TOKEN_COLOR:
+			LookAHeadToken = pParser->Color(TOKEN_COLOR, pIN, m_Attrib.m_Color, LookAHeadToken);
+			break;
+		case TOKEN_TRANSPARENT:
+			LookAHeadToken = pParser->DecimalValue(TOKEN_TRANSPARENT, pIN, m_Attrib.m_bTransparent, LookAHeadToken);
+			break;
+		case ',':
+			LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
+			break;
+		case ')':
+			bLoop = FALSE;
+			LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
+			break;
+		default:
+			break;
+		}
+	}
 	(*ppDrawing)->AddObject(this);
 	return LookAHeadToken;
 }
@@ -121,7 +149,10 @@ void CCadArrow::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 		{
 		case OBJECT_MODE_FINAL:
 			penLine.CreatePen(PS_SOLID, 1, m_Attrib.m_Color);
-			brushFill.CreateSolidBrush(m_Attrib.m_Color);
+			if (CCadObject::AreShapeFillsDisabled())
+				brushFill.CreateStockObject(NULL_BRUSH);
+			else
+				brushFill.CreateSolidBrush(m_Attrib.m_Color);
 			break;
 		case OBJECT_MODE_SELECTED:
 			penLine.CreatePen(PS_SOLID, 1, m_Attrib.m_Color ^ 0x00ff00);
@@ -167,13 +198,25 @@ void CCadArrow::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 
 int CCadArrow::CheckSelected(CPoint p,CSize Off)
 {
-	CCadPolygon Cp(3);
-	Cp.AddPoint(GetP1() + Off);
+	int rV = 0;
+
+	if(theApp.HasConsol())
+	{
+		printf("------------------------------------------\n");
+		printf("Enter CCadArrow::CheckSelected\n");
+	}
+	CCadPolygon Cp;
+	Cp.AddPoint(GetP1() + Off, TRUE, TRUE);
 	CPoint P3, P4;
 	CalcPoints(P3, P4, Off, CScale(1.0, 1.0));
-	Cp.AddPoint(P3);
-	Cp.AddPoint(P4);
-	return Cp.CheckSelected(p);
+	Cp.AddPoint(P3, TRUE, TRUE);
+	Cp.AddPoint(P4, TRUE, TRUE);
+	rV = Cp.CheckSelected(p, CSize(0, 0));
+	if (theApp.HasConsol())
+	{
+		printf("Exit CCadArrow::CheckSelected\n");
+	}
+	return rV;
 }
 
 CPoint CCadArrow::GetReference()
@@ -194,11 +237,6 @@ void CCadArrow::RemoveObject(CCadObject *pO)
 CCadObject *CCadArrow::GetHead(void)
 {
 	return 0;
-}
-
-void CCadArrow::MakeDirty(void)
-{
-	CCadObject::MakeDirty();
 }
 
 void CCadArrow::SetSelected(int Flag)

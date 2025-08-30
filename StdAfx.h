@@ -40,7 +40,7 @@
 #include "CadLibObject.h"
 #include "CadOrigin.h"
 #include "CadPolygon.h"
-#include "CadPolygonFill.h"
+//#include "CadPolygonFill.h"
 #include "CadArrow.h"
 #include "CadLine.h"
 #include "CadPrintRect.h"
@@ -116,7 +116,6 @@ union ObjectTypes {
 	CCadLine* pLine;
 	CCadOrigin* pOrigin;
 	CCadPolygon* pPoly;
-	CCadPolygonFill* pPolyFill;
 	CCadPrintRect* pPrintRect;
 	CCadRect* pRect;
 	CCadRectHole* pRectHole;

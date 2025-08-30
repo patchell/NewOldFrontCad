@@ -1,5 +1,9 @@
 Move along folks, nothing to see here, move along.
 
+August 29, 2025
+I thought I could make the code a little better.  Boy, that was a mistake.
+All better now, but I also had to contend with the AI that is now
+part of Visual Studio.  
 
 August 25, 2025
 The source code was modified, well actuall brought up to snuff, for C++20.

@@ -54,7 +54,7 @@ public:
 	//------------------------------
 	COLORREF GetFillColor(void)const {return m_FillColor;}
 	COLORREF GetLineColor(void)const {return m_LineColor;}
-	int GetOutLineWidth(void) const {return m_LineWidth;}
+	int GetLineWidth(void) const {return m_LineWidth;}
 	void SetFillColor(COLORREF nC){m_FillColor = nC;}
 	void SetLineColor(COLORREF nC){m_LineColor = nC;}
 	void SetLineWidth(int nW){m_LineWidth = nW;}

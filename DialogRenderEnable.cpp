@@ -98,7 +98,7 @@ void CDialogRenderEnable::OnClickedCheckEllispeenable()
 
 void CDialogRenderEnable::OnClickedCheckFilledpolyenable()
 {
-	CCadPolygonFill::SetRenderEnable(m_Check_FillPolygonEnable.GetCheck());
+//	CCadPolygonFill::SetRenderEnable(m_Check_FillPolygonEnable.GetCheck());
 }
 
 
@@ -172,7 +172,6 @@ BOOL CDialogRenderEnable::OnInitDialog()
 	m_Check_ArrowEnable.SetCheck(CCadArrow::IsRenderEnabled());
 	m_Check_DimensionEnable.SetCheck(CCadDimension::IsRenderEnabled());
 	m_Check_EllipseEnable.SetCheck(CCadElipse::IsRenderEnabled());
-	m_Check_FillPolygonEnable.SetCheck(CCadPolygonFill::IsRenderEnabled());
 	m_Check_LineEnable.SetCheck(CCadLine::IsRenderEnabled());
 	m_Check_OneFlatHoleEnable.SetCheck(CCadHoleRnd1Flat::IsRenderEnabled());
 	m_Check_OriginEnable.SetCheck(CCadOrigin::IsRenderEnabled());

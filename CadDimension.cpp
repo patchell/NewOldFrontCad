@@ -3,7 +3,6 @@
 
 CCadDimension::CCadDimension():CCadObject(OBJECT_TYPE_DIMENSION)
 {
-	m_pLine = 0;
 	m_pText = new CCadText;
 	TextAttributes* pAtrb;
 	
@@ -23,7 +22,6 @@ CCadDimension::CCadDimension():CCadObject(OBJECT_TYPE_DIMENSION)
 
 CCadDimension::CCadDimension(CCadDimension &cd) :CCadObject(OBJECT_TYPE_DIMENSION)
 {
-	m_pLine = 0;
 	SetP1(cd.GetP1());
 	SetP2(cd.GetP2());
 	m_pText = new CCadText(*cd.m_pText);
@@ -74,7 +72,7 @@ int CCadDimension::Parse(
 			LookAHeadToken = pParser->Point(TOKEN_POINT_2, pIN, GetP2(), LookAHeadToken);
 			break;
 		case TOKEN_LINE_WIDTH:
-			LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, GetAttrib().m_Width, LookAHeadToken);
+			LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, GetAttrib().m_LineWidth, LookAHeadToken);
 			break;
 		case TOKEN_LINE_COLOR:
 			LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, GetAttrib().m_Color, LookAHeadToken);
@@ -118,7 +116,7 @@ void CCadDimension::Save(FILE *pO,  int Indent)
 		CFileParser::TokenLookup(TOKEN_DIMENSION),
 		CFileParser::SavePoint(s1,64,TOKEN_POINT_1, GetP1()),
 		CFileParser::SavePoint(s2, 64, TOKEN_POINT_2, GetP2()),
-		CFileParser::SaveDecimalValue(s3,64,TOKEN_LINE_WIDTH, m_Atrib.m_Width),
+		CFileParser::SaveDecimalValue(s3,64,TOKEN_LINE_WIDTH, m_Atrib.m_LineWidth),
 		CFileParser::SaveColor(s4,64, m_Atrib.m_Color,TOKEN_LINE_COLOR)
 	);
 	m_pText->Save(pO,Indent+4);
@@ -153,7 +151,7 @@ void CCadDimension::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 	//		Offset...Offset to add to points
 	//		Scale....Sets Units to Pixels ratio
 	//---------------------------------------------
-	CPen *pOld;
+	CPen *pOld, penLine;
 	CRect rect;
 	CPoint P1, P2;
 	int Lw;
@@ -162,44 +160,37 @@ void CCadDimension::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 	{
 		P1 = (Scale * GetP1()) + Offset;
 		P2 = (Scale * GetP2()) + Offset;
-		Lw = int(Scale.m_ScaleX * m_Atrib.m_Width);
+		Lw = int(Scale.m_ScaleX * m_Atrib.m_LineWidth);
 		if (Lw < 1) Lw = 1;
-		if ((GetLastMode() != mode) || GetDirty())
+		switch (mode)
 		{
-			if (m_pLine) delete m_pLine;
-			switch (mode)
-			{
-			case OBJECT_MODE_FINAL:
-				m_pLine = new CPen(PS_SOLID, Lw, m_Atrib.m_Color);
-				break;
-			case OBJECT_MODE_SELECTED:
-				m_pLine = new CPen(PS_SOLID, Lw, RGB(0, 255, 50));
-				break;
-			case OBJECT_MODE_SKETCH:
-				m_pLine = new CPen(PS_DOT, 1, RGB(0, 0, 255));
-				break;
-			}
+		case OBJECT_MODE_FINAL:
+			penLine.CreatePen(PS_SOLID, Lw, m_Atrib.m_Color);
+			break;
+		case OBJECT_MODE_SELECTED:
+			penLine.CreatePen(PS_SOLID, Lw, RGB(0, 255, 50));
+			break;
+		case OBJECT_MODE_SKETCH:
+			penLine.CreatePen(PS_DOT, 1, RGB(0, 0, 255));
+			break;
 		}
+		pOld = pDC->SelectObject(&penLine);
 		switch (mode)
 		{
 		case OBJECT_MODE_SELECTED:
 		case OBJECT_MODE_FINAL:
-			pOld = pDC->SelectObject(m_pLine);
 			pDC->MoveTo(P1);
 			pDC->LineTo(P2);
-			pDC->SelectObject(pOld);
 			m_pText->Draw(pDC, mode, Offset, Scale);
 			break;
 		case OBJECT_MODE_SKETCH:
-			pOld = pDC->SelectObject(m_pLine);
 			pDC->MoveTo(P1);
 			pDC->LineTo(P2);
-			pDC->SelectObject(pOld);
 			break;
 		case OBJECT_MODE_ERASE:
 			break;
 		}
-		SetLastMode(mode);
+		pDC->SelectObject(pOld);
 	}
 }
 
@@ -234,12 +225,6 @@ int CCadDimension::CheckSelected(CPoint p,CSize O)
 CPoint CCadDimension::GetReference()
 {
 	return GetP1();
-}
-
-void CCadDimension::MakeDirty(void)
-{
-	SetDirty(1);
-	if (m_pText)m_pText->MakeDirty();
 }
 
 void CCadDimension::SetSelected(int Flag)

@@ -17,27 +17,20 @@ static char THIS_FILE[]=__FILE__;
 
 CCadHoleRnd1Flat::CCadHoleRnd1Flat():CCadObject(OBJECT_TYPE_HOLERND1FLAT)
 {
-	m_pPenLine = 0;
-	m_FlatDist = 0;
-	m_LineColor = RGB(0,0,0);
-	m_Radius = 0;
-	m_Width = 0;
 }
 
 CCadHoleRnd1Flat::CCadHoleRnd1Flat(CCadHoleRnd1Flat &h):CCadObject(OBJECT_TYPE_HOLERND1FLAT)
 {
-	m_pPenLine = 0;
 	SetP1(h.GetP1());
 	SetP2(h.GetP2());
-	m_FlatDist = h.m_FlatDist;
-	m_LineColor = h.m_LineColor;
-	m_Radius = h.m_Radius;
-	m_Width = h.m_Width;
+	GetAttributes()->m_FlatDist = h.GetAttributes()->m_FlatDist;
+	GetAttributes()->m_LineColor = h.GetAttributes()->m_LineColor;
+	GetAttributes()->m_Radius = h.GetAttributes()->m_Radius;
+	GetAttributes()->m_LineWidth = h.GetAttributes()->m_LineWidth;
 }
 
 CCadHoleRnd1Flat::~CCadHoleRnd1Flat()
 {
-	if(m_pPenLine) delete m_pPenLine;
 }
 
 void CCadHoleRnd1Flat::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
@@ -53,9 +46,10 @@ void CCadHoleRnd1Flat::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 	//		Offset...Offset to add to points
 	//		Scale....Sets Units to Pixels ratio
 	//---------------------------------------------
-	CPen *pOld;
+	CPen *pOld = 0, penLine;
+	CBrush* pBrush = 0, brushFill;	
 	CRect rect;
-	int dx = m_Radius;
+	int dx = GetAttributes()->m_Radius;
 	int Rad;
 	CPoint start,end;
 	CPoint P1,P2;
@@ -66,36 +60,33 @@ void CCadHoleRnd1Flat::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 		P1 = Scale * GetP1() + Offset;
 		dx = int(Scale.m_ScaleX * dx);
 		Rad = dx;
-		Lw = int(Scale.m_ScaleX * m_Width);
-		Fd = int(Scale.m_ScaleX * m_FlatDist);
+		Lw = int(Scale.m_ScaleX * GetAttributes()->m_LineWidth);
+		Fd = int(Scale.m_ScaleX * GetAttributes()->m_FlatDist);
 		if (Lw < 1) Lw = 1;
 
 		rect.SetRect(P1 + CPoint(-dx, -dx), P1 + CPoint(dx, dx));
 		dx = dx / 2;
 
-		if (GetLastMode() != mode || GetDirty())
+		switch (mode)
 		{
-			if (m_pPenLine) delete m_pPenLine;
-			switch (mode)
-			{
-			case OBJECT_MODE_FINAL:
-				m_pPenLine = new CPen(PS_SOLID, Lw, m_LineColor);
-				break;
-			case OBJECT_MODE_SELECTED:
-				m_pPenLine = new CPen(PS_SOLID, Lw, RGB(0, 250, 0));
-				break;
-			case OBJECT_MODE_SKETCH:
-				m_pPenLine = new CPen(PS_SOLID, 1, m_LineColor);
-				break;
-			}
-			SetDirty(0);
+		case OBJECT_MODE_FINAL:
+			penLine.CreatePen(PS_SOLID, Lw, GetAttributes()->m_LineColor);
+			break;
+		case OBJECT_MODE_SELECTED:
+			penLine.CreatePen(PS_SOLID, Lw, RGB(0, 250, 0));
+			break;
+		case OBJECT_MODE_SKETCH:
+			penLine.CreatePen(PS_SOLID, 1, GetAttributes()->m_LineColor);
+			break;
 		}
+		brushFill.CreateStockObject(NULL_BRUSH);
+		pBrush = (CBrush*)pDC->SelectObject(&brushFill);	
+		pOld = (CPen*)pDC->SelectObject(&penLine);
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
 		case OBJECT_MODE_SELECTED:
 		case OBJECT_MODE_SKETCH:
-			pOld = pDC->SelectObject(m_pPenLine);
 			start.x = P1.x + Fd;
 			start.y = int(SolveIntersection(1, P1, Fd, Rad));
 			end.x = start.x;
@@ -107,13 +98,12 @@ void CCadHoleRnd1Flat::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 			pDC->LineTo(P1.x - dx, P1.y - dx);
 			pDC->MoveTo(P1.x - dx, P1.y + dx);
 			pDC->LineTo(P1.x + dx, P1.y - dx);
-
-			pDC->SelectObject(pOld);
 			break;
 		case OBJECT_MODE_ERASE:
 			break;
 		}
-		SetLastMode(mode);
+		pDC->SelectObject(pOld);	
+		pDC->SelectObject(pBrush);
 	}
 }
 
@@ -135,8 +125,8 @@ int CCadHoleRnd1Flat::CheckSelected(CPoint p,CSize O)
 {
 	int dx,dy;
 	CPoint P1 = GetP1() + O;
-	dx = this->m_FlatDist;
-	dy = this->m_Radius;
+	dx = GetAttributes()->m_FlatDist;
+	dy = GetAttributes()->m_Radius;
 	CRect rect(P1 + CPoint(-dy,-dy),P1+CPoint(dx,dy));
 	rect.NormalizeRect();
 	return rect.PtInRect(p);
@@ -147,10 +137,10 @@ CCadHoleRnd1Flat CCadHoleRnd1Flat::operator=(CCadHoleRnd1Flat &v)
 {
 	SetP1(v.GetP1());
 	SetP2(v.GetP2());
-	m_FlatDist = v.m_FlatDist;
-	m_LineColor = v.m_LineColor;
-	m_Radius = v.m_Radius;
-	m_Width = v.m_Width;
+	GetAttributes()->m_FlatDist = v.GetAttributes()->m_FlatDist;
+	GetAttributes()->m_LineColor = v.GetAttributes()->m_LineColor;
+	GetAttributes()->m_Radius = v.GetAttributes()->m_Radius;
+	GetAttributes()->m_LineWidth = v.GetAttributes()->m_LineWidth;
 	return *this;
 }
 
@@ -166,13 +156,13 @@ int CCadHoleRnd1Flat::Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawi
 	LookAHeadToken = pParser->Expect('(', LookAHeadToken, pIN);
 	LookAHeadToken = pParser->Point(TOKEN_POINT_1, pIN, GetP1(), LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_RADIUS, pIN, m_Radius, LookAHeadToken);
+	LookAHeadToken = pParser->DecimalValue(TOKEN_RADIUS, pIN, GetAttributes()->m_Radius, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_FLATDIST, pIN, m_FlatDist, LookAHeadToken);
+	LookAHeadToken = pParser->DecimalValue(TOKEN_FLATDIST, pIN, GetAttributes()->m_FlatDist, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, m_LineColor, LookAHeadToken);
+	LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, GetAttributes()->m_LineColor, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_Width, LookAHeadToken);
+	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, GetAttributes()->m_LineWidth, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
 	(*ppDrawing)->AddObject(this);
 	return LookAHeadToken;
@@ -191,10 +181,10 @@ void CCadHoleRnd1Flat::Save(FILE* pO, int Indent)
 		theApp.IndentString(s, 256, Indent),
 		CFileParser::TokenLookup(TOKEN_HOLE_1FLAT),
 		CFileParser::SavePoint(s1, 64, TOKEN_POINT_1, GetP1()),
-		CFileParser::SaveDecimalValue(s2, 64, TOKEN_RADIUS, m_Radius),
-		CFileParser::SaveDecimalValue(s3,64, TOKEN_FLATDIST,m_FlatDist),
-		CFileParser::SaveColor(s4,64,m_LineColor,TOKEN_LINE_COLOR),
-		CFileParser::SaveDecimalValue(s5,64,TOKEN_LINE_WIDTH,m_Width)
+		CFileParser::SaveDecimalValue(s2, 64, TOKEN_RADIUS, GetAttributes()->m_Radius),
+		CFileParser::SaveDecimalValue(s3,64, TOKEN_FLATDIST, GetAttributes()->m_FlatDist),
+		CFileParser::SaveColor(s4,64, GetAttributes()->m_LineColor,TOKEN_LINE_COLOR),
+		CFileParser::SaveDecimalValue(s5,64,TOKEN_LINE_WIDTH, GetAttributes()->m_LineWidth)
 	);
 	delete[]s5;
 	delete[]s4;
@@ -240,8 +230,8 @@ CRect CCadHoleRnd1Flat::GetRect()
 	CPoint p1,p2;
 	int dx,dy;
 
-	dx = m_Radius;
-	dy = m_Radius;
+	dx = GetAttributes()->m_Radius;
+	dy = GetAttributes()->m_Radius;
 	rect.SetRect(GetP1() + CPoint(dx, dy), GetP1() + CPoint(-dx, -dy));
 	rect.NormalizeRect();
 	return rect;
@@ -282,5 +272,5 @@ CSize CCadHoleRnd1Flat::GetSize()
 
 void CCadHoleRnd1Flat::ChangeSize(CSize Sz)
 {
-	m_Radius = Sz.cx / 2;
+	GetAttributes()->m_Radius = Sz.cx / 2;
 }

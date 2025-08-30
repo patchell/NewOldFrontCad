@@ -46,7 +46,7 @@ void CStaticPreview::OnPaint()
 	CPoint Offset = rect.CenterPoint();
 	if(m_pLibObj)
 	{
-		m_pLibObj->Draw(&dc,0,Offset,CScale(0.1,0.1));
+		m_pLibObj->Draw(&dc,0,Offset,CScale(0.3,0.3));
 	}
 	
 	// Do not call CStatic::OnPaint() for painting messages

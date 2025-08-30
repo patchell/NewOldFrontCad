@@ -4,20 +4,16 @@
 CCadCircle::CCadCircle() :CCadObject(OBJECT_TYPE_CIRCLE)
 {
 	m_Radius = 0.0;
-	m_FillColor = RGB(0, 0, 0);
-	m_LineColor = RGB(0, 0, 0);
-	m_Width = 0;
-	m_bTransparentFill = FALSE;
 }
 
 CCadCircle::CCadCircle(CCadCircle& e) :CCadObject(OBJECT_TYPE_CIRCLE)
 {
 	SetP1(e.GetP1());
 	SetP2(e.GetP2());
-	this->m_FillColor = e.m_FillColor;
-	this->m_LineColor = e.m_LineColor;
-	this->m_Width = e.m_Width;
-	this->m_bTransparentFill = e.m_bTransparentFill;
+	GetAttributes()->m_FillColor = e.GetAttributes()->m_FillColor;
+	GetAttributes()->m_LineColor = e.GetAttributes()->m_LineColor;
+	GetAttributes()->m_LineWidth = e.GetAttributes()->m_LineWidth;
+	GetAttributes()->m_bTransparent = e.GetAttributes()->m_bTransparent;
 	m_Radius = e.m_Radius;
 }
 
@@ -79,7 +75,7 @@ void CCadCircle::Draw(CDC* pDC, int mode, CPoint Offset, CScale Scale)
 		P1 = Scale * GetP1() + Offset;
 		P2 = Scale * GetP2() + Offset;
 		szRadius = CSize(int(Scale.m_ScaleX * m_Radius), int(Scale.m_ScaleY * m_Radius));
-		if ((Lw = int(Scale.m_ScaleX * m_Width)) < 1) Lw = 1;
+		if ((Lw = int(Scale.m_ScaleX * GetAttributes()->m_LineWidth)) < 1) Lw = 1;
 		if (Lw <= 1 || OBJECT_MODE_SKETCH == mode)
 		{
 			Lw = 1;
@@ -90,15 +86,15 @@ void CCadCircle::Draw(CDC* pDC, int mode, CPoint Offset, CScale Scale)
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
-			PenLine.CreatePen(PS_SOLID, Lw, m_LineColor);
-			if (m_bTransparentFill)
+			PenLine.CreatePen(PS_SOLID, Lw, GetAttributes()->m_LineColor);
+			if (GetAttributes()->m_bTransparent || CCadObject::AreShapeFillsDisabled())
 				BrushFill.CreateStockObject(NULL_BRUSH);
 			else
-				BrushFill.CreateSolidBrush(m_FillColor);
+				BrushFill.CreateSolidBrush(GetAttributes()->m_FillColor);
 			break;
 		case OBJECT_MODE_SELECTED:
 			PenLine.CreatePen(PS_SOLID, Lw, RGB(200, 50, 100));
-			if (m_bTransparentFill)
+			if (GetAttributes()->m_bTransparent || CCadObject::AreShapeFillsDisabled())
 				BrushFill.CreateStockObject(NULL_BRUSH);
 			else
 				BrushFill.CreateSolidBrush(RGB(255, 0, 0));
@@ -106,11 +102,11 @@ void CCadCircle::Draw(CDC* pDC, int mode, CPoint Offset, CScale Scale)
 			BrushSelRect.CreateSolidBrush(RGB(0, 0, 255));
 			break;
 		case OBJECT_MODE_SKETCH:
-			PenLine.CreatePen(PS_DOT, 1, m_LineColor);
-			if (m_bTransparentFill)
+			PenLine.CreatePen(PS_DOT, 1, GetAttributes()->m_LineColor);
+			if (GetAttributes()->m_bTransparent || CCadObject::AreShapeFillsDisabled())
 				BrushFill.CreateStockObject(NULL_BRUSH);
 			else
-				BrushFill.CreateSolidBrush(m_FillColor);
+				BrushFill.CreateSolidBrush(GetAttributes()->m_FillColor);
 			break;
 		}
 		SetRect(rect, P1 + szRadius, P1 - szRadius, rectLWcomp);
@@ -139,7 +135,6 @@ void CCadCircle::Draw(CDC* pDC, int mode, CPoint Offset, CScale Scale)
 		case OBJECT_MODE_ERASE:
 			break;
 		}
-		SetLastMode(mode);
 		pDC->SelectObject(pOldPen);
 		pDC->SelectObject(pOldBrush);
 	}
@@ -170,9 +165,9 @@ CCadCircle CCadCircle::operator=(CCadCircle& v)
 {
 	SetP1(v.GetP1());
 	SetP2(v.GetP2());
-	m_FillColor = v.m_FillColor;
-	m_LineColor = v.m_LineColor;
-	m_Width = v.m_Width;
+	GetAttributes()->m_FillColor = v.GetAttributes()->m_FillColor;
+	GetAttributes()->m_LineColor = v.GetAttributes()->m_LineColor;
+	GetAttributes()->m_LineWidth = v.GetAttributes()->m_LineWidth;
 	return *this;
 }
 
@@ -185,21 +180,46 @@ void CCadCircle::Move(CPoint p)
 
 int CCadCircle::Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, CFileParser* pParser)
 {
+	BOOL bLoop = TRUE;
+
 	LookAHeadToken = pParser->Expect(TOKEN_CIRCLE, LookAHeadToken, pIN);
 	LookAHeadToken = pParser->Expect('(', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Point(TOKEN_POINT_1, pIN, GetP1(), LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Point(TOKEN_POINT_2, pIN, GetP2(), LookAHeadToken);
-	CalculateRadius();
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, m_LineColor, LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Color(TOKEN_FILL_COLOR, pIN, m_FillColor, LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_Width, LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_TRANSPARENT, pIN, m_bTransparentFill, LookAHeadToken);
-	LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
+
+	while(bLoop)
+	{
+		switch (LookAHeadToken)
+		{
+		case TOKEN_POINT_1:
+			LookAHeadToken = pParser->Point(TOKEN_POINT_1, pIN, GetP1(), LookAHeadToken);
+			break;
+		case TOKEN_POINT_2:
+			LookAHeadToken = pParser->Point(TOKEN_POINT_2, pIN, GetP2(), LookAHeadToken);
+			CalculateRadius();
+			break;
+		case TOKEN_LINE_COLOR:
+			LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, GetAttributes()->m_LineColor, LookAHeadToken);
+			break;
+		case TOKEN_FILL_COLOR:
+			LookAHeadToken = pParser->Color(TOKEN_FILL_COLOR, pIN, GetAttributes()->m_FillColor, LookAHeadToken);
+			break;
+		case TOKEN_LINE_WIDTH:
+			LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, GetAttributes()->m_LineWidth, LookAHeadToken);
+			break;
+		case TOKEN_TRANSPARENT:
+			LookAHeadToken = pParser->DecimalValue(TOKEN_TRANSPARENT, pIN, GetAttributes()->m_bTransparent, LookAHeadToken);
+			break;
+		case ')':
+			bLoop = FALSE;
+			LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
+			break;
+		case ',':
+			LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
+			break;
+		default:
+			LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
+			break;
+		}
+	}
 	(*ppDrawing)->AddObject(this);
 	return LookAHeadToken;
 }
@@ -214,16 +234,16 @@ void CCadCircle::Save(FILE* pO, int Indent)
 	char* s5 = new char[64];
 	char* s6 = new char[64];
 
-	fprintf(theApp.GetLog(), "CCadCircle::Save  P2(%d,%d)\n", GetP2().x, GetP2().y);
+	fprintf(theApp.LogFile(), "CCadCircle::Save  P2(%d,%d)\n", GetP2().x, GetP2().y);
 	fprintf(pO, "%s%s(%s,%s,%s,%s,%s, %s)\n",
 		theApp.IndentString(s, 256, Indent),
 		CFileParser::TokenLookup(TOKEN_CIRCLE),
 		CFileParser::SavePoint(s1, 64, TOKEN_POINT_1, GetP1()),
 		CFileParser::SavePoint(s2, 64, TOKEN_POINT_2, GetP2()),
-		CFileParser::SaveColor(s3, 64, m_LineColor, TOKEN_LINE_COLOR),
-		CFileParser::SaveColor(s4, 64, m_FillColor, TOKEN_FILL_COLOR),
-		CFileParser::SaveDecimalValue(s5, 64, TOKEN_LINE_WIDTH, m_Width),
-		CFileParser::SaveTransparent(s6, 64, TOKEN_TRANSPARENT, m_bTransparentFill)
+		CFileParser::SaveColor(s3, 64, GetAttributes()->m_LineColor, TOKEN_LINE_COLOR),
+		CFileParser::SaveColor(s4, 64, GetAttributes()->m_FillColor, TOKEN_FILL_COLOR),
+		CFileParser::SaveDecimalValue(s5, 64, TOKEN_LINE_WIDTH, GetAttributes()->m_LineWidth),
+		CFileParser::SaveTransparent(s6, 64, TOKEN_TRANSPARENT, GetAttributes()->m_bTransparent)
 	);
 	
 	delete[] s6;

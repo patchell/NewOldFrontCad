@@ -74,13 +74,6 @@ CCadLibObject::CCadLibObject(CCadObject *pChain): CCadObject(OBJECT_TYPE_LIBCOMP
 					AddObject(pP);
 				}
 				break;
-			case OBJECT_TYPE_POLYFILL:
-				{
-					CCadPolygonFill *pP = new CCadPolygonFill;
-					*pP = *(CCadPolygonFill *)pLobj;
-					AddObject(pP);
-				}
-				break;
 			case OBJECT_TYPE_LIBCOMP:
 				{
 				}
@@ -180,24 +173,10 @@ CCadLibObject::CCadLibObject(CCadLibObject &LibObj):CCadObject(OBJECT_TYPE_LIBCO
 					AddObject(pE);
 				}
 				break;
-			case OBJECT_TYPE_RNDRECT:
-				{
-					CCadRoundRect *pR = new CCadRoundRect;
-					*pR = *(CCadRoundRect *)pLobj;
-					AddObject(pR);
-				}
-				break;
 			case OBJECT_TYPE_POLY:
 				{
 					CCadPolygon *pP = new CCadPolygon;
 					*pP = *(CCadPolygon *)pLobj;
-					AddObject(pP);
-				}
-				break;
-			case OBJECT_TYPE_POLYFILL:
-				{
-					CCadPolygonFill *pP = new CCadPolygonFill;
-					*pP = *(CCadPolygonFill *)pLobj;
 					AddObject(pP);
 				}
 				break;
@@ -433,17 +412,6 @@ void CCadLibObject::SetVertex(int Vi, CPoint p)
 CPoint CCadLibObject::GetReference()
 {
 	return GetP1() + m_Ref;
-}
-
-void CCadLibObject::MakeDirty()
-{
-	SetDirty(1);
-	CCadObject *pCO = this->m_pStart;
-	while(pCO)
-	{
-		pCO->MakeDirty();
-		pCO = pCO->GetNext();
-	}
 }
 
 void CCadLibObject::AdjustRefernce(CPoint Ref)

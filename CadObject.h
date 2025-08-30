@@ -34,8 +34,6 @@ struct ObjectTypeMembers {
 
 class CCadObject
 {
-	int m_Dirty;
-	int m_LastMode;
 	int m_Type;
 	CPoint m_P2;
 	CPoint m_P1;
@@ -43,7 +41,7 @@ class CCadObject
 	CCadObject* m_pPrev;
 	CCadObject* m_pNext;
 	CCadObject* m_pSelNext;
-	static BOOL RenderObjectFillsEnable;
+	inline static BOOL RenderObjectFillsEnable = TRUE;
 public:
 	CCadObject();
 	CCadObject(int type);
@@ -51,8 +49,6 @@ public:
 	//----------------------------------
 	// Private Data Member Access
 	//----------------------------------
-	void SetDirty(int dirty) { m_Dirty = dirty; }
-	int GetDirty() const { return m_Dirty; }
 	void SetP1(CPoint p) { m_P1 = p; }
 	void SetP1X(int x) { m_P1.x = x; }
 	void SetP1Y(int y) { m_P1.y = y; }
@@ -63,8 +59,6 @@ public:
 	CPoint& GetP2() { return m_P2; }
 	virtual void SetSelected(int Sel = 0) { m_Selected = Sel; }
 	int GetSelected() const { return m_Selected; }
-	void SetLastMode(int m) { m_LastMode = m; }
-	int GetLastMode() const { return m_LastMode; }
 	void SetNext(CCadObject* pN) { m_pNext = pN; }
 	CCadObject* GetNext() { return m_pNext; }
 	void SetPrev(CCadObject* pP) { m_pPrev = pP; }
@@ -83,7 +77,6 @@ public:
 	virtual void AddObject(CCadObject *pO);
 	virtual void RemoveObject(CCadObject *pO);
 	virtual CCadObject *GetHead(void){return 0;}
-	virtual void MakeDirty(void);
 	virtual void AdjustRefernce(CPoint Ref);
 	virtual CRect GetRect(void);
 	virtual const char * GetTypeString(void);

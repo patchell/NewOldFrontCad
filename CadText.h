@@ -41,9 +41,6 @@ class CCadText : public CCadObject
 	friend CFileParser;
 	inline static int m_RenderEnable = 1;
 	TextAttributes m_atrb;
-	CFont *m_pFont;
-	double m_LastScaleX;
-	CPen * m_pSelPen;
 	CCadPolygon m_SelRect;
 public:
 	CCadText();

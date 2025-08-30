@@ -68,9 +68,6 @@
     <ClCompile Include="CadPolygon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CadPolygonFill.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CadRect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -253,9 +250,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CadPolygon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CadPolygonFill.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CadRect.h">

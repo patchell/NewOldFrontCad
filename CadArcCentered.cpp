@@ -27,7 +27,7 @@ CCadArcCentered::CCadArcCentered(CCadArcCentered &arc):CCadObject(OBJECT_TYPE_AR
 	m_atrb.m_LineColor = arc.m_atrb.m_LineColor;
 	m_atrb.m_Start = arc.m_atrb.m_Start;
 	m_atrb.m_StartAngle = arc.m_atrb.m_StartAngle;
-	m_atrb.m_Width = arc.m_atrb.m_Width;
+	m_atrb.m_LineWidth = arc.m_atrb.m_LineWidth;
 }
 
 CCadArcCentered::~CCadArcCentered()
@@ -52,7 +52,7 @@ void CCadArcCentered::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 		P2 = Scale * GetP2() + O;
 		Start = Scale * m_atrb.m_Start + O;
 		End = Scale * m_atrb.m_End + O;
-		Lw = int(m_atrb.m_Width * Scale.m_ScaleX);
+		Lw = int(m_atrb.m_LineWidth * Scale.m_ScaleX);
 		if (Lw <= 1 || OBJECT_MODE_SKETCH == mode)
 		{
 			Lw = 1;
@@ -191,7 +191,7 @@ int CCadArcCentered::Parse(
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
 	LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, m_atrb.m_LineColor, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_atrb.m_Width, LookAHeadToken);
+	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_atrb.m_LineWidth, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
 	(*ppDrawing)->AddObject(this);
 	return LookAHeadToken;
@@ -214,7 +214,7 @@ void CCadArcCentered::Save(FILE *pO,  int Indent)
 		CFileParser::SavePoint(s3, 64, TOKEN_START_POINT, m_atrb.m_Start),
 		CFileParser::SavePoint(s4, 64, TOKEN_END_POINT, m_atrb.m_End),
 		CFileParser::SaveColor(s5,64, m_atrb.m_LineColor,TOKEN_LINE_COLOR),
-		CFileParser::SaveDecimalValue(s6, 64, TOKEN_LINE_WIDTH, m_atrb.m_Width)
+		CFileParser::SaveDecimalValue(s6, 64, TOKEN_LINE_WIDTH, m_atrb.m_LineWidth)
 	);
 	delete[]s6;
 	delete[]s5;
@@ -232,7 +232,7 @@ CCadArcCentered CCadArcCentered::operator=(CCadArcCentered &v)
 	m_atrb.m_LineColor = v.m_atrb.m_LineColor;
 	m_atrb.m_End = v.m_atrb.m_End;
 	m_atrb.m_Start = v.m_atrb.m_Start;
-	m_atrb.m_Width = v.m_atrb.m_Width;
+	m_atrb.m_LineWidth = v.m_atrb.m_LineWidth;
 	return *this;
 }
 
@@ -253,7 +253,7 @@ int CCadArcCentered::CheckSelected(CPoint p,CSize Offset)
 	rV = CheckAngle(StartAngle,EndAngle,Angle);
 
 	// 1 = x^2/A^2 + y^2/B^2
-	double W = double(this->GetWidth())/2.0;
+	double W = double(this->GetLineWidth())/2.0;
 	if( W < 50.0) W = 50.0;
 	double A,B;
 	double X,Y,X1,Y1,X2,Y2;	

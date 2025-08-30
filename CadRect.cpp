@@ -17,16 +17,14 @@ static char THIS_FILE[]=__FILE__;
 
 CCadRect::CCadRect():CCadObject(OBJECT_TYPE_RECT)
 {
-	m_LineColor = RGB(0,0,0);
-	m_FillColor = RGB(0, 0, 0);
-	m_LineWidth = 0;
 }
 
 CCadRect::CCadRect(CCadRect &r):CCadObject(OBJECT_TYPE_RECT)
 {
-	m_FillColor = r.m_FillColor;
-	m_LineColor = r.m_LineColor;
-	m_LineWidth = r.m_LineWidth;
+	GetAttributes()->m_FillColor = r.GetAttributes()->m_FillColor;
+	GetAttributes()->m_LineColor = r.GetAttributes()->m_LineColor;
+	GetAttributes()->m_LineWidth = r.GetAttributes()->m_LineWidth;
+	GetAttributes()->m_bTransparentFill = r.GetAttributes()->m_bTransparentFill;
 	SetP1(r.GetP1());
 	SetP2(r.GetP2());
 }
@@ -59,7 +57,7 @@ void CCadRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 	{
 		P1 = Scale * GetP1() + Offset;
 		P2 = Scale * GetP2() + Offset;
-		Lw = int(m_LineWidth * Scale.m_ScaleX);
+		Lw = int(GetAttributes()->m_LineWidth * Scale.m_ScaleX);
 		if (Lw <= 1 || OBJECT_MODE_SKETCH == mode)
 		{
 			Lw = 1;
@@ -70,11 +68,11 @@ void CCadRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
-			penDraw.CreatePen(PS_SOLID, Lw, m_LineColor);
+			penDraw.CreatePen(PS_SOLID, Lw, GetAttributes()->m_LineColor);
 			if(CCadObject::AreShapeFillsDisabled())
 				brushFill.CreateStockObject(NULL_BRUSH);
 			else
-				brushFill.CreateSolidBrush(m_FillColor);
+				brushFill.CreateSolidBrush(GetAttributes()->m_FillColor);
 			break;
 		case OBJECT_MODE_SELECTED:
 			penDraw.CreatePen(PS_SOLID, Lw, RGB(200, 50, 50));
@@ -86,7 +84,7 @@ void CCadRect::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 					brushFill.CreateSolidBrush(RGB(100, 50, 50));
 			break;
 		case OBJECT_MODE_SKETCH:
-			penDraw.CreatePen(PS_DOT, 1, m_LineColor);
+			penDraw.CreatePen(PS_DOT, 1, GetAttributes()->m_LineColor);
 			penPoint.CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
 			brushSelect.CreateSolidBrush(RGB(0, 0, 255));
 			brushFill.CreateStockObject(NULL_BRUSH);
@@ -139,18 +137,44 @@ int CCadRect::Parse(
 	CFileParser* pParser
 )
 {
+	BOOL bLoop = TRUE;
+
 	LookAHeadToken = pParser->Expect(TOKEN_RECT, LookAHeadToken, pIN);
 	LookAHeadToken = pParser->Expect('(', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Point(TOKEN_POINT_1, pIN, GetP1(), LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Point(TOKEN_POINT_2, pIN, GetP2(), LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR,pIN, m_LineColor, LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Color(TOKEN_FILL_COLOR,pIN, m_FillColor, LookAHeadToken);
-	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_LineWidth, LookAHeadToken);
-	LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
+	while(bLoop)
+	{
+		switch (LookAHeadToken)
+		{
+		case TOKEN_POINT_1:
+			LookAHeadToken = pParser->Point(TOKEN_POINT_1, pIN, GetP1(), LookAHeadToken);
+			break;
+		case TOKEN_POINT_2:
+			LookAHeadToken = pParser->Point(TOKEN_POINT_2, pIN, GetP2(), LookAHeadToken);
+			break;
+		case TOKEN_LINE_COLOR:
+			LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, GetAttributes()->m_LineColor, LookAHeadToken);
+			break;
+		case TOKEN_FILL_COLOR:
+			LookAHeadToken = pParser->Color(TOKEN_FILL_COLOR, pIN, GetAttributes()->m_FillColor, LookAHeadToken);
+			break;
+		case TOKEN_LINE_WIDTH:
+			LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, GetAttributes()->m_LineWidth, LookAHeadToken);
+			break;
+		case TOKEN_TRANSPARENT:
+			LookAHeadToken = pParser->DecimalValue(TOKEN_TRANSPARENT, pIN, GetAttributes()->m_bTransparentFill, LookAHeadToken);
+			break;
+		case ',':
+			LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
+			break;
+		case ')':
+			LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
+			bLoop = FALSE;
+			break;
+		default:
+			AfxMessageBox("CCadRect::Parse\r\nUnexpected token");
+			break;
+		}
+	}
 	(*ppDrawing)->AddObject(this);
 	return LookAHeadToken;
 }
@@ -163,16 +187,19 @@ void CCadRect::Save(FILE *pO,  int Indent)
 	char* s3 = new char[64];
 	char* s4 = new char[64];
 	char* s5 = new char[64];
+	char* s6 = new char[64];
 
-	fprintf(pO, "%s%s(%s,%s,%s,%s,%s)\n",
+	fprintf(pO, "%s%s(%s,%s,%s,%s,%s,%s)\n",
 		theApp.IndentString(s, 256, Indent),
 		CFileParser::TokenLookup(TOKEN_RECT),
 		CFileParser::SavePoint(s1, 64, TOKEN_POINT_1, GetP1()),
 		CFileParser::SavePoint(s2, 64, TOKEN_POINT_2, GetP2()),
-		CFileParser::SaveColor(s3,64,m_LineColor,TOKEN_LINE_COLOR),
-		CFileParser::SaveColor(s4, 64, m_FillColor, TOKEN_FILL_COLOR),
-		CFileParser::SaveDecimalValue(s5,64,TOKEN_LINE_WIDTH, m_LineWidth)
+		CFileParser::SaveColor(s3,64,GetAttributes()->m_LineColor,TOKEN_LINE_COLOR),
+		CFileParser::SaveColor(s4, 64, GetAttributes()->m_FillColor, TOKEN_FILL_COLOR),
+		CFileParser::SaveDecimalValue(s5,64,TOKEN_LINE_WIDTH, GetAttributes()->m_LineWidth),
+		CFileParser::SaveDecimalValue(s5, 64, TOKEN_TRANSPARENT, GetAttributes()->m_bTransparentFill)
 	);
+	delete[]s6;	
 	delete[]s5;
 	delete[]s4;
 	delete[]s3;
@@ -185,9 +212,9 @@ CCadRect CCadRect::operator=(CCadRect &v)
 {
 	SetP1(v.GetP1());
 	SetP2(v.GetP2());
-	m_FillColor = v.m_FillColor;
-	m_LineColor = v.m_LineColor;
-	m_LineWidth = v.m_LineWidth;
+	GetAttributes()->m_FillColor = v.GetAttributes()->m_FillColor;
+	GetAttributes()->m_LineColor = v.GetAttributes()->m_LineColor;
+	GetAttributes()->m_LineWidth = v.GetAttributes()->m_LineWidth;
 	return *this;
 }
 

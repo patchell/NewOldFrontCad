@@ -152,7 +152,6 @@
     <ClCompile Include="CadObject.cpp" />
     <ClCompile Include="CadOrigin.cpp" />
     <ClCompile Include="CadPolygon.cpp" />
-    <ClCompile Include="CadPolygonFill.cpp" />
     <ClCompile Include="CadPrintRect.cpp" />
     <ClCompile Include="CadRect.cpp" />
     <ClCompile Include="CadRectHole.cpp" />
@@ -222,7 +221,6 @@
     <ClInclude Include="CadObject.h" />
     <ClInclude Include="CadOrigin.h" />
     <ClInclude Include="CadPolygon.h" />
-    <ClInclude Include="CadPolygonFill.h" />
     <ClInclude Include="CadPrintRect.h" />
     <ClInclude Include="CadRect.h" />
     <ClInclude Include="CadRectHole.h" />

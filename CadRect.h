@@ -12,12 +12,12 @@
 
 
 struct RectAttributes {
-	int m_Width;
+	int m_LineWidth;
 	COLORREF m_LineColor;
 	COLORREF m_FillColor;
 	BOOL m_bTransparentFill;
 	RectAttributes() {
-		m_Width = 0;
+		m_LineWidth = 0;
 		m_LineColor = RGB(0, 0, 0);
 		m_FillColor = RGB(0, 0, 0);
 		m_bTransparentFill = FALSE;
@@ -29,10 +29,7 @@ class CFileParser;
 class CCadRect : public CCadObject
 {
 	friend CFileParser;
-	int m_LineWidth;
-	BOOL m_bTransparentFill;
-	COLORREF m_LineColor;
-	COLORREF m_FillColor;
+	RectAttributes m_atrb;
 	inline static int m_RenderEnable = 1;
 public:
 	CCadRect();
@@ -48,12 +45,12 @@ public:
 	virtual void Save(FILE *pO,  int Indent);
 	virtual void SetVertex(int Vi, CPoint p);
 	virtual int GrabVertex(CPoint p);
-	void SetOutLineWidth(int w) { m_LineWidth = w; }
-	int GetOutLineWidth(void) { return m_LineWidth; }
-	void SetLineColor(COLORREF c) { m_LineColor = c; }
-	COLORREF GetLineColor(void) { return m_LineColor; }
-	void SetFillColor(COLORREF c) { m_FillColor = c; }
-	COLORREF GetFillColor(void) { return m_FillColor; }
+	void SetLineWidth(int w) { GetAttributes()->m_LineWidth = w; }
+	int GetLineWidth(void) { return GetAttributes()->m_LineWidth; }
+	void SetLineColor(COLORREF c) { GetAttributes()->m_LineColor = c; }
+	COLORREF GetLineColor(void) { return GetAttributes()->m_LineColor; }
+	void SetFillColor(COLORREF c) { GetAttributes()->m_FillColor = c; }
+	COLORREF GetFillColor(void) { return GetAttributes()->m_FillColor; }
 	CPoint GetReference();
 	CCadRect operator=(CCadRect &v);
 	virtual void RenderEnable(int e);
@@ -62,6 +59,7 @@ public:
 	virtual void ChangeCenter(CSize p);
 	virtual CSize GetSize();
 	virtual void ChangeSize(CSize Sz);
+	RectAttributes* GetAttributes() { return &m_atrb; }
 };
 
 #endif // !defined(AFX_CADRECT_H__65FA097A_DD30_4DCD_A691_E90895F5F2BC__INCLUDED_)

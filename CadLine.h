@@ -12,11 +12,11 @@
 class CFileParser;
 
 struct LineAttrib {
-	int m_Width;
-	COLORREF m_Color;
+	int m_LineWidth;
+	COLORREF m_LineColor;
 	LineAttrib() {
-		m_Width = 1;
-		m_Color = RGB(0, 0, 0);
+		m_LineWidth = 1;
+		m_LineColor = RGB(0, 0, 0);
 	}
 } ;
 
@@ -24,9 +24,8 @@ class CCadLine : public CCadObject
 {
 	friend CFileParser;
 	inline static int m_RenderEnable = 1;
-	int m_OutLineWidth;
-	COLORREF m_LineColor;
-	CCadPolygon* m_Poly;
+	LineAttrib m_atrb;
+	CCadPolygon* m_pPoly;	//encloses like a polygon for selection purposes
 public:
 	CCadLine();
 	CCadLine(CCadLine &line);
@@ -42,10 +41,10 @@ public:
 	virtual int CheckSelected(CPoint p, CSize Offset = CSize(0, 0));
 	virtual void Draw(CDC *pDC,int mode=0,CPoint Offset=CPoint(0,0),CScale Scale=CScale(0.1,0.1));
 	virtual void AdjustRefernce(CPoint Ref);
-	void SetOutLineWidth(int w){m_OutLineWidth = w;}
-	int GetOutLineWidth(void){return m_OutLineWidth;}
-	void SetLineColor(COLORREF c){m_LineColor = c;}
-	COLORREF GetLineColor(void){return m_LineColor;}
+	void SetLineWidth(int w){GetAttributes()->m_LineWidth = w;}
+	int GetLineWidth(void){return GetAttributes()->m_LineWidth;}
+	void SetLineColor(COLORREF c){ GetAttributes()->m_LineColor = c;}
+	COLORREF GetLineColor(void){return GetAttributes()->m_LineColor;}
 	CCadLine operator=(CCadLine &v);
 	virtual void RenderEnable(int e);
 	virtual CPoint GetCenter();
@@ -53,6 +52,7 @@ public:
 	virtual void ChangeCenter(CSize p);
 	virtual CSize GetSize();
 	virtual void ChangeSize(CSize Sz);
+	LineAttrib* GetAttributes(void) { return &m_atrb; }
 };
 
 #endif // !defined(AFX_CADLINE_H__B86774F1_566B_4664_8176_344A2AC8B46E__INCLUDED_)

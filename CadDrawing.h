@@ -34,7 +34,6 @@ public:
 	static int IsRenderEnabled() { return m_RenderEnable; }
 	void CheckPrev(void);
 	CCadLibObject * CreatePartFromSelected(char *name);
-	virtual void MakeDirty();
 	int CheckSelected(CPoint p,CCadObject **ppSelList,int n,int flag= CADDRAWUBG_CHECKSEL_FLAG_ALL);
 	void Print(CDC *pDC,int mode,CPoint Offset,CScale Scale);
 	virtual int Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, CFileParser* pParser);

@@ -129,7 +129,7 @@ void CCadBitmap::Draw(CDC *pDC,int mode,CPoint Offset,CScale Scale)
 
 	if (CCadBitmap::m_RenderEnable)
 	{
-		if (mode == OBJECT_MODE_SKETCH || GetLastMode() == OBJECT_MODE_SKETCH)
+		if (mode == OBJECT_MODE_SKETCH)
 		{
 			double AspectRatioBM;
 			AspectRatioBM = double(m_Size.cy) / double(m_Size.cx);
@@ -184,7 +184,6 @@ void CCadBitmap::Draw(CDC *pDC,int mode,CPoint Offset,CScale Scale)
 			pDC->SelectObject(oldpen);
 			break;
 		}
-		this->SetLastMode(mode);
 	}
 }
 
@@ -211,11 +210,6 @@ void CCadBitmap::AddObject(CCadObject *pO)
 
 void CCadBitmap::RemoveObject(CCadObject *pO)
 {
-}
-
-void CCadBitmap::MakeDirty(void)
-{
-	CCadObject::MakeDirty();
 }
 
 void CCadBitmap::SetSelected(int Flag)

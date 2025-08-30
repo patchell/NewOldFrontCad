@@ -186,7 +186,6 @@ void CUtilView::ShowHide(int DrawMode)
 			break;
 		case DrawMode::LINE:
 		case DrawMode::ORIGIN:
-		case DrawMode::POLYGON:
 			this->m_Check_TransparentFill.ShowWindow(SW_HIDE);
 			this->m_Combo_FontWeight.ShowWindow(SW_HIDE);
 			this->m_Button_Font.ShowWindow(SW_HIDE);
@@ -208,6 +207,47 @@ void CUtilView::ShowHide(int DrawMode)
 			this->m_Edit_FlatToCenterDist.ShowWindow(SW_HIDE);
 			this->m_Static_FillColor.ShowWindow(SW_HIDE);
 			this->m_Static_FillColorText.ShowWindow(SW_HIDE);
+			this->m_Static_LineColor.ShowWindow(SW_SHOW);
+			this->m_Static_LineColorText.ShowWindow(SW_SHOW);
+			this->m_Static_X1.ShowWindow(SW_HIDE);
+			this->m_Static_X2.ShowWindow(SW_HIDE);
+			this->m_Static_X3.ShowWindow(SW_HIDE);
+			this->m_Static_Y1.ShowWindow(SW_HIDE);
+			this->m_Static_Y2.ShowWindow(SW_HIDE);
+			this->m_Static_Y3.ShowWindow(SW_HIDE);
+			this->m_Static_LineWidth.ShowWindow(SW_SHOW);
+			this->m_Edit_LineThickness.ShowWindow(SW_SHOW);
+			this->m_Edit_X1.ShowWindow(SW_HIDE);
+			this->m_Edit_X2.ShowWindow(SW_HIDE);
+			this->m_Edit_X3.ShowWindow(SW_HIDE);
+			this->m_Edit_Y1.ShowWindow(SW_HIDE);
+			this->m_Edit_Y2.ShowWindow(SW_HIDE);
+			this->m_Edit_Y3.ShowWindow(SW_HIDE);
+			this->m_Static_HoleRad.ShowWindow(SW_HIDE);
+			this->m_Edit_HoleRadius.ShowWindow(SW_HIDE);
+			break;
+		case DrawMode::POLYGON:
+			this->m_Check_TransparentFill.ShowWindow(SW_SHOW);
+			this->m_Combo_FontWeight.ShowWindow(SW_HIDE);
+			this->m_Button_Font.ShowWindow(SW_HIDE);
+			this->m_Static_Fg.ShowWindow(SW_HIDE);
+			this->m_Static_Bk.ShowWindow(SW_HIDE);
+			this->m_Static_BkGrndColor.ShowWindow(SW_HIDE);
+			this->m_Edit_Text.ShowWindow(SW_HIDE);
+			this->m_Edit_TextAngle.ShowWindow(SW_HIDE);
+			this->m_Edit_FontHeight.ShowWindow(SW_HIDE);
+			this->m_Edit_FontWidth.ShowWindow(SW_HIDE);
+			this->m_Check_TransparentFont.ShowWindow(SW_HIDE);
+			this->m_Static_TextAngle.ShowWindow(SW_HIDE);
+			this->m_Static_FontHieght.ShowWindow(SW_HIDE);
+			this->m_Static_FontWidth.ShowWindow(SW_HIDE);
+			this->m_Static_TextColor.ShowWindow(SW_HIDE);
+			this->m_Static_TextColorText.ShowWindow(SW_HIDE);
+			this->m_Static_TextText.ShowWindow(SW_HIDE);
+			this->m_Static_FlatToCenterDist.ShowWindow(SW_HIDE);
+			this->m_Edit_FlatToCenterDist.ShowWindow(SW_HIDE);
+			this->m_Static_FillColor.ShowWindow(SW_SHOW);
+			this->m_Static_FillColorText.ShowWindow(SW_SHOW);
 			this->m_Static_LineColor.ShowWindow(SW_SHOW);
 			this->m_Static_LineColorText.ShowWindow(SW_SHOW);
 			this->m_Static_X1.ShowWindow(SW_HIDE);

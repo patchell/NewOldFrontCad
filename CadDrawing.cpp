@@ -257,22 +257,6 @@ int CCadDrawing::CheckSelected(CPoint p, CCadObject **ppSelList, int n,int flag)
 	return count;
 }
 
-void CCadDrawing::MakeDirty()
-{
-	//------------------------------------------
-	// MakeDirty
-	//		This function is used to set the Dirty
-	// flag in all of the objects.  The Dirty
-	// flag forces the object to reset pens
-	//------------------------------------------
-	CCadObject *pObj = m_pHead;
-	while(pObj)
-	{
-		pObj->MakeDirty();
-		pObj = pObj->GetNext();
-	}
-}
-
 CCadLibObject * CCadDrawing::CreatePartFromSelected(char *name)
 {
 	//------------------------------------------------
@@ -335,13 +319,6 @@ CCadLibObject * CCadDrawing::CreatePartFromSelected(char *name)
 						{
 							CCadPolygon *pO = new CCadPolygon;
 							*pO = *((CCadPolygon *)pObj);
-							pPart->AddObject(pO);
-						}
-						break;
-					case OBJECT_TYPE_POLYFILL:
-						{
-							CCadPolygonFill *pO = new CCadPolygonFill;
-							*pO = *((CCadPolygonFill *)pObj);
 							pPart->AddObject(pO);
 						}
 						break;

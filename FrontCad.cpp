@@ -85,9 +85,9 @@ BOOL CFrontCadApp::InitInstance()
 	// Dispatch commands specified on the command line
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
-//	AllocConsole();
-//	freopen_s(&pConsol, "CONOUT$", "w", stdout);
-//	if (HasConsol())	printf("Ready\n");
+	AllocConsole();
+	freopen_s(&pConsol, "CONOUT$", "w", stdout);
+	if (HasConsol())	printf("Ready\n");
 
 	// The one and only window has been initialized, so show and update it.
 	m_pMainWnd->ShowWindow(SW_SHOW);
@@ -176,10 +176,10 @@ int CFrontCadApp::ExitInstance()
 void CFrontCadApp::LoadSettings()
 {
 	m_OriginAttrib.m_Color = GetProfileInt("Origin", "Color", (int)RGB(0, 0, 0));
-	m_OriginAttrib.m_Width = GetProfileInt("Origin", "Width", 10);
+	m_OriginAttrib.m_LineWidth = GetProfileInt("Origin", "Width", 10);
 
 	m_DimAttrib.m_Color = GetProfileInt("Dimension", "Color", (int)RGB(0, 0, 0));
-	m_DimAttrib.m_Width = GetProfileInt("Dimension", "Width", 10);
+	m_DimAttrib.m_LineWidth = GetProfileInt("Dimension", "Width", 10);
 	m_DimAttrib.m_Text.m_Color = GetProfileInt("Dimension", "Color", (int)RGB(0, 0, 0));
 	m_DimAttrib.m_Text.m_BkColor = GetProfileInt("Dimension", "BackColor", (int)RGB(255, 255, 255));
 	m_DimAttrib.m_Text.m_Angle = GetProfileInt("Dimension", "Angle", 0);
@@ -202,12 +202,12 @@ void CFrontCadApp::LoadSettings()
 	m_RndRectAttributes.m_X3 = GetProfileInt("RndRect","X3",250);
 	m_RndRectAttributes.m_Y3 =  GetProfileInt("RndRect","Y3",250);
 
-	m_LineAttrib.m_Width = GetProfileInt("Line","LineWidth",125);
-	m_LineAttrib.m_Color = GetProfileInt("Line","LineColor",(int)RGB(0,0,0));
+	m_LineAttrib.m_LineWidth = GetProfileInt("Line","LineWidth",125);
+	m_LineAttrib.m_LineColor = GetProfileInt("Line","LineColor",(int)RGB(0,0,0));
 
 	m_RectAttributes.m_FillColor = GetProfileInt("Rect","FillColor",(int)RGB(0,0,255) );
 	m_RectAttributes.m_LineColor = GetProfileInt("Rect","LineColor",(int)RGB(0,0,0) );
-	m_RectAttributes.m_Width = GetProfileInt("Rect","LineWidth",100);
+	m_RectAttributes.m_LineWidth = GetProfileInt("Rect","LineWidth",100);
 
 	//--------------------------------------------------------------
 	// Load Circle Attributes
@@ -215,27 +215,25 @@ void CFrontCadApp::LoadSettings()
 	m_CircleAttributs.m_FillColor = GetProfileInt("Circle", "FillColor", (int)RGB(0, 0, 255));
 	m_CircleAttributs.m_LineColor = GetProfileInt("Circle", "LineColor", (int)RGB(0, 0, 0));
 	m_CircleAttributs.m_LineWidth = GetProfileInt("Circle", "LineWidth", 100);
-	m_CircleAttributs.m_Transparent = GetProfileInt("Circle", "TransParenetFill",0);
+	m_CircleAttributs.m_bTransparent = GetProfileInt("Circle", "TransParenetFill",0);
 
 	m_EllipseAttributes.m_FillColor = GetProfileInt("Ellipse","FillColor",(int)RGB(0,0,255) );
 	m_EllipseAttributes.m_LineColor = GetProfileInt("Ellipse","LineColor",(int)RGB(0,0,0) );
 	m_EllipseAttributes.m_LineWidth = GetProfileInt("Ellipse","LineWidth",100);
 
 	m_PolyAttributes.m_LineColor = GetProfileInt("Poly","LineColor",(int)RGB(0,0,0) );
-	m_PolyAttributes.m_Width = GetProfileInt("Poly","LineWidth",50);
-
-	m_PolyFillAttributes.m_Width = GetProfileInt("PolyFill","LineWidth",50);
-	m_PolyFillAttributes.m_FillColor = GetProfileInt("PolyFill","FillColor",(int)RGB(0,255,0) );
-	m_PolyFillAttributes.m_LineColor = GetProfileInt("PolyFill","LineColor",(int)RGB(255,0,0) );
+	m_PolyAttributes.m_LineWidth = GetProfileInt("Poly","LineWidth",50);
+	m_PolyAttributes.m_FillColor = GetProfileInt("Poly", "FillColor", 50);
+	m_PolyAttributes.m_Transparent = GetProfileInt("Poly", "Transparent", 50);
 
 	m_ArcAttributes.m_LineColor = GetProfileInt("Arc","LineColor",(int)RGB(0,0,0) );
-	m_ArcAttributes.m_Width = GetProfileInt("Arc","LineWidth",50);
+	m_ArcAttributes.m_LineWidth = GetProfileInt("Arc","LineWidth",50);
 
 	m_HoleRoundAttributes.m_Radius = GetProfileInt("HoleRound","Radius",188);
 	m_HoleRoundAttributes.m_LineColor = GetProfileInt("HoleRound","LineColor",(int)RGB(0,0,0) );
-	m_HoleRoundAttributes.m_Width = GetProfileInt("HoleRound","LineWidth",20);
+	m_HoleRoundAttributes.m_LineWidth = GetProfileInt("HoleRound","LineWidth",20);
 
-	m_HoleRnd2FlatAttributes.m_Width = GetProfileInt("HoleRound2Flat","LineWidth",20);
+	m_HoleRnd2FlatAttributes.m_LineWidth = GetProfileInt("HoleRound2Flat","LineWidth",20);
 	m_HoleRnd2FlatAttributes.m_FlatDist = GetProfileInt("HoleRound2Flat","FlatDist",150);
 	m_HoleRnd2FlatAttributes.m_LineColor = GetProfileInt("HoleRound2Flat","LineColor",(int)RGB(0,0,0) );
 	m_HoleRnd2FlatAttributes.m_Radius = GetProfileInt("HoleRound2Flat","Radius",188);
@@ -243,11 +241,11 @@ void CFrontCadApp::LoadSettings()
 	m_HoleRnd1FlatAttributes.m_FlatDist = GetProfileInt("HoleRound1Flat","FlatDist",150);
 	m_HoleRnd1FlatAttributes.m_LineColor = GetProfileInt("HoleRound1Flat","LineColor",(int)RGB(0,0,0) );
 	m_HoleRnd1FlatAttributes.m_Radius = GetProfileInt("HoleRound1Flat","Radius",188);
-	m_HoleRnd1FlatAttributes.m_Width = GetProfileInt("HoleRound1Flat","LineWidth",20);;
+	m_HoleRnd1FlatAttributes.m_LineWidth = GetProfileInt("HoleRound1Flat","LineWidth",20);;
 
 	m_RectHoleAttributes.m_H = GetProfileInt("HoleRect","Height",250);
 	m_RectHoleAttributes.m_W = GetProfileInt("HoleRect","Width",250);
-	m_RectHoleAttributes.m_Width = GetProfileInt("HoleRect","LineWidth",20);
+	m_RectHoleAttributes.m_LineWidth = GetProfileInt("HoleRect","LineWidth",20);
 	m_RectHoleAttributes.m_LineColor = GetProfileInt("HoleRect","LineColor",(int)RGB(0,0,0) );
 
 	m_TextAttributes.m_Color = GetProfileInt("Text","Color",(int)RGB(0,0,0) );
@@ -298,7 +296,7 @@ void CFrontCadApp::LoadSettings()
 void CFrontCadApp::SaveSettings()
 {
 	WriteProfileInt("Dimension", "Color", (int)m_DimAttrib.m_Color);
-	WriteProfileInt("Dimension", "Width", m_DimAttrib.m_Width);
+	WriteProfileInt("Dimension", "Width", m_DimAttrib.m_LineWidth);
 	WriteProfileInt("Dimension", "Color", (int)m_DimAttrib.m_Text.m_Color);
 	WriteProfileInt("Dimension", "BackColor",(int)m_DimAttrib.m_Text.m_BkColor);
 	WriteProfileInt("Dimension", "Angle", m_DimAttrib.m_Text.m_Angle);
@@ -310,7 +308,7 @@ void CFrontCadApp::SaveSettings()
 	WriteProfileStringA("Dimension", "Font", m_DimAttrib.m_Text.m_pFontName);
 
 	WriteProfileInt("Origin", "Color", (int)m_OriginAttrib.m_Color);
-	WriteProfileInt("Origin", "Width", m_OriginAttrib.m_Width);
+	WriteProfileInt("Origin", "Width", m_OriginAttrib.m_LineWidth);
 
 	WriteProfileInt("Arrow", "Color", (int)m_ArrowAttrib.m_Color);
 	WriteProfileInt("Arrow", "Len", m_ArrowAttrib.m_Len);
@@ -322,12 +320,12 @@ void CFrontCadApp::SaveSettings()
 	WriteProfileInt("RndRect","X3",m_RndRectAttributes.m_X3);
 	WriteProfileInt("RndRect","Y3",m_RndRectAttributes.m_Y3);
 
-	WriteProfileInt("Line","LineWidth",m_LineAttrib.m_Width);
-	WriteProfileInt("Line","LineColor",(int)m_LineAttrib.m_Color);
+	WriteProfileInt("Line","LineWidth",m_LineAttrib.m_LineWidth);
+	WriteProfileInt("Line","LineColor",(int)m_LineAttrib.m_LineColor);
 
 	WriteProfileInt("Rect","FillColor",(int)m_RectAttributes.m_FillColor );
 	WriteProfileInt("Rect","LineColor",(int)m_RectAttributes.m_LineColor);
-	WriteProfileInt("Rect","LineWidth",m_RectAttributes.m_Width);
+	WriteProfileInt("Rect","LineWidth",m_RectAttributes.m_LineWidth);
 
 	//---------------------------------------------------
 	// Save Circle Attributes
@@ -335,7 +333,7 @@ void CFrontCadApp::SaveSettings()
 	WriteProfileInt("Circle", "FillColor", (int)m_CircleAttributs.m_FillColor);
 	WriteProfileInt("Circle", "LineColor", (int)m_CircleAttributs.m_LineColor);
 	WriteProfileInt("Circle", "LineWidth", m_CircleAttributs.m_LineWidth);
-	WriteProfileInt("Circle", "TransParenetFill", m_CircleAttributs.m_Transparent);
+	WriteProfileInt("Circle", "TransParenetFill", m_CircleAttributs.m_bTransparent);
 
 
 
@@ -344,20 +342,18 @@ void CFrontCadApp::SaveSettings()
 	WriteProfileInt("Ellipse","LineWidth",m_EllipseAttributes.m_LineWidth );
 
 	WriteProfileInt("Poly","LineColor",(int)m_PolyAttributes.m_LineColor );
-	WriteProfileInt("Poly","LineWidth",m_PolyAttributes.m_Width);
-
-	WriteProfileInt("PolyFill","LineWidth",m_PolyFillAttributes.m_Width);
-	WriteProfileInt("PolyFill","FillColor",(int)m_PolyFillAttributes.m_FillColor );
-	WriteProfileInt("PolyFill","LineColor",(int)m_PolyFillAttributes.m_LineColor );
+	WriteProfileInt("Poly","LineWidth",m_PolyAttributes.m_LineWidth);
+	WriteProfileInt("Poly", "FillColor", m_PolyAttributes.m_FillColor);
+	WriteProfileInt("Poly", "Transparent", m_PolyAttributes.m_Transparent);
 
 	WriteProfileInt("Arc","LineColor",(int)m_ArcAttributes.m_LineColor );
-	WriteProfileInt("Arc","LineWidth",m_ArcAttributes.m_Width);
+	WriteProfileInt("Arc","LineWidth",m_ArcAttributes.m_LineWidth);
 
 	WriteProfileInt("HoleRound","Radius",m_HoleRoundAttributes.m_Radius);
 	WriteProfileInt("HoleRound","LineColor",(int)m_HoleRoundAttributes.m_LineColor );
-	WriteProfileInt("HoleRound","LineWidth",m_HoleRoundAttributes.m_Width);
+	WriteProfileInt("HoleRound","LineWidth",m_HoleRoundAttributes.m_LineWidth);
 
-	WriteProfileInt("HoleRound2Flat","LineWidth",m_HoleRnd2FlatAttributes.m_Width);
+	WriteProfileInt("HoleRound2Flat","LineWidth",m_HoleRnd2FlatAttributes.m_LineWidth);
 	WriteProfileInt("HoleRound2Flat","FlatDist",m_HoleRnd2FlatAttributes.m_FlatDist);
 	WriteProfileInt("HoleRound2Flat","LineColor",(int)m_HoleRnd2FlatAttributes.m_LineColor );
 	WriteProfileInt("HoleRound2Flat","Radius",m_HoleRnd2FlatAttributes.m_Radius);
@@ -365,11 +361,11 @@ void CFrontCadApp::SaveSettings()
 	WriteProfileInt("HoleRound1Flat","FlatDist",m_HoleRnd1FlatAttributes.m_FlatDist);
 	WriteProfileInt("HoleRound1Flat","LineColor",(int)m_HoleRnd1FlatAttributes.m_LineColor );
 	WriteProfileInt("HoleRound1Flat","Radius",m_HoleRnd1FlatAttributes.m_Radius);
-	WriteProfileInt("HoleRound1Flat","LineWidth",m_HoleRnd1FlatAttributes.m_Width);;
+	WriteProfileInt("HoleRound1Flat","LineWidth",m_HoleRnd1FlatAttributes.m_LineWidth);;
 
 	WriteProfileInt("HoleRect","Height",m_RectHoleAttributes.m_H);
 	WriteProfileInt("HoleRect","Width",m_RectHoleAttributes.m_W);
-	WriteProfileInt("HoleRect","LineWidth",m_RectHoleAttributes.m_Width);
+	WriteProfileInt("HoleRect","LineWidth",m_RectHoleAttributes.m_LineWidth);
 	WriteProfileInt("HoleRect","LineColor",(int)m_RectHoleAttributes.m_LineColor );
 
 	WriteProfileInt("Text","Color",(int)m_TextAttributes.m_Color );

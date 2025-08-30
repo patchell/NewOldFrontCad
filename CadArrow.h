@@ -5,10 +5,12 @@ struct ArrowAttributes {
 	COLORREF m_Color;
 	int m_Len;
 	int m_ArrowWidth;
+	BOOL m_bTransparent;
 	ArrowAttributes() {
 		m_Color = RGB(0, 0, 0);
 		m_Len = 20;
 		m_ArrowWidth = 10;
+		m_bTransparent = FALSE;
 	}
 
 };
@@ -41,15 +43,16 @@ public:
 	virtual void AddObject(CCadObject *pO);
 	virtual void RemoveObject(CCadObject *pO);
 	virtual CCadObject *GetHead(void);
-	virtual void MakeDirty(void);
 	virtual void SetSelected(int Flag = 0);
 	virtual void AdjustRefernce(CPoint Ref);
 	virtual CRect GetRect(void);
 	COLORREF GetColor(void) const { return m_Attrib.m_Color; }
 	void SetColor(COLORREF c) { m_Attrib.m_Color = c; }
-	int GetWidth(void) { return m_Attrib.m_ArrowWidth; }
+	int GetLineWidth(void) { return m_Attrib.m_ArrowWidth; }
 	void SetArrowWidth(int w) { m_Attrib.m_ArrowWidth = w; }
 	int GetArrowLegnth(void) { return m_Attrib.m_Len; }
+	BOOL IsTransparent(void) { return m_Attrib.m_bTransparent; }
+	void SetTransparent(BOOL b) { m_Attrib.m_bTransparent = b; }
 	void SetLegnth(int l) { m_Attrib.m_Len = l; }
 	CCadArrow operator=(CCadArrow & Ca);
 	virtual void RenderEnable(int e);

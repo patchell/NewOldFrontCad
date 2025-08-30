@@ -1,11 +1,11 @@
 #pragma once
 
 struct DimAttrib {
-	int m_Width;
+	int m_LineWidth;
 	COLORREF m_Color;
 	TextAttributes m_Text;
 	DimAttrib() {
-		m_Width = 0;
+		m_LineWidth = 0;
 		m_Color = RGB(0, 0, 0);
 	}
 };
@@ -14,7 +14,6 @@ class CCadDimension :public CCadObject
 {
 	inline static int m_RenderEnable = 1;
 	DimAttrib m_Atrib;
-	CPen *m_pLine;
 	CCadText *m_pText;
 public:
 	CCadDimension();
@@ -34,7 +33,6 @@ public:
 	virtual void AddObject(CCadObject *pO);
 	virtual void RemoveObject(CCadObject *pO);
 	virtual CCadObject *GetHead(void) { return (CCadObject *)m_pText; }
-	virtual void MakeDirty(void);
 	virtual void SetSelected(int Flag = 0);
 	virtual void AdjustRefernce(CPoint Ref);
 	virtual CRect GetRect(void);
@@ -42,8 +40,8 @@ public:
 	void SetValue(int v, int dp);
 	inline void SetColor(COLORREF c) { m_Atrib.m_Color = c; }
 	inline COLORREF GetColor(void) { return m_Atrib.m_Color; }
-	inline void SetWidth(int w) { m_Atrib.m_Width = w; }
-	inline int GetWidth(void) { return m_Atrib.m_Width; }
+	inline void SetLineWidth(int w) { m_Atrib.m_LineWidth = w; }
+	inline int GetLineWidth(void) { return m_Atrib.m_LineWidth; }
 	inline CCadText *GetText(void) { return m_pText; }
 	DimAttrib &GetAttrib(void) { return m_Atrib; }
 	virtual void RenderEnable(int e);

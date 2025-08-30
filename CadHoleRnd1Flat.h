@@ -12,12 +12,12 @@
 class CFileParser;
 
 struct HoleRnd1FlatAttributes {
-	int m_Width;
+	int m_LineWidth;
 	int m_FlatDist;	//distance from flat to center point
 	COLORREF m_LineColor;
 	int m_Radius;
 	HoleRnd1FlatAttributes() {
-		m_Width = 1;
+		m_LineWidth = 1;
 		m_LineColor = RGB(0, 0, 0);
 		m_FlatDist = 50;
 		m_Radius = 50;
@@ -28,11 +28,7 @@ class CCadHoleRnd1Flat : public CCadObject
 {
 	friend CFileParser;
 	inline static int m_RenderEnable = 1;
-	CPen *m_pPenLine;
-	int m_Width;
-	int m_FlatDist;	//distance from flat to center point
-	int m_Radius;
-	COLORREF m_LineColor;
+	HoleRnd1FlatAttributes atrb;
 public:
 	CCadHoleRnd1Flat();
 	virtual ~CCadHoleRnd1Flat();
@@ -49,17 +45,15 @@ public:
 	virtual int GrabVertex(CPoint p);
 	virtual void AdjustRefernce(CPoint Ref);
 	virtual void Draw(CDC *pDC,int mode=0,CPoint Offset=CPoint(0,0),CScale Scale=CScale(0.1,0.1));
-	void SetOutLineWidth(int w){m_Width = w;}
-	int GetOutLineWidth(void){return m_Width;}
-	void SetLineColor(COLORREF c){m_LineColor = c;}
-	COLORREF GetLineColor(void){return m_LineColor;}
+	void SetLineColor(COLORREF c){ GetAttributes()->m_LineColor = c;}
+	COLORREF GetLineColor(void){return GetAttributes()->m_LineColor;}
 	double SolveIntersection(int m,CPoint P,int FlatDist,int Radius);
-	void SetFlatDist(int d){m_FlatDist = d;}
-	int GetFlatDist(void){return m_FlatDist;}
-	void SetRadius(int r){m_Radius = r;}
-	int GetRadius(void){return m_Radius;}
-	void SetWidth(int w){m_Width = w;}
-	int GetWidth(void){return m_Width;}
+	void SetFlatDist(int d){GetAttributes()->m_FlatDist = d; }
+	int GetFlatDist(void){return GetAttributes()->m_FlatDist;}
+	void SetRadius(int r){ GetAttributes()->m_Radius = r;}
+	int GetRadius(void){return GetAttributes()->m_Radius;}
+	void SetLineWidth(int w){ GetAttributes()->m_LineWidth = w;}
+	int GetLineWidth(void){return GetAttributes()->m_LineWidth;}
 	CCadHoleRnd1Flat operator=(CCadHoleRnd1Flat &v);
 	virtual void RenderEnable(int e);
 	virtual CPoint GetCenter();
@@ -67,6 +61,7 @@ public:
 	virtual void ChangeCenter(CSize p);
 	virtual CSize GetSize();
 	virtual void ChangeSize(CSize Sz);
+	HoleRnd1FlatAttributes* GetAttributes() { return &atrb; }
 };
 
 #endif // !defined(AFX_CADHOLERND1FLAT_H__A9C94EAC_1F36_421C_A9F3_8B94ED066B9B__INCLUDED_)

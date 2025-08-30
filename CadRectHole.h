@@ -12,12 +12,12 @@
 
 
 struct RectHoleAttributes {
-	int m_Width;
+	int m_LineWidth;
 	COLORREF m_LineColor;
 	int m_W;
 	int m_H;
 	RectHoleAttributes() {
-		m_Width = 1;
+		m_LineWidth = 1;
 		m_LineColor = RGB(0, 0, 0);
 		m_W = 100;
 		m_H = 100;
@@ -30,11 +30,7 @@ class CCadRectHole : public CCadObject
 {
 	friend CFileParser;
 	inline static int m_RenderEnable = 1;
-	CPen *m_pPenLine;
-	int m_Width;
-	COLORREF m_LineColor;
-	int m_W;	//hole width
-	int m_H;	//hole hight
+	RectHoleAttributes m_Attr;
 public:
 	CCadRectHole();
 	virtual ~CCadRectHole();
@@ -51,13 +47,12 @@ public:
 	virtual void SetVertex(int Vi,CPoint p);
 	virtual int GrabVertex(CPoint p);
 	virtual void AdjustRefernce(CPoint p);
-	void SetOutLineWidth(int w){m_Width = w;}
-	int GetOutLineWidth(void) const {return m_Width;}
-	void SetLineColor(COLORREF c){m_LineColor = c;}
-	COLORREF GetLineColor(void) const {return m_LineColor;}
-	void SetHieghtWidth(int h, int w){m_H = h;m_W=w;}
-	int GetWidth(void) const{return m_W;}
-	int GetHieght(void) const {return m_H;}
+	void SetLineWidth(int w){GetAttributes()->m_LineWidth = w;}
+	int GetLineWidth(void) {return GetAttributes()->m_LineWidth;}
+	void SetLineColor(COLORREF c){ GetAttributes()->m_LineColor = c;}
+	COLORREF GetLineColor(void) {return GetAttributes()->m_LineColor;}
+	void SetHieghtWidth(int h, int w){ GetAttributes()->m_H = h; GetAttributes()->m_W=w;}
+	int GetHieght(void) {return GetAttributes()->m_H;}
 	CCadRectHole operator=(CCadRectHole &v);
 	virtual void RenderEnable(int e);
 	virtual CPoint GetCenter();
@@ -71,5 +66,6 @@ public:
 	virtual void ChangeCenter(CSize p);
 	virtual CSize GetSize();
 	virtual void ChangeSize(CSize Sz);
+	RectHoleAttributes* GetAttributes() { return &m_Attr; }
 };
 #endif // !defined(AFX_CADRECTHOLE_H__7D533B79_BB3B_4DFF_8AD2_D368D3DD1871__INCLUDED_)

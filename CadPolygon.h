@@ -9,20 +9,49 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-
+constexpr auto POLY_MAX_VERTECIES = 512;
 
 struct PolyAttributes
 {
-	int m_Width;
+	int m_LineWidth;
 	COLORREF m_LineColor;
+	COLORREF m_FillColor;
+	BOOL m_Transparent;
+	int m_Size;		//size of the array that holds vertex points
+	int m_Count;	//total numbeer of verticies
+	CPoint* m_pVertex;	//array of vertex points
 	PolyAttributes()
 	{
-		m_Width = 1;
+		m_LineWidth = 1;
 		m_LineColor = RGB(0, 0, 0);
+		m_FillColor = RGB(255, 255, 255);
+		m_Transparent = 0;
+		m_Size = 0;
+		m_Count = 0;
+		m_pVertex = new CPoint[POLY_MAX_VERTECIES];		//pointer to array of vertexes;
+		for(int i=0;i<POLY_MAX_VERTECIES;++i)
+			m_pVertex[i] = CPoint(0, 0);
 	}
+	virtual ~PolyAttributes() {
+		if (m_pVertex)
+			delete[] m_pVertex;
+		m_pVertex = 0;
+	}
+	void Rest() {
+		m_Size = 0;
+		m_Count = 0;
+		if (m_pVertex)
+			delete[] m_pVertex;
+		m_pVertex = new CPoint[POLY_MAX_VERTECIES];		//pointer to array of vertexes;
+		for (int i = 0; i < POLY_MAX_VERTECIES; ++i)
+			m_pVertex[i] = CPoint(0, 0);
+	}
+	void SetPoint(CPoint p) {
+		m_pVertex[m_Count] = p;
+	}
+	BOOL AddPoint(CPoint p, BOOL bInc , BOOL bIncSizeToo);
 };
 
-class CCadPolygonFill;
 class CFileParser;
 class CCadText;
 
@@ -30,24 +59,15 @@ class CCadPolygon:public CCadObject
 {
 	friend CCadText;
 	friend CFileParser;
-	friend CCadPolygonFill;
 	inline static int m_RenderEnable = 1;
+	PolyAttributes m_atrb;
 	int m_MaxY;
 	int m_MinY;
 	int m_MaxX;
 	int m_MinX;
-	int m_PolyID;
-	CPoint * m_pVertex;
-	CPen *m_pPenLine;
-	int m_size;		//size of the array that holds vertex points
-	int m_Count;	//total numbeer of veticies
-	int m_InCount;	//keeps track of current vertex being loaded
-	int m_Width;
-	COLORREF m_LineColor;
 public:
 	CCadPolygon();
 	CCadPolygon(CCadPolygon &v);
-	CCadPolygon(int size);
 	virtual ~CCadPolygon();
 	static void SetRenderEnable(int e) { m_RenderEnable = e; }
 	static int IsRenderEnabled() { return m_RenderEnable; }
@@ -57,7 +77,6 @@ public:
 	int PolyParams(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, CFileParser* pParser);
 	int Vertex(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, CFileParser* pParser);
 	int VertexList(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, CFileParser* pParser);
-	int VertexList1(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, CFileParser* pParser);
 	virtual void Save(FILE *pO,  int Indent);
 	virtual CPoint GetReference();
 	virtual void Move(CPoint p);
@@ -68,21 +87,26 @@ public:
 	void UpdateMinMax(void);
 	void SetCurPoint(CPoint p);
 	void Reset(void);
-	inline void SetCount(int cnt){m_Count = cnt;}
-	inline void SetPolySize(int sz){m_size = sz;}
-	inline int GetPolySize(void){return m_size;}
+	inline void SetCount(int cnt){ GetAttributes()->m_Count = cnt;}
+	inline void SetPolySize(int sz){ GetAttributes()->m_Size = sz;}
+	inline int GetPolySize(void){return GetAttributes()->m_Size;}
+	inline void SetLineWidth(int w) { GetAttributes()->m_LineWidth = w; }
+	inline int GetLineWidth(void) { return GetAttributes()->m_LineWidth; }
+	inline void SetLineColor(COLORREF c) { GetAttributes()->m_LineColor = c; }
+	inline COLORREF GetLineColor(void) { return GetAttributes()->m_LineColor; }
+	BOOL IsTransparent(void) { return GetAttributes()->m_Transparent; }
+	BOOL GetTransparent(void) { return GetAttributes()->m_Transparent; }
+	void SetTransparent(BOOL t) { GetAttributes()->m_Transparent = t; }
+	COLORREF GetFillColor(void) { return GetAttributes()->m_FillColor; }	
+	void SetFillColor(COLORREF c) { GetAttributes()->m_FillColor = c; }	
 	void Copy(CCadPolygon *pP);
+	BOOL AddPoint(CPoint ptNewPoint, BOOL bInc, BOOL bIncSize);
 	CPoint * GetPoints(void);
 	int CompareToLast(CPoint nP);
 	int DeleteLastPoint(void);
 	int GetCount(void);
-	void AddPoint(CPoint nP);
 	BOOL PointEnclosed(CPoint,CSize Offset=CSize(0,0));
 	void Create(CPoint *);
-	inline void SetWidth(int w){m_Width = w;}
-	inline int GetWidth(void){return m_Width;}
-	inline void SetLineColor(COLORREF c){m_LineColor = c;}
-	inline COLORREF GetLineColor(void){return m_LineColor;}
 	CCadPolygon operator=(CCadPolygon &v);
 	virtual void RenderEnable(int e);
 	virtual CPoint GetCenter();
@@ -90,6 +114,7 @@ public:
 	virtual void ChangeCenter(CSize p);
 	virtual CSize GetSize();
 	virtual void ChangeSize(CSize Sz);
+	PolyAttributes* GetAttributes(void) { return &m_atrb; }	
 };
 
 #endif // !defined(AFX_POLYGON_H__6B41D47F_05BB_4035_A037_9D6862C9C946__INCLUDED_)

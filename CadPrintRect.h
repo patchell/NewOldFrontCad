@@ -1,11 +1,13 @@
 #pragma once
 
 struct PrintRectAttributes {
-	int m_Width;
+	int m_LineWidth;
 	COLORREF m_LineColor;
+	CSize m_Size;
 	PrintRectAttributes() {
-		m_Width = 0;
+		m_LineWidth = 0;
 		m_LineColor = RGB(0, 0, 0);
+		m_Size = CSize(0, 0);
 	}
 };
 
@@ -15,8 +17,6 @@ class CCadPrintRect :public CCadObject
 {
 	friend CFileParser;
 	PrintRectAttributes m_Attrib;
-	CPen *m_pPenLine;
-	CSize m_Size;
 	inline static int m_RenderEnable = 1;
 public:
 	CCadPrintRect();
@@ -32,8 +32,8 @@ public:
 	virtual void Save(FILE *pO,  int Indent);
 	virtual void SetVertex(int Vi, CPoint p);
 	virtual int GrabVertex(CPoint p);
-	void SetOutLineWidth(int w) { m_Attrib.m_Width = w; }
-	int GetOutLineWidth(void) { return m_Attrib.m_Width; }
+	void SetLineWidth(int w) { m_Attrib.m_LineWidth = w; }
+	int GetLineWidth(void) { return m_Attrib.m_LineWidth; }
 	void SetLineColor(COLORREF c) { m_Attrib.m_LineColor = c; }
 	COLORREF GetLineColor(void) { return m_Attrib.m_LineColor; }
 	CPoint GetReference();
@@ -42,9 +42,10 @@ public:
 	virtual CPoint GetCenter();
 	// Moves the center of the object to the spcified point
 	virtual void ChangeCenter(CSize p);
-	void SetSize(CSize s) { m_Size = s; }
-	virtual CSize GetSize(void) { return m_Size; }
+	void SetSize(CSize s) { GetAttributes()->m_Size = s; }
+	virtual CSize GetSize(void) { return GetAttributes()->m_Size; }
 	virtual CRect GetRect(void);
 	virtual void ChangeSize(CSize Sz);
+	PrintRectAttributes* GetAttributes() { return &m_Attrib; }
 };
 

@@ -394,7 +394,7 @@ CCadLibObject *CScaleWizDialog::CreateLibObject(const char *pName)
 				pHR->SetP1(CPoint(0,0)); 
 				pHR->SetLineColor(RGB(0,0,0));
 				pHR->SetRadius(m_atrb.m_HoleSize);
-				pHR->SetWidth(10);
+				pHR->SetLineWidth(10);
 				pLibObj->AddObject(pHR);
 			}
 			break;
@@ -404,7 +404,7 @@ CCadLibObject *CScaleWizDialog::CreateLibObject(const char *pName)
 				pHR = new CCadRectHole;
 				pHR->SetP1(CPoint(0, 0));
 				pHR->SetLineColor(RGB(0,0,0));
-				pHR->SetOutLineWidth(1);
+				pHR->SetLineWidth(1);
 				pLibObj->AddObject(pHR);
 			}
 			break;
@@ -416,7 +416,7 @@ CCadLibObject *CScaleWizDialog::CreateLibObject(const char *pName)
 				pHR->SetFlatDist(m_atrb.m_FlatDist);
 				pHR->SetLineColor(RGB(0,0,0));
 				pHR->SetRadius(m_atrb.m_HoleSize);
-				pHR->SetWidth(1);
+				pHR->SetLineWidth(1);
 				pLibObj->AddObject(pHR);
 			}
 			break;
@@ -428,7 +428,7 @@ CCadLibObject *CScaleWizDialog::CreateLibObject(const char *pName)
 				pHR->SetLineColor(RGB(0,0,0));
 				pHR->SetFlatDist(m_atrb.m_FlatDist);
 				pHR->SetRadius(m_atrb.m_HoleSize);
-				pHR->SetWidth(1);
+				pHR->SetLineWidth(1);
 				pLibObj->AddObject(pHR);
 			}
 			break;
@@ -456,7 +456,7 @@ CCadLibObject *CScaleWizDialog::CreateLibObject(const char *pName)
 		pCL = new CCadLine;
 		pCL->SetP1(p1);
 		pCL->SetP2(p2);
-		pCL->SetOutLineWidth(m_atrb.m_DivisionLineWidth);
+		pCL->SetLineWidth(m_atrb.m_DivisionLineWidth);
 		pCL->SetLineColor(m_atrb.m_DivLineColor);
 		pLibObj->AddObject(pCL);
 		//--------------------------------
@@ -473,7 +473,7 @@ CCadLibObject *CScaleWizDialog::CreateLibObject(const char *pName)
 				pCL = new CCadLine;
 				pCL->SetP1(p1);
 				pCL->SetP2(p2);
-				pCL->SetOutLineWidth(m_atrb.m_SubDivisionLineWidth);
+				pCL->SetLineWidth(m_atrb.m_SubDivisionLineWidth);
 				pCL->SetLineColor(m_atrb.m_SubDivColor);
 				pLibObj->AddObject(pCL);
 				SStartAng -= SubAngle;
@@ -533,7 +533,7 @@ CCadLibObject *CScaleWizDialog::CreateLibObject(const char *pName)
 	pAC->SetP2(CPoint(i, i));
 	pAC->SetStartPoint(CalcXYonArc(m_atrb.m_ArcRadius*2,m_atrb.m_ArcStart/10));
 	pAC->SetEndPoint(CalcXYonArc(m_atrb.m_ArcRadius*2,m_atrb.m_ArcEnd/10));
-	pAC->SetWidth(m_atrb.m_ArcLineWidth);
+	pAC->SetLineWidth(m_atrb.m_ArcLineWidth);
 	pAC->SetLineColor(m_atrb.m_ArcColor);
 	pLibObj->AddObject(pAC);
 	return pLibObj;

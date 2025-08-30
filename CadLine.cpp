@@ -17,16 +17,14 @@ static char THIS_FILE[]=__FILE__;
 
 CCadLine::CCadLine():CCadObject(OBJECT_TYPE_LINE)
 {
-	m_OutLineWidth = 1;
-	m_LineColor = RGB(0,0,0);	//black line
-	m_Poly = 0;
+	m_pPoly = 0;
 }
 
 CCadLine::CCadLine(CCadLine &line):CCadObject(OBJECT_TYPE_LINE)
 {
-	m_OutLineWidth = 1;
-	m_LineColor = line.m_LineColor;	//black line
-	m_Poly = 0;
+	GetAttributes()->m_LineWidth = 1;
+	GetAttributes()->m_LineColor = line.GetAttributes()->m_LineColor;	//black line
+	m_pPoly = 0;
 	SetP1(line.GetP1());
 	SetP2(line.GetP2());
 }
@@ -59,7 +57,7 @@ void CCadLine::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 	{
 		P1 = (Scale * GetP1()) + O;
 		P2 = (Scale * GetP2()) + O;
-		Lw = int(Scale.m_ScaleX * m_OutLineWidth);
+		Lw = int(Scale.m_ScaleX * GetAttributes()->m_LineWidth);
 		if (Lw < 1) Lw = 1;
 		brushFill.CreateSolidBrush(RGB(0,0,255));
 		switch (mode)
@@ -70,7 +68,7 @@ void CCadLine::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 			else
 			{
 				lbMode.lbStyle = BS_SOLID;
-				lbMode.lbColor = m_LineColor;
+				lbMode.lbColor = GetAttributes()->m_LineColor;
 				lbMode.lbHatch = 0;
 			}
 			penLine.CreatePen(PS_GEOMETRIC | PS_ENDCAP_ROUND | PS_JOIN_ROUND, Lw, &lbMode);
@@ -120,10 +118,10 @@ void CCadLine::Draw(CDC *pDC, int mode,CPoint O,CScale Scale)
 
 int CCadLine::CheckSelected(CPoint p,CSize O)
 {
-	if(m_Poly == 0)
-		m_Poly = new CCadPolygon(4);
+	if(m_pPoly == 0)
+		m_pPoly = new CCadPolygon();
 	else
-		m_Poly->Reset();
+		m_pPoly->Reset();
 
 	//-----------------------------
 	// enclose the line inside
@@ -131,65 +129,65 @@ int CCadLine::CheckSelected(CPoint p,CSize O)
 	//-----------------------------
 	CPoint P1 = GetP1() + O;
 	CPoint P2 = GetP2() + O;
-	int d = this->m_OutLineWidth/2;
+	int d = GetAttributes()->m_LineWidth/2;
 	if(d < 10) d = 10;
 	if((P1.x < P2.x) && (P1.y < P2.y))
 	{
-		m_Poly->AddPoint(CPoint(P1.x-d,P1.y+d));
-		m_Poly->AddPoint(CPoint(P1.x+d,P1.y-d));
-		m_Poly->AddPoint(CPoint(P2.x+d,P2.y-d));
-		m_Poly->AddPoint(CPoint(P2.x-d,P2.y+d));
+		m_pPoly->AddPoint(CPoint(P1.x-d,P1.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P1.x+d,P1.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x+d,P2.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x-d,P2.y+d), TRUE, TRUE);
 	}
 	else if((P1.x > P2.x) && (P1.y < P2.y))
 	{
-		m_Poly->AddPoint(CPoint(P1.x-d,P1.y-d));
-		m_Poly->AddPoint(CPoint(P1.x+d,P1.y+d));
-		m_Poly->AddPoint(CPoint(P2.x+d,P2.y+d));
-		m_Poly->AddPoint(CPoint(P2.x-d,P2.y-d));
+		m_pPoly->AddPoint(CPoint(P1.x-d,P1.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P1.x+d,P1.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x+d,P2.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x-d,P2.y-d), TRUE, TRUE);
 	}
 	else if((P1.x < P2.x) && (P1.y > P2.y))
 	{
-		m_Poly->AddPoint(CPoint(P1.x-d,P1.y-d));
-		m_Poly->AddPoint(CPoint(P1.x+d,P1.y+d));
-		m_Poly->AddPoint(CPoint(P2.x+d,P2.y+d));
-		m_Poly->AddPoint(CPoint(P2.x-d,P2.y-d));
+		m_pPoly->AddPoint(CPoint(P1.x-d,P1.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P1.x+d,P1.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x+d,P2.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x-d,P2.y-d), TRUE, TRUE);
 	}
 	else if((P1.x > P2.x) && (P1.y > P2.y))
 	{
-		m_Poly->AddPoint(CPoint(P1.x-d,P1.y+d));
-		m_Poly->AddPoint(CPoint(P1.x+d,P1.y-d));
-		m_Poly->AddPoint(CPoint(P2.x+d,P2.y-d));
-		m_Poly->AddPoint(CPoint(P2.x-d,P2.y+d));
+		m_pPoly->AddPoint(CPoint(P1.x-d,P1.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P1.x+d,P1.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x+d,P2.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x-d,P2.y+d), TRUE, TRUE);
 	}
 	else if((P1.x == P2.x)&& (P1.y < P2.y))
 	{
-		m_Poly->AddPoint(CPoint(P1.x-d,P1.y-d));
-		m_Poly->AddPoint(CPoint(P1.x+d,P1.y-d));
-		m_Poly->AddPoint(CPoint(P2.x+d,P2.y+d));
-		m_Poly->AddPoint(CPoint(P2.x-d,P2.y+d));
+		m_pPoly->AddPoint(CPoint(P1.x-d,P1.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P1.x+d,P1.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x+d,P2.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x-d,P2.y+d), TRUE, TRUE);
 	}
 	else if((P1.x == P2.x)&& (P1.y > P2.y))
 	{
-		m_Poly->AddPoint(CPoint(P1.x-d,P1.y+d));
-		m_Poly->AddPoint(CPoint(P1.x+d,P1.y+d));
-		m_Poly->AddPoint(CPoint(P2.x+d,P2.y-d));
-		m_Poly->AddPoint(CPoint(P2.x-d,P2.y-d));
+		m_pPoly->AddPoint(CPoint(P1.x-d,P1.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P1.x+d,P1.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x+d,P2.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x-d,P2.y-d), TRUE, TRUE);
 	}
 	else if((P1.x > P2.x)&& (P1.y == P2.y))
 	{
-		m_Poly->AddPoint(CPoint(P1.x+d,P1.y+d));
-		m_Poly->AddPoint(CPoint(P1.x+d,P1.y-d));
-		m_Poly->AddPoint(CPoint(P2.x-d,P2.y-d));
-		m_Poly->AddPoint(CPoint(P2.x-d,P2.y+d));
+		m_pPoly->AddPoint(CPoint(P1.x+d,P1.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P1.x+d,P1.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x-d,P2.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x-d,P2.y+d), TRUE, TRUE);
 	}
 	else if((P1.x < P2.x)&& (P1.y == P2.y))
 	{
-		m_Poly->AddPoint(CPoint(P1.x-d,P1.y+d));
-		m_Poly->AddPoint(CPoint(P1.x-d,P1.y-d));
-		m_Poly->AddPoint(CPoint(P2.x+d,P2.y-d));
-		m_Poly->AddPoint(CPoint(P2.x+d,P2.y+d));
+		m_pPoly->AddPoint(CPoint(P1.x-d,P1.y+d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P1.x-d,P1.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x+d,P2.y-d), TRUE, TRUE);
+		m_pPoly->AddPoint(CPoint(P2.x+d,P2.y+d), TRUE, TRUE);
 	}
-	return m_Poly->PointEnclosed(p);
+	return m_pPoly->PointEnclosed(p);
 }
 
 int CCadLine::Parse(
@@ -205,9 +203,9 @@ int CCadLine::Parse(
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
 	LookAHeadToken = pParser->Point(TOKEN_POINT_2, pIN, GetP2(), LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, m_LineColor, LookAHeadToken);
+	LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, GetAttributes()->m_LineColor, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_OutLineWidth, LookAHeadToken);
+	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, GetAttributes()->m_LineWidth, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
 	(*ppDrawing)->AddObject(this);
 	return LookAHeadToken;
@@ -226,8 +224,8 @@ void CCadLine::Save(FILE *pO,  int Indent)
 		CFileParser::TokenLookup(TOKEN_LINE),
 		CFileParser::SavePoint(s1,64,TOKEN_POINT_1,GetP1()),
 		CFileParser::SavePoint(s2, 64, TOKEN_POINT_2, GetP2()),
-		CFileParser::SaveColor(s3,64,m_LineColor, TOKEN_LINE_COLOR),
-		CFileParser::SaveDecimalValue(s4,64,TOKEN_LINE_WIDTH, m_OutLineWidth)
+		CFileParser::SaveColor(s3,64, GetAttributes()->m_LineColor, TOKEN_LINE_COLOR),
+		CFileParser::SaveDecimalValue(s4,64,TOKEN_LINE_WIDTH, GetAttributes()->m_LineWidth)
 	);
 	delete[] s4;
 	delete[] s3;
@@ -240,10 +238,10 @@ CCadLine CCadLine::operator=(CCadLine &v)
 {
 	SetP1(v.GetP1());
 	SetP2(v.GetP2());
-	m_LineColor = v.m_LineColor;
-	m_OutLineWidth = v.m_OutLineWidth;
-	if((m_Poly == NULL) && (v.m_Poly != NULL))
-		m_Poly = (CCadPolygon *)v.m_Poly->CopyObject();
+	GetAttributes()->m_LineColor = v.GetAttributes()->m_LineColor;
+	GetAttributes()->m_LineWidth = v.GetAttributes()->m_LineWidth;
+	if((m_pPoly == NULL) && (v.m_pPoly != NULL))
+		m_pPoly = (CCadPolygon *)v.m_pPoly->CopyObject();
 	return *this;
 }
 

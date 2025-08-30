@@ -34,7 +34,7 @@ public:
 	virtual CPoint GetReference();
 	virtual void AddObject(CCadObject *pO);
 	virtual void RemoveObject(CCadObject *pO);
-	virtual void MakeDirty(void);
+	
 	virtual void SetSelected(int Flag=0);
 	virtual void AdjustRefernce(CPoint Ref);
 	virtual CRect GetRect(void);

@@ -19,11 +19,7 @@ CCadText::CCadText():CCadObject(OBJECT_TYPE_TEXT)
 {
 	m_atrb.m_pText = 0;
 	m_atrb.m_pFontName = new char[LF_FACESIZE];
-	m_pFont = 0;
-	m_pSelPen = 0;
 	m_atrb.m_Transparent = 1;
-	m_LastScaleX = 0;
-
 }
 
 CCadText::CCadText(CCadText& v):CCadObject(OBJECT_TYPE_TEXT)
@@ -31,8 +27,6 @@ CCadText::CCadText(CCadText& v):CCadObject(OBJECT_TYPE_TEXT)
 
 	m_atrb.m_pText = 0;
 	m_atrb.m_pFontName = new char[LF_FACESIZE];
-	m_pFont = 0;
-	m_pSelPen = 0;
 	SetP1(v.GetP1());
 	CopyAttributes(&this->m_atrb,&v.m_atrb);
 	this->m_SelRect = v.m_SelRect;
@@ -42,7 +36,6 @@ CCadText::~CCadText()
 {
 	if(m_atrb.m_pText) delete[] m_atrb.m_pText;
 	if(m_atrb.m_pFontName) delete[] m_atrb.m_pFontName;
-	if(m_pFont) delete m_pFont;
 }
 
 void CCadText::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
@@ -58,8 +51,8 @@ void CCadText::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 	//		Offset...Offset to add to points
 	//		Scale....Sets Units to Pixels ratio
 	//---------------------------------------------
-	CFont *pOldFont;
-	CPen *pOldPen;
+	CFont *pOldFont, fontText;
+	CPen *pOldPen = 0, penLine;
 	COLORREF OldColor,OldBk;
 	int FontHeight,FontWidth;
 	CPoint P1;
@@ -70,42 +63,31 @@ void CCadText::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 		P1 = (Scale * GetP1()) + Offset;
 		FontHeight = int(Scale.m_ScaleX * m_atrb.m_FontHeight);
 		FontWidth = int(Scale.m_ScaleX * m_atrb.m_FontWidth);
-		if (GetLastMode() != mode || GetDirty() || (m_LastScaleX != Scale.m_ScaleX))
+		CRect rect = GetTextRectangle(pDC, Scale);
+		Rotate(m_atrb.m_Angle, rect, m_SelRect);
+		switch (mode)
 		{
-			CRect rect = GetTextRectangle(pDC, Scale);
-			Rotate(m_atrb.m_Angle, rect, m_SelRect);
-			switch (mode)
-			{
-			case OBJECT_MODE_SELECTED:
-				if (m_pSelPen == 0)
-				{
-					m_pSelPen = new CPen;
-					m_pSelPen->CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-				}
-			case OBJECT_MODE_SKETCH:
-			case OBJECT_MODE_FINAL:
-				if (this->m_pFont) delete m_pFont;
-				m_pFont = new CFont;
-				if (Scale.m_ScaleY > 0.0)
-					m_pFont->CreateFont(FontHeight, FontWidth, m_atrb.m_Angle, m_atrb.m_Angle,
-						m_atrb.m_Weight, 0, 0, 0, DEFAULT_CHARSET, OUT_CHARACTER_PRECIS,
-						CLIP_CHARACTER_PRECIS, PROOF_QUALITY, DEFAULT_PITCH,
-						m_atrb.m_pFontName);
-				else
-					m_pFont->CreateFont(FontHeight, FontWidth, -m_atrb.m_Angle, -m_atrb.m_Angle,
-						m_atrb.m_Weight, 0, 0, 0, DEFAULT_CHARSET, OUT_CHARACTER_PRECIS,
-						CLIP_CHARACTER_PRECIS, PROOF_QUALITY, DEFAULT_PITCH,
-						m_atrb.m_pFontName);
+		case OBJECT_MODE_SELECTED:
+				penLine.CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+		case OBJECT_MODE_SKETCH:
+		case OBJECT_MODE_FINAL:
+			if (Scale.m_ScaleY > 0.0)
+				fontText.CreateFont(FontHeight, FontWidth, m_atrb.m_Angle, m_atrb.m_Angle,
+					m_atrb.m_Weight, 0, 0, 0, DEFAULT_CHARSET, OUT_CHARACTER_PRECIS,
+					CLIP_CHARACTER_PRECIS, PROOF_QUALITY, DEFAULT_PITCH,
+					m_atrb.m_pFontName);
+			else
+				fontText.CreateFont(FontHeight, FontWidth, -m_atrb.m_Angle, -m_atrb.m_Angle,
+					m_atrb.m_Weight, 0, 0, 0, DEFAULT_CHARSET, OUT_CHARACTER_PRECIS,
+					CLIP_CHARACTER_PRECIS, PROOF_QUALITY, DEFAULT_PITCH,
+					m_atrb.m_pFontName);
 
-				break;
-			}
-			SetDirty(0);
-			SetLastMode(mode);
-			m_LastScaleX = Scale.m_ScaleX;
+			break;
 		}
+	
 		OldColor = pDC->SetTextColor(m_atrb.m_Color);
 		OldBk = pDC->SetBkColor(m_atrb.m_BkColor);
-		pOldFont = pDC->SelectObject(m_pFont);
+		pOldFont = pDC->SelectObject(&fontText);
 		if (m_atrb.m_Transparent)
 			OldMode = pDC->SetBkMode(TRANSPARENT);
 		else
@@ -114,12 +96,12 @@ void CCadText::Draw(CDC *pDC, int mode,CPoint Offset,CScale Scale)
 		pDC->SetBkMode(OldMode);
 		if (mode == OBJECT_MODE_SELECTED)
 		{
-			pOldPen = pDC->SelectObject(m_pSelPen);
-			pDC->MoveTo(Scale * m_SelRect.m_pVertex[0] + Offset);
-			pDC->LineTo(Scale * m_SelRect.m_pVertex[1] + Offset);
-			pDC->LineTo(Scale * m_SelRect.m_pVertex[2] + Offset);
-			pDC->LineTo(Scale * m_SelRect.m_pVertex[3] + Offset);
-			pDC->LineTo(Scale * m_SelRect.m_pVertex[0] + Offset);
+			pOldPen = pDC->SelectObject(&penLine);
+			pDC->MoveTo(Scale * m_SelRect.GetAttributes()->m_pVertex[0] + Offset);
+			pDC->LineTo(Scale * m_SelRect.GetAttributes()->m_pVertex[1] + Offset);
+			pDC->LineTo(Scale * m_SelRect.GetAttributes()->m_pVertex[2] + Offset);
+			pDC->LineTo(Scale * m_SelRect.GetAttributes()->m_pVertex[3] + Offset);
+			pDC->LineTo(Scale * m_SelRect.GetAttributes()->m_pVertex[0] + Offset);
 			pDC->SelectObject(pOldPen);
 		}
 		pDC->SetBkColor(OldBk);
@@ -337,15 +319,15 @@ void CCadText::Rotate(int Angle,CRect rect,CCadPolygon &Poly)
 	CPoint p,p1;
 	p.x = (int)(rect.Width() * cos(Ang)) + rect.TopLeft().x;
 	p.y = -(int)(rect.Width() * sin(Ang)) + rect.TopLeft().y;
-	Poly.AddPoint(p);
-	Poly.AddPoint(rect.TopLeft());
+	Poly.AddPoint(p, TRUE, TRUE);
+	Poly.AddPoint(rect.TopLeft(), TRUE, TRUE);
 	p1.x = (int)(rect.Height() * sin(Ang)) + rect.TopLeft().x;
 	p1.y = (int)(rect.Height() * cos(Ang)) + rect.TopLeft().y;
-	Poly.AddPoint(p1);
+	Poly.AddPoint(p1, TRUE, TRUE);
 	p.x = (int)(rect.Width() * cos(Ang)) + rect.TopLeft().x;
 	p.y = -(int)(rect.Width() * sin(Ang)) + rect.TopLeft().y;
 	p = p + p1 - rect.TopLeft();
-	Poly.AddPoint(p);
+	Poly.AddPoint(p, TRUE, TRUE);
 }
 
 CCadText CCadText::operator=(CCadText &v)
@@ -360,8 +342,6 @@ CCadText CCadText::operator=(CCadText &v)
 	//		v.....reference to CCadText object to copy
 	//-----------------------------------------------
 	m_atrb.m_pText = 0;
-	m_pFont = 0;
-	m_pSelPen = 0;
 	SetP1(v.GetP1());
 	CopyAttributes(&this->m_atrb,&v.m_atrb);
 	this->m_SelRect =v.m_SelRect;

@@ -11,61 +11,33 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-static int IDcount = 0;
-
 ///////////////////////////////////////////////
 // Construction/Destruction
 ///////////////////////////////////////////////
 
 CCadPolygon::CCadPolygon(): CCadObject(OBJECT_TYPE_POLY)
 {
-	m_pVertex = new CPoint[256];		//pointer to array of vertexes
-	m_Count = 0;
-	m_size = 256;
-	m_PolyID = ++IDcount;
 	m_MinX = m_MinY = m_MaxX = m_MaxY = 0;
-	m_pPenLine = 0;
-	m_InCount = 0;
-	m_LineColor = RGB(0, 0, 0);
-	m_Width = 0;
 }
 
 CCadPolygon::CCadPolygon(CCadPolygon &v) : CCadObject(OBJECT_TYPE_POLY)
 {
-	m_pVertex = new CPoint[256];		//pointer to array of vertexes
-	m_Count = v.m_Count;
-	m_size = 256;
-	m_PolyID = ++IDcount;
+	GetAttributes()->m_pVertex = new CPoint[256];		//pointer to array of vertexes
+	GetAttributes()->m_Count = v.GetAttributes()->m_Count;
+	GetAttributes()->m_Size = v.GetAttributes()->m_Size;
 	m_MinX = v.m_MinX;
 	m_MinY = v.m_MinY;
 	m_MaxX = v.m_MaxX;
 	m_MaxY = v.m_MaxY;
-	m_LineColor = v.m_LineColor;
-	m_Width = v.m_Width;
-	m_pPenLine = 0;
-	m_InCount = 0;
+	GetAttributes()->m_LineColor = v.GetAttributes()->m_LineColor;
+	GetAttributes()->m_LineWidth = v.GetAttributes()->m_LineWidth;
 	int i;
-	for(i=0;i<m_Count;++i)
-		m_pVertex[i] = v.m_pVertex[i];
-}
-
-CCadPolygon::CCadPolygon(int size) : CCadObject(OBJECT_TYPE_POLY)
-{
-	m_pVertex = new CPoint[size];		//pointer to array of vertexes
-	m_Count = 0;
-	m_size = size;
-	m_PolyID = ++IDcount;
-	m_MinX = m_MinY = m_MaxX = m_MaxY = 0;
-	m_pPenLine = 0;
-	m_InCount = 0;
-	m_LineColor = RGB(0, 0, 0);
-	m_Width = 0;
+	for(i=0;i< GetAttributes()->m_Count;++i)
+		GetAttributes()->m_pVertex[i] = v.GetAttributes()->m_pVertex[i];
 }
 
 CCadPolygon::~CCadPolygon()
 {
-	delete[] m_pVertex;
-	if(m_pPenLine) delete m_pPenLine;
 }
 
 void CCadPolygon::Draw(CDC *pDC,int mode,CPoint Offset,CScale Scale)
@@ -83,69 +55,98 @@ void CCadPolygon::Draw(CDC *pDC,int mode,CPoint Offset,CScale Scale)
 	//---------------------------------------------
 	if (CCadPolygon::m_RenderEnable)
 	{
-		CPen *oldpen;
+		CPen *oldpen = 0, penLine, penPoint;
+		CBrush* oldbrush = 0, brushFill, brushPoint;
 		int Lw;
-		if ((Lw = int(Scale.m_ScaleX * m_Width)) < 1) Lw = 1;
+		CPoint* pP = 0;
 		int i = 0;
 
-		if ((GetLastMode() != mode) || GetDirty())
+		if ((Lw = int(Scale.m_ScaleX * GetAttributes()->m_LineWidth)) < 1) Lw = 1;
+		//-----------------------
+		// need to scale the
+		// verticies
+		//-----------------------
+		pP = new CPoint[GetAttributes()->m_Size];
+		fprintf(theApp.LogFile(), "----------------------------\n");
+		for (i = 0; i < GetAttributes()->m_Size; ++i)
 		{
-			if (m_pPenLine) delete m_pPenLine;
-			switch (mode)
-			{
-			case OBJECT_MODE_FINAL:
-				m_pPenLine = new CPen(PS_SOLID, Lw, m_LineColor);
-				break;
-			case OBJECT_MODE_SELECTED:
-				m_pPenLine = new CPen(PS_SOLID, Lw, RGB(200, 50, 50));
-				break;
-			case OBJECT_MODE_SKETCH:
-				m_pPenLine = new CPen(PS_DOT, 1, m_LineColor);
-				break;
-			}
-			SetDirty(0);
+			fprintf(theApp.LogFile(), "Vertex %d: %d,%d\n", i, GetAttributes()->m_pVertex[i].x, GetAttributes()->m_pVertex[i].y);
+			pP[i] = Scale * GetAttributes()->m_pVertex[i] + Offset;
 		}
+		fprintf(theApp.LogFile(), "----------------------------\n");
+
 		switch (mode)
 		{
 		case OBJECT_MODE_FINAL:
-			oldpen = pDC->SelectObject(m_pPenLine);
-			pDC->MoveTo(Scale * m_pVertex[i] + Offset);
-			for (i = 1; i < m_Count; ++i)
-				pDC->LineTo(Scale * m_pVertex[i] + Offset);
-			pDC->LineTo(Scale * m_pVertex[0] + Offset);
-			pDC->SelectObject(oldpen);
-			SetLastMode(mode);
+			penLine.CreatePen(PS_SOLID, Lw, GetAttributes()->m_LineColor);
+			if(GetAttributes()->m_Transparent || CCadObject::AreShapeFillsDisabled())
+				brushFill.CreateStockObject(HOLLOW_BRUSH);
+			else
+				brushFill.CreateSolidBrush(GetAttributes()->m_FillColor);
 			break;
 		case OBJECT_MODE_SELECTED:
-			oldpen = pDC->SelectObject(m_pPenLine);
-			pDC->MoveTo(Scale * m_pVertex[i] + Offset);
-			for (i = 1; i < this->m_Count; ++i)
-				pDC->LineTo(Scale * m_pVertex[i] + Offset);
-			pDC->LineTo(Scale * m_pVertex[0] + Offset);
-			for (i = 0; i < this->m_Count; ++i)
+			penLine.CreatePen(PS_SOLID, Lw, RGB(200, 50, 50));
+			if (GetAttributes()->m_Transparent || CCadObject::AreShapeFillsDisabled())
+				brushFill.CreateStockObject(HOLLOW_BRUSH);
+			else
+				brushFill.CreateSolidBrush(GetAttributes()->m_FillColor);
+			break;
+		case OBJECT_MODE_SKETCH:
+			penLine.CreatePen(PS_DOT, 1, GetAttributes()->m_LineColor);
+			brushFill.CreateStockObject(HOLLOW_BRUSH);
+			break;
+		}
+		brushPoint.CreateSolidBrush(RGB(0, 0, 255));
+		penPoint.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+		oldpen = pDC->SelectObject(&penLine);
+		oldbrush = pDC->SelectObject(&brushFill);
+		//-------------------------------
+		// Draw the polygon
+		//-------------------------------
+		switch (mode)
+		{
+		case OBJECT_MODE_FINAL:
+			pDC->Polygon(pP, GetAttributes()->m_Size);
+			break;
+		case OBJECT_MODE_SELECTED:
+			i = 0;
+			pDC->Polygon(pP, GetAttributes()->m_Size);
+			pDC->SelectObject(&penPoint);
+			pDC->SelectObject(&brushPoint);	
+			for (i = 0; i < GetAttributes()->m_Size; ++i)
 			{
 				CPoint p1, p2, p;
-				p = Scale * m_pVertex[i] + Offset;
+				p = pP[i];
 				p1 = p + CPoint(4, 4);
 				p2 = p - CPoint(4, 4);
 				CRect rect;
 				rect.SetRect(p2, p1);
 				pDC->Rectangle(&rect);
 			}
-			pDC->SelectObject(oldpen);
-			SetLastMode(mode);
 			break;
 		case OBJECT_MODE_SKETCH:
-			oldpen = pDC->SelectObject(m_pPenLine);
-			pDC->MoveTo(Scale * m_pVertex[i] + Offset);
-			for (i = 1; i < this->m_Count; ++i)
-				pDC->LineTo(Scale * m_pVertex[i] + Offset);
-			SetLastMode(mode);
+			pDC->Polygon(pP, GetAttributes()->m_Size);
+			pDC->SelectObject(oldpen);
+			pDC->SelectObject(&penPoint);
+			pDC->SelectObject(&brushPoint);
+			for (i = 0; i < GetAttributes()->m_Size; ++i)
+			{
+				CPoint p1, p2, p;
+				p = pP[i];
+				p1 = p + CPoint(4, 4);
+				p2 = p - CPoint(4, 4);
+				CRect rect;
+				rect.SetRect(p2, p1);
+				pDC->Rectangle(&rect);
+			}
 			break;
 		case OBJECT_MODE_ERASE:
 			break;
 		}
+		pDC->SelectObject(oldpen);
+		pDC->SelectObject(oldbrush);
 	}
+
 }
 
 void CCadPolygon::Create(CPoint *)
@@ -165,12 +166,12 @@ BOOL CCadPolygon::PointEnclosed(CPoint nP,CSize Off)
 	** Returns: TRUE if point inside
 	**          FALSE if point is outside
 	*****************************************/
-	int   i, j=m_Count-1 ;
+	int   i, j= GetAttributes()->m_Count-1 ;
 	BOOL  Enclosed=0      ;
 	int Xintercept;
-	CPoint *vert = new CPoint[m_Count];
-	for(i=0;i<m_Count;++i)
-		vert[i] = m_pVertex[i] + Off;
+	CPoint *vert = new CPoint[GetAttributes()->m_Count];
+	for(i=0;i< GetAttributes()->m_Count;++i)
+		vert[i] = GetAttributes()->m_pVertex[i] + Off;
 	//--------------------------------------------
 	// Do a precheck agains the rectangle that
 	// encloses the polygon
@@ -182,7 +183,7 @@ BOOL CCadPolygon::PointEnclosed(CPoint nP,CSize Off)
 		// is in polygon, so make a
 		// thorough check
 		//---------------------------------
-		for (i=0; i<m_Count; i++)
+		for (i=0; i< GetAttributes()->m_Count; i++)
 		{
 			if (( (vert[i].y< nP.y && vert[j].y>=nP.y)
 				|| (vert[j].y< nP.y && vert[i].y>=nP.y))
@@ -198,35 +199,35 @@ BOOL CCadPolygon::PointEnclosed(CPoint nP,CSize Off)
 	return Enclosed;
 }
 
-void CCadPolygon::AddPoint(CPoint nP)
+BOOL CCadPolygon::AddPoint(CPoint ptNewPoint, BOOL bInc, BOOL bIncSize)
 {
-	/*************************************
-	** AddPoint
-	**
-	** Adds a new vertex to the polygon.
-	**
-	** parameters:
-	**	nP....point of the new vertex.
-	*************************************/
-	m_pVertex[m_Count] = nP;
+	//-------------------------------------
+	// AddPoint
+	//
+	// Adds a new vertex to the polygon.
+	//
+	// parameters:
+	//	nP....point of the new vertex.
+	//-------------------------------------
+
 	//------------------------------------------
 	// Create a rectangle that enbloses polygon
 	//------------------------------------------
-	if(m_Count == 0)
+	if(GetAttributes()->m_Count == 0)
 	{
-		m_MinX = nP.x;
-		m_MaxX = nP.x;
-		m_MinY = nP.y;
-		m_MaxY = nP.y;
+		m_MinX = ptNewPoint.x;
+		m_MaxX = ptNewPoint.x;
+		m_MinY = ptNewPoint.y;
+		m_MaxY = ptNewPoint.y;
 	}
 	else
 	{
-		if(nP.x > m_MaxX) m_MaxX = nP.x;
-		else if (m_MinX > nP.x) m_MinX = nP.x;
-		if(nP.y > m_MaxY) m_MaxY = nP.y;
-		else if(m_MinY > nP.y) m_MinY = nP.y;
+		if(ptNewPoint.x > m_MaxX) m_MaxX = ptNewPoint.x;
+		else if (m_MinX > ptNewPoint.x) m_MinX = ptNewPoint.x;
+		if(ptNewPoint.y > m_MaxY) m_MaxY = ptNewPoint.y;
+		else if(m_MinY > ptNewPoint.y) m_MinY = ptNewPoint.y;
 	}
-	++m_Count;
+	return GetAttributes()->AddPoint(ptNewPoint, bInc, bIncSize);
 }
 
 int CCadPolygon::GetCount()
@@ -236,7 +237,7 @@ int CCadPolygon::GetCount()
 	**	Retturns the number of points
 	** (verticies) in the polygon
 	***********************************/
-	return m_Count;
+	return GetAttributes()->m_Count;
 }
 
 int CCadPolygon::DeleteLastPoint()
@@ -247,9 +248,9 @@ int CCadPolygon::DeleteLastPoint()
 	** polygon.
 	** RETURNS:new vertex count.
 	**********************************/
-	if(m_Count > 0)
-		--m_Count;
-	return m_Count;
+	if(GetAttributes()->m_Count > 0)
+		--GetAttributes()->m_Count;
+	return GetAttributes()->m_Count;
 }
 
 int CCadPolygon::CompareToLast(CPoint nP)
@@ -267,7 +268,7 @@ int CCadPolygon::CompareToLast(CPoint nP)
 	**	       FALSE if not equal.
 	*********************************/
 	int rV = 0;
-	if(nP == m_pVertex[m_Count - 1])
+	if(nP == GetAttributes()->m_pVertex[GetAttributes()->m_Count - 1])
 		rV = 1;
 	return rV;
 }
@@ -280,7 +281,7 @@ CPoint * CCadPolygon::GetPoints()
 	** Returns the list of points that
 	** define the polygon.
 	*************************************/
-	return m_pVertex;
+	return GetAttributes()->m_pVertex;
 }
 
 void CCadPolygon::Copy(CCadPolygon *pP)
@@ -296,22 +297,22 @@ void CCadPolygon::Copy(CCadPolygon *pP)
 	************************************/
 	int i;
 	CPoint *pPA = pP->GetPoints();
-	this->SetPolySize(pP->GetPolySize());
-	this->SetCount(pP->GetCount());
+	SetPolySize(pP->GetPolySize());
+	SetCount(pP->GetCount());
 	m_MinX = pP->m_MinX;
 	m_MinY = pP->m_MinY;
 	m_MaxX = pP->m_MaxX;
 	m_MaxY = pP->m_MaxY;
 
-	for(i=0;i<m_Count;++i)
+	for(i=0;i< GetAttributes()->m_Count;++i)
 	{
-		this->m_pVertex[i] = pPA[i];
+		GetAttributes()->m_pVertex[i] = pPA[i];
 	}
 }
 
 void CCadPolygon::Reset()
 {
-	m_Count = 0;
+	GetAttributes()->m_Count = 0;
 	SetSelected(0);	//initial not selected
 }
 
@@ -323,26 +324,24 @@ CRect CCadPolygon::GetRect()
 	return Rect;
 }
 
-void CCadPolygon::SetCurPoint(CPoint nP)
+void CCadPolygon::SetCurPoint(CPoint newPoint)
 {
-	m_pVertex[m_Count] = nP;
-	++m_Count;
+	fprintf(theApp.LogFile(), "SetCurPoint (%d,%d) Count:%d  Size:%d\n", newPoint.x, newPoint.y, GetAttributes()->m_Count, GetAttributes()->m_Size);
+	GetAttributes()->m_pVertex[GetAttributes()->m_Count] = newPoint;
 }
 
 CCadPolygon CCadPolygon::operator=(CCadPolygon &v)
 {
-	this->m_pPenLine =0;
-	m_size = v.m_size;
-	m_Count = v.m_Count;
-	m_Width = v.m_Width;
-	m_LineColor = v.m_LineColor;
+	GetAttributes()->m_Size = v.GetAttributes()->m_Size;
+	GetAttributes()->m_Count = v.GetAttributes()->m_Count;
+	GetAttributes()->m_LineWidth = v.GetAttributes()->m_LineWidth;
+	GetAttributes()->m_LineColor = v.GetAttributes()->m_LineColor;
 	m_MaxY = v.m_MaxY;
 	m_MinY = v.m_MinY;
 	m_MaxX = v.m_MaxX;
 	m_MinX = v.m_MinX;
-	m_PolyID = v.m_PolyID;
-	for(int i=0;i<m_Count	;++i)
-		m_pVertex[i] = v.m_pVertex[i];
+	for(int i=0;i< GetAttributes()->m_Count	;++i)
+		GetAttributes()->m_pVertex[i] = v.GetAttributes()->m_pVertex[i];
 	return *this;
 }
 
@@ -356,14 +355,26 @@ int CCadPolygon::Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, C
 	//--------------------------------------------------------
 	// Polygon		-> POLY '(' PolyParams ')' '{' Vertex '}';
 	//--------------------------------------------------------
-	
-	LookAHeadToken = pParser->Expect(TOKEN_POLY, LookAHeadToken, pIN);
+	BOOL Loop = 1;
+
+	switch (LookAHeadToken)
+	{
+	case TOKEN_POLY:
+		LookAHeadToken = pParser->Expect(TOKEN_POLY, LookAHeadToken, pIN);
+		break;
+	case TOKEN_POLYFILL:
+		LookAHeadToken = pParser->Expect(TOKEN_POLYFILL, LookAHeadToken, pIN);
+		break;
+	default:
+		break;
+	}
 	LookAHeadToken = pParser->Expect('(', LookAHeadToken, pIN);
-	LookAHeadToken = PolyParams(pIN,LookAHeadToken, ppDrawing, pParser);
+	LookAHeadToken = PolyParams(pIN, LookAHeadToken, ppDrawing, pParser);
 	LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
 	LookAHeadToken = pParser->Expect('{', LookAHeadToken, pIN);
 	LookAHeadToken = Vertex(pIN, LookAHeadToken, ppDrawing, pParser);
 	LookAHeadToken = pParser->Expect('}', LookAHeadToken, pIN);
+
 	(*ppDrawing)->AddObject(this);
 	return LookAHeadToken;
 }
@@ -373,9 +384,12 @@ int CCadPolygon::PolyParams(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawi
 	//--------------------------------------------------------
 	// PolyParams	-> LINECOLLOR '(' COLOR ')'
 	//				-> LINEWIDTH '(' NUMBER ')'
+	//				-> FILL_COLOR '(' COLOR ')'
+	//				-> TRANSPARENT
 	//				-> .
 	//--------------------------------------------------------
 	BOOL Loop = 1;
+
 	while (Loop)
 	{
 		switch (LookAHeadToken)
@@ -384,10 +398,19 @@ int CCadPolygon::PolyParams(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawi
 			LookAHeadToken = pParser->Expect(',',LookAHeadToken, pIN);
 			break;
 		case TOKEN_LINE_COLOR:
-			LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, m_LineColor, LookAHeadToken);
+			LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, GetAttributes()->m_LineColor, LookAHeadToken);
 			break;
 		case TOKEN_LINE_WIDTH:
-			LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_Width, LookAHeadToken);
+			LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, GetAttributes()->m_LineWidth, LookAHeadToken);
+			break;
+		case TOKEN_FILL_COLOR:
+			LookAHeadToken = pParser->Color(TOKEN_FILL_COLOR, pIN, GetAttributes()->m_FillColor, LookAHeadToken);
+			break;
+		case TOKEN_TRANSPARENT:
+			LookAHeadToken = pParser->DecimalValue(TOKEN_TRANSPARENT, pIN, GetAttributes()->m_Transparent, LookAHeadToken);
+			break;
+		case ')':
+			Loop = FALSE;
 			break;
 		default:
 			Loop = FALSE;
@@ -402,7 +425,7 @@ int CCadPolygon::Vertex(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, 
 	//--------------------------------------------------------
 	// Vertex		-> VERTEX '(' NUMBEER ')' '[' VertexList ']';
 	//--------------------------------------------------------
-	LookAHeadToken = pParser->DecimalValue(TOKEN_VERTEX, pIN, m_Count, LookAHeadToken);
+	LookAHeadToken = pParser->DecimalValue(TOKEN_VERTEX, pIN, GetAttributes()->m_Size,LookAHeadToken);
 	LookAHeadToken = pParser->Expect('[', LookAHeadToken, pIN);
 	LookAHeadToken = VertexList(pIN, LookAHeadToken, ppDrawing, pParser);
 	LookAHeadToken = pParser->Expect(']', LookAHeadToken, pIN);
@@ -414,23 +437,24 @@ int CCadPolygon::VertexList(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawi
 	//--------------------------------------------------------
 	// VertexList	-> VERTEX_POINT '(' NUMBER ',' NUMBER ')' VertexList1;
 	//--------------------------------------------------------
-	LookAHeadToken = pParser->Point(TOKEN_VERTEX_POINT, pIN, m_pVertex[m_InCount++], LookAHeadToken);
-	LookAHeadToken = VertexList1(pIN, LookAHeadToken, ppDrawing, pParser);
-	return LookAHeadToken;
-}
+	BOOL Loop = TRUE;
+	CPoint ptTemp;
 
-int CCadPolygon::VertexList1(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing, CFileParser* pParser)
-{
-	//--------------------------------------------------------
-	// VertexList1	-> ',' VertexList
-	//				-> .
-	//--------------------------------------------------------
-	switch (LookAHeadToken)
+	while (Loop)
 	{
-	case ',':
-		LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-		LookAHeadToken = VertexList(pIN, LookAHeadToken, ppDrawing, pParser);
-		break;
+		switch (LookAHeadToken)
+		{
+		case TOKEN_VERTEX_POINT:
+			LookAHeadToken = pParser->Point(TOKEN_VERTEX_POINT, pIN, ptTemp, LookAHeadToken);
+			AddPoint(ptTemp,TRUE, FALSE);
+			break;
+		case ',':
+			LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
+			break;
+		default:
+			Loop = FALSE;
+			break;
+		}
 	}
 	return LookAHeadToken;
 }
@@ -451,20 +475,20 @@ void CCadPolygon::Save(FILE* pO, int Indent)
 	fprintf(pO, "%s%s(%s,%s)\n%s{\n%s%s\n%s[\n",
 		Indent1,
 		CFileParser::TokenLookup(TOKEN_POLY),
-		CFileParser::SaveColor(s3, 64, m_LineColor, TOKEN_LINE_COLOR),
-		CFileParser::SaveDecimalValue(s4, 64, TOKEN_LINE_WIDTH, m_Width),
+		CFileParser::SaveColor(s3, 64, GetAttributes()->m_LineColor, TOKEN_LINE_COLOR),
+		CFileParser::SaveDecimalValue(s4, 64, TOKEN_LINE_WIDTH, GetAttributes()->m_LineWidth),
 		Indent1,
 		Indent2,
-		CFileParser::SaveDecimalValue(s5, 64, TOKEN_VERTEX, m_Count),
+		CFileParser::SaveDecimalValue(s5, 64, TOKEN_VERTEX, GetAttributes()->m_Size),
 		Indent2
 	);
-	for (int i = 0; i < m_Count; ++i)
+	for (int i = 0; i < GetAttributes()->m_Size; ++i)
 	{
 		fprintf(pO, "%s%s", 
 			Indent3,
-			CFileParser::SavePoint(s4,64,TOKEN_VERTEX_POINT, m_pVertex[i])
+			CFileParser::SavePoint(s4,64,TOKEN_VERTEX_POINT, GetAttributes()->m_pVertex[i])
 		);
-		if (i < (m_Count - 1))
+		if (i < (GetAttributes()->m_Size - 1))
 			fprintf(pO, ",\n");
 		else
 			fprintf(pO, "\n%s]\n%s}\n", Indent2,Indent1);
@@ -482,9 +506,9 @@ int CCadPolygon::GrabVertex(CPoint point)
 	CRect rect;
 	CPoint p1,p2,p;
 
-	for(i=0,loop=1;(i<this->m_Count) && loop;++i)
+	for(i=0,loop=1;(i<this->GetAttributes()->m_Count) && loop;++i)
 	{
-		p = m_pVertex[i];
+		p = GetAttributes()->m_pVertex[i];
 		p1 = p + CPoint(-4,-4);
 		p2 = p + CPoint(4,4);
 		rect.SetRect(p1,p2);
@@ -500,7 +524,7 @@ int CCadPolygon::GrabVertex(CPoint point)
 
 void CCadPolygon::SetVertex(int Vi, CPoint p)
 {
-	this->m_pVertex[Vi] = p;
+	GetAttributes()->m_pVertex[Vi] = p;
 	UpdateMinMax();
 }
 
@@ -508,10 +532,10 @@ void CCadPolygon::Move(CPoint p)
 {
 	CPoint Diff;
 
-	Diff = p - m_pVertex[0];
+	Diff = p - GetAttributes()->m_pVertex[0];
 	int i;
-	for(i=0;i<m_Count;++i)
-		m_pVertex[i] += Diff;
+	for(i=0;i< GetAttributes()->m_Count;++i)
+		GetAttributes()->m_pVertex[i] += Diff;
 	UpdateMinMax();
 }
 
@@ -522,18 +546,18 @@ void CCadPolygon::UpdateMinMax()
 	m_MaxX = 0;
 	m_MinY = 0;
 	m_MaxY = 0;
-	for(i=0;i<m_Count;++i)
+	for(i=0;i< GetAttributes()->m_Count;++i)
 	{
-		if(m_pVertex[i].x > m_MaxX) m_MaxX = m_pVertex[i].x;
-		else if (m_MinX > m_pVertex[i].x) m_MinX = m_pVertex[i].x;
-		if(m_pVertex[i].y > m_MaxY) m_MaxY = m_pVertex[i].y;
-		else if(m_MinY > m_pVertex[i].y) m_MinY = m_pVertex[i].y;
+		if(GetAttributes()->m_pVertex[i].x > m_MaxX) m_MaxX = GetAttributes()->m_pVertex[i].x;
+		else if (m_MinX > GetAttributes()->m_pVertex[i].x) m_MinX = GetAttributes()->m_pVertex[i].x;
+		if(GetAttributes()->m_pVertex[i].y > m_MaxY) m_MaxY = GetAttributes()->m_pVertex[i].y;
+		else if(m_MinY > GetAttributes()->m_pVertex[i].y) m_MinY = GetAttributes()->m_pVertex[i].y;
 	}
 }
 
 CPoint CCadPolygon::GetReference()
 {
-	return m_pVertex[0];
+	return GetAttributes()->m_pVertex[0];
 }
 
 void CCadPolygon::AdjustRefernce(CPoint p)
@@ -549,8 +573,8 @@ void CCadPolygon::AdjustRefernce(CPoint p)
 	//-----------------------------------------
 	SetP1(GetP1() - p);
 	int i;
-	for(i=0;i<m_Count;++i)
-		m_pVertex[i] -= p;
+	for(i=0;i< GetAttributes()->m_Count;++i)
+		GetAttributes()->m_pVertex[i] -= p;
 	UpdateMinMax();
 }
 
@@ -570,8 +594,8 @@ void CCadPolygon::ChangeCenter(CSize p)
 {
 	SetP1(GetP1() - p);
 	int i;
-	for (i = 0; i<m_Count; ++i)
-		m_pVertex[i] -= p;
+	for (i = 0; i< GetAttributes()->m_Count; ++i)
+		GetAttributes()->m_pVertex[i] -= p;
 	UpdateMinMax();
 
 }
@@ -586,4 +610,27 @@ CSize CCadPolygon::GetSize()
 
 void CCadPolygon::ChangeSize(CSize Sz)
 {
+}
+
+BOOL PolyAttributes::AddPoint(CPoint p, BOOL bInc, BOOL bIncSizeToo)
+{
+	BOOL rV = TRUE;
+	int c, s;
+
+	c = m_Count;
+	s = m_Size;
+	if (m_Count >= POLY_MAX_VERTECIES)
+		rV = FALSE;
+	else
+	{
+		if(bInc)
+			m_pVertex[m_Count++] = p;
+		else
+			m_pVertex[m_Count] = p;
+		if(bIncSizeToo)
+			++m_Size;
+
+	}
+	fprintf(theApp.LogFile(), "AddPoint: (OldCount:%d OldSize:%d) Count=%d Size=%d  P(%d,%d)\n", c, s,m_Count, m_Size, p.x, p.y);
+	return rV;
 }

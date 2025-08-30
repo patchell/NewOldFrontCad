@@ -8,14 +8,14 @@
 
 
 struct ArcAttributes {
-	int m_Width;
+	int m_LineWidth;
 	COLORREF m_LineColor;
 	CPoint m_Start;
 	CPoint m_End;
 	int m_StartAngle;
 	int m_EndAngle;
 	ArcAttributes() {
-		m_Width = 0;
+		m_LineWidth = 0;
 		m_LineColor = RGB(0,0,0);
 		m_Start = CPoint(0,0);
 		m_End = CPoint(0, 0);
@@ -45,8 +45,8 @@ public:
 	virtual void Draw(CDC *pDC,int mode=0,CPoint Offset=CPoint(0,0),CScale Scale=CScale(0.1,0.1));
 	virtual int CheckSelected(CPoint p, CSize Offset = CSize(0, 0));
 	virtual void AdjustRefernce(CPoint Ref);
-	void SetWidth(int w){m_atrb.m_Width = w;}
-	int GetWidth(void){return m_atrb.m_Width;}
+	void SetLineWidth(int w){m_atrb.m_LineWidth = w;}
+	int GetLineWidth(void){return m_atrb.m_LineWidth;}
 	void SetLineColor(COLORREF c){m_atrb.m_LineColor = c;}
 	COLORREF GetLineColor(void){return m_atrb.m_LineColor;}
 	void SetEndAngle(int Angle);

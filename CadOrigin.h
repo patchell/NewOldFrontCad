@@ -5,10 +5,10 @@
 #define ORIGINATRIB
 
 struct OriginAttrib {
-	int m_Width;
+	int m_LineWidth;
 	COLORREF m_Color;
 	OriginAttrib() {
-		m_Width = 1;
+		m_LineWidth = 1;
 		m_Color = RGB(0, 0, 0);
 	}
 } ;
@@ -22,7 +22,6 @@ class CCadOrigin :public CCadObject
 	inline static int m_RenderEnable = 1;
 	OriginAttrib m_Atrib;
 	CFrontCadView *m_pMainView;
-	CPen *m_pPenLine;
 public:
 	CCadOrigin();
 	CCadOrigin(CCadOrigin &v);
@@ -36,20 +35,21 @@ public:
 	virtual int CheckSelected(CPoint p, CSize Offset = CSize(0, 0));
 	virtual CPoint GetReference();
 	virtual CCadObject *GetHead(void) { return 0; }
-	virtual void MakeDirty(void);
+	
 	virtual void SetSelected(int Flag = 0);
 	virtual void AdjustRefernce(CPoint Ref);
 	virtual CRect GetRect(void);
 	inline void SetParent(CFrontCadView *pW) { m_pMainView = pW; }
 	inline void SetColor(COLORREF c) { m_Atrib.m_Color = c; }
 	inline COLORREF GetColor(void) { return m_Atrib.m_Color; }
-	inline void SetWidth(int w) { m_Atrib.m_Width = w; }
-	inline int GetWidth(void) { return m_Atrib.m_Width; }
+	inline void SetLineWidth(int w) { m_Atrib.m_LineWidth = w; }
+	inline int GetLineWidth(void) { return m_Atrib.m_LineWidth; }
 	virtual void RenderEnable(int e);
 	virtual CPoint GetCenter();
 	// Moves the center of the object to the spcified point
 	virtual void ChangeCenter(CSize p);
 	virtual CSize GetSize();
 	virtual void ChangeSize(CSize Sz);
+	OriginAttrib* GetAttributes() { return &m_Atrib; }
 };
 

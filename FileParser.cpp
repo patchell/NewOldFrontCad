@@ -497,10 +497,10 @@ int CFileParser::PrintRect(FILE* pIN, int Token, CCadObject* pO)
 			Token = Color(TOKEN_COLOR, pIN, pPR->m_Attrib.m_LineColor, Token);
 			break;
 		case TOKEN_LINE_WIDTH:
-			Token = DecimalValue(TOKEN_LINE_WIDTH, pIN, pPR->m_Attrib.m_Width, Token);
+			Token = DecimalValue(TOKEN_LINE_WIDTH, pIN, pPR->m_Attrib.m_LineWidth, Token);
 			break;
 		case TOKEN_SIZE:
-			Token = Size(TOKEN_SIZE, pIN, pPR->m_Size, Token);
+			Token = Size(TOKEN_SIZE, pIN, pPR->GetAttributes()->m_Size, Token);
 			break;
 		case ',':
 			Token = Expect(',', Token, pIN);
@@ -567,12 +567,9 @@ int CFileParser::DrawObjects(FILE* pIN, int Token, CCadObject* pO)
 			Token = DrawingObjects.pRndedRect->Parse(pIN, Token, &pDraw, this);
 			break;
 		case TOKEN_POLY:
+		case TOKEN_POLYFILL:
 			DrawingObjects.pPoly = new CCadPolygon;
 			Token = DrawingObjects.pPoly->Parse(pIN, Token, &pDraw, this);
-			break;
-		case TOKEN_POLYFILL:
-			DrawingObjects.pPolyFill = new CCadPolygonFill;
-			Token = DrawingObjects.pPolyFill->Parse(pIN, Token, &pDraw, this);
 			break;
 		case TOKEN_LINE:
 			DrawingObjects.pLine = new CCadLine;
@@ -631,7 +628,7 @@ int CFileParser::Point(int TargeToken, FILE* pIN, CPoint& Point, int Token)
 	Token = Expect(TOKEN_NUM, Token, pIN);
 	Token = Expect(')', Token, pIN);
 	Point = CPoint(x, y);
-	fprintf(theApp.GetLog(), "CParser::Point(%d,%d)\n", x, y);
+	fprintf(theApp.LogFile(), "CParser::Point(%d,%d)\n", x, y);
 	return Token;
 }
 

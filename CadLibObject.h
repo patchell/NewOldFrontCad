@@ -32,7 +32,6 @@ public:
 	static int IsRenderEnabled() { return m_RenderEnable; }
 	virtual CRect GetRect(void);
 	void AdjustRefernce(CPoint Ref);
-	virtual void MakeDirty(void);
 	virtual CPoint GetReference();
 	virtual void Move(CPoint p);
 	virtual void SetVertex(int Vi,CPoint p);

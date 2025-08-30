@@ -3,16 +3,13 @@
 
 CCadPrintRect::CCadPrintRect():CCadObject(OBJECT_TYPE_PRINTRECT)
 {
-	m_pPenLine = 0;
-	m_Attrib.m_LineColor = 0;
-	m_Attrib.m_Width = 0;
 }
 
 CCadPrintRect::CCadPrintRect(CCadPrintRect &PR) : CCadObject(OBJECT_TYPE_PRINTRECT)
 {
-	m_pPenLine = 0;
 	m_Attrib.m_LineColor = PR.m_Attrib.m_LineColor;
-	m_Attrib.m_Width = PR.m_Attrib.m_Width;
+	m_Attrib.m_LineWidth = PR.m_Attrib.m_LineWidth;
+	GetAttributes()->m_Size = PR.GetAttributes()->m_Size;
 	SetP1(PR.GetP1());
 	SetP2(PR.GetP2());
 }
@@ -20,7 +17,6 @@ CCadPrintRect::CCadPrintRect(CCadPrintRect &PR) : CCadObject(OBJECT_TYPE_PRINTRE
 
 CCadPrintRect::~CCadPrintRect()
 {
-	if (m_pPenLine) delete m_pPenLine;
 }
 
 
@@ -37,16 +33,18 @@ void CCadPrintRect::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 	//		Offset...Offset to add to points
 	//		Scale....Sets Units to Pixels ratio
 	//---------------------------------------------
-	CPen *pOld;
+	CPen *pOld, penLine, penPoint;
+	CBrush* pOldB, brushFill, brushPoint;
 	CRect rect;
 	CSize rectLWcomp;
 	CPoint P1, P2;
 	int Lw;
+	CSize p = CSize(4, 4);
 
 	if (!CCadPrintRect::m_RenderEnable) return;	//don't print
 	P1 = Scale * GetP1() + Offset;
-	P2 = P1 + Scale * m_Size;;
-	Lw = int(m_Attrib.m_Width * Scale.m_ScaleX);
+	P2 = P1 + Scale * GetAttributes()->m_Size;;
+	Lw = int(m_Attrib.m_LineWidth * Scale.m_ScaleX);
 	if (Lw <= 1 || OBJECT_MODE_SKETCH == mode)
 	{
 		Lw = 1;
@@ -54,72 +52,52 @@ void CCadPrintRect::Draw(CDC *pDC, int mode, CPoint Offset, CScale Scale)
 	}
 	else
 		rectLWcomp = CSize(Lw / 2, Lw / 2);
-	if (GetLastMode() != mode || GetDirty())
-	{
-		if (m_pPenLine) delete m_pPenLine;
-		switch (mode)
-		{
-		case OBJECT_MODE_FINAL:
-			m_pPenLine = new CPen(PS_SOLID, Lw, m_Attrib.m_LineColor);
-			break;
-		case OBJECT_MODE_SELECTED:
-			m_pPenLine = new CPen(PS_SOLID, Lw, RGB(200, 50, 50));
-			break;
-		case OBJECT_MODE_SKETCH:
-			m_pPenLine = new CPen(PS_DOT, 1, m_Attrib.m_LineColor);
-			break;
-		}
-	}
-	if (GetDirty())
-	{
-		SetDirty(0);
-	}
+	SetRect(rect, P1 - rectLWcomp, P2 + rectLWcomp, CSize(Lw, Lw));
 	switch (mode)
 	{
 	case OBJECT_MODE_FINAL:
-		pOld = pDC->SelectObject(m_pPenLine);
-		pDC->MoveTo(P1);
-		pDC->LineTo(P1.x, P2.y);
-		pDC->LineTo(P2);
-		pDC->LineTo(P2.x, P1.y);
-		pDC->LineTo(P1);
-		pDC->SelectObject(pOld);
+		penLine.CreatePen(PS_SOLID, Lw, m_Attrib.m_LineColor);
 		break;
 	case OBJECT_MODE_SELECTED:
+		penLine.CreatePen(PS_SOLID, Lw, RGB(200, 50, 50));
+		break;
+	case OBJECT_MODE_SKETCH:
+		penLine.CreatePen(PS_DOT, 1, m_Attrib.m_LineColor);
+		break;
+	}
+	brushFill.CreateStockObject(NULL_BRUSH);
+	penPoint.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+	brushPoint.CreateSolidBrush(RGB(0, 0, 255));
+	pOld = (CPen*)pDC->SelectObject(&penLine);
+	pOldB = (CBrush*)pDC->SelectObject(&brushFill);
+	switch (mode)
 	{
-		CPen SelPen;
-		CBrush SelBrush;
-		SelPen.CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-		SelBrush.CreateSolidBrush(RGB(255, 0, 0));
-		pOld = pDC->SelectObject(m_pPenLine);
-		pDC->MoveTo(P1);
-		pDC->LineTo(P1.x, P2.y);
-		pDC->LineTo(P2);
-		pDC->LineTo(P2.x, P1.y);
-		pDC->LineTo(P1);
-		pDC->SelectObject(&SelPen);
-		pDC->SelectObject(&SelBrush);
-		CSize p = CSize(4, 4);
+	case OBJECT_MODE_FINAL:
+		pDC->Rectangle(&rect);
+		break;
+	case OBJECT_MODE_SELECTED:
+		pDC->Rectangle(&rect);
+		pDC->SelectObject(&penPoint);
+		pDC->SelectObject(&brushPoint);
 		rect.SetRect(P1 - p, P1 + p);
 		pDC->Rectangle(&rect);
 		rect.SetRect(P2 - p, P2 + p);
 		pDC->Rectangle(&rect);
-		pDC->SelectObject(pOld);
-	}
-	break;
+		break;
 	case OBJECT_MODE_SKETCH:
-		pOld = pDC->SelectObject(m_pPenLine);
-		pDC->MoveTo(P1);
-		pDC->LineTo(P1.x, P2.y);
-		pDC->LineTo(P2);
-		pDC->LineTo(P2.x, P1.y);
-		pDC->LineTo(P1);
-		pDC->SelectObject(pOld);
+		pDC->Rectangle(&rect);
+		pDC->SelectObject(&penPoint);
+		pDC->SelectObject(&brushPoint);
+		rect.SetRect(P1 - p, P1 + p);
+		pDC->Rectangle(&rect);
+		rect.SetRect(P2 - p, P2 + p);
+		pDC->Rectangle(&rect);
 		break;
 	case OBJECT_MODE_ERASE:
 		break;
 	}
-	SetLastMode(mode);
+	pDC->SelectObject(pOld);
+	pDC->SelectObject(pOldB);
 }
 
 int CCadPrintRect::CheckSelected(CPoint p,CSize O)
@@ -127,7 +105,7 @@ int CCadPrintRect::CheckSelected(CPoint p,CSize O)
 	CRect rect;
 	int rV;
 	CPoint P1 = GetP1() + O;
-	CPoint P2 = P1 + m_Size;
+	CPoint P2 = P1 + GetAttributes()->m_Size;
 	rect.SetRect(P1, P2);
 	rect.NormalizeRect();
 	rV = (int)rect.PtInRect(p);
@@ -140,9 +118,9 @@ int CCadPrintRect::Parse(FILE* pIN, int LookAHeadToken, CCadDrawing** ppDrawing,
 	LookAHeadToken = pParser->Expect('(', LookAHeadToken, pIN);
 	LookAHeadToken = pParser->Point(TOKEN_POINT_1, pIN, GetP1(), LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->Size(TOKEN_SIZE, pIN, m_Size, LookAHeadToken);
+	LookAHeadToken = pParser->Size(TOKEN_SIZE, pIN, GetAttributes()->m_Size, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
-	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_Attrib.m_Width, LookAHeadToken);
+	LookAHeadToken = pParser->DecimalValue(TOKEN_LINE_WIDTH, pIN, m_Attrib.m_LineWidth, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(',', LookAHeadToken, pIN);
 	LookAHeadToken = pParser->Color(TOKEN_LINE_COLOR, pIN, m_Attrib.m_LineColor, LookAHeadToken);
 	LookAHeadToken = pParser->Expect(')', LookAHeadToken, pIN);
@@ -162,8 +140,8 @@ void CCadPrintRect::Save(FILE *pO,  int Indent)
 		theApp.IndentString(s, 256, Indent),
 		CFileParser::TokenLookup(TOKEN_PRINTRECT),
 		CFileParser::SavePoint(s1, 64, TOKEN_POINT_1, GetP1()),
-		CFileParser::SaveSize(s2, 64, TOKEN_SIZE, m_Size),
-		CFileParser::SaveDecimalValue(s3,64,TOKEN_LINE_WIDTH,m_Attrib.m_Width),
+		CFileParser::SaveSize(s2, 64, TOKEN_SIZE, GetAttributes()->m_Size),
+		CFileParser::SaveDecimalValue(s3,64,TOKEN_LINE_WIDTH,m_Attrib.m_LineWidth),
 		CFileParser::SaveColor(s4,64, m_Attrib.m_LineColor,TOKEN_LINE_COLOR)
 	);
 	delete[]s4;
@@ -178,7 +156,7 @@ CCadPrintRect CCadPrintRect::operator=(CCadPrintRect &v)
 	SetP1(v.GetP1());
 	SetP2(v.GetP2());
 	m_Attrib.m_LineColor = v.m_Attrib.m_LineColor;
-	m_Attrib.m_Width = v.m_Attrib.m_Width;
+	m_Attrib.m_LineWidth = v.m_Attrib.m_LineWidth;
 	return *this;
 }
 
@@ -239,7 +217,7 @@ CRect CCadPrintRect::GetRect()
 {
 	CRect rect;
 
-	rect.SetRect(GetP1(), GetP1() + m_Size);
+	rect.SetRect(GetP1(), GetP1() + GetAttributes()->m_Size);
 	rect.NormalizeRect();
 	return rect;
 }
